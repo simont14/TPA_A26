@@ -28,3 +28,17 @@ Thumbs.db
 
 # Sorties
 *.log
+
+# Fichiers de compilation LaTeX (regeneres a chaque compilation, pas le .pdf final)
+*.aux
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.nav
+*.snm

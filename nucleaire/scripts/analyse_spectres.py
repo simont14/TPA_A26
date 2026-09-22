@@ -285,23 +285,25 @@ def plot_spectrum(key, title, filename, xlim, mark_peaks=None, bg_key=None, ysca
         floor = cps[(cps > 0) & mask].min() if np.any((cps > 0) & mask) else 1e-3
         ax.set_ylim(floor * 0.5, ymax * 5)
     else:
-        ax.set_ylim(0, ymax * 1.35)
+        ax.set_ylim(0, ymax * 1.45)
 
     if mark_peaks:
         counts = d["counts"]
+        smooth_kernel = np.ones(5) / 5
+        counts_smooth = np.convolve(counts, smooth_kernel, mode="same")
         for pk in mark_peaks:
             Epk = pk["energy"]
             mu = pk.get("mu")
             sigma = pk.get("sigma")
             if mu is not None and sigma is not None:
-                # Snap the marker to the true maximum bin of the actual
-                # (plotted) histogram near the fitted centroid, so the red
-                # line always lands exactly on the visible peak apex rather
-                # than on the literature energy (which can differ slightly
-                # from the fit due to calibration residuals).
+                # Snap the marker to the apex of a lightly smoothed version of
+                # the histogram near the fitted centroid, so the dotted line
+                # lands visually centered on the peak tip rather than on a
+                # single noisy bin or on the literature energy (which can
+                # differ slightly from the fit due to calibration residuals).
                 lo_c = max(0, int(round(mu - 1.5 * sigma)))
                 hi_c = min(len(counts), int(round(mu + 1.5 * sigma)) + 1)
-                idx = lo_c + int(np.argmax(counts[lo_c:hi_c]))
+                idx = lo_c + int(np.argmax(counts_smooth[lo_c:hi_c]))
                 E_line, local_max = E[idx], cps[idx]
             else:
                 window = (E > Epk - 20) & (E < Epk + 20)
@@ -311,12 +313,13 @@ def plot_spectrum(key, title, filename, xlim, mark_peaks=None, bg_key=None, ysca
                 else:
                     E_line, local_max = Epk, ymax
 
-            label_y = local_max * 1.8 if yscale == "log" else local_max + ymax * 0.06
+            label_y = local_max * 2.2 if yscale == "log" else local_max + ymax * 0.08
             ax.axvline(E_line, color="red", ls=":", lw=1, alpha=0.7)
             ax.annotate(f"{Epk:.2f} keV",
                         xy=(E_line, local_max), xytext=(E_line, label_y),
-                        rotation=90, ha="center", va="bottom",
-                        fontsize=8, color="red")
+                        ha="center", va="bottom",
+                        fontsize=8, color="red",
+                        bbox=dict(facecolor="white", edgecolor="none", alpha=0.75, pad=1))
 
     ax.set_xlabel("Energie (keV)")
     ax.set_ylabel("Taux de comptage (coups/s)")
@@ -337,5 +340,145 @@ for key, info in SOURCES.items():
 bg_xlim = (0, chan_to_E(data[BACKGROUND_FILE]["channels"].max()))
 plot_spectrum(BACKGROUND_FILE, "Bruit de fond (background)",
               f"{plot_num:02d}_spectre_background.png", bg_xlim, yscale="log")
+plot_num += 1
+
+# ---------------------------------------------------------------------------
+# 6) Identification de la raie dominante du bruit de fond (K-40, 1460.8 keV)
+# ---------------------------------------------------------------------------
+K40_ENERGY = 1460.8  # keV, litterature (IAEA)
+
+d_bg = data[BACKGROUND_FILE]
+E_bg_grid = chan_to_E(d_bg["channels"])
+guess_ch_k40 = float(np.interp(K40_ENERGY, E_bg_grid, d_bg["channels"]))
+k40_fit = fit_peak(d_bg["channels"], d_bg["counts"], guess_ch_k40, half_win=220)
+
+if k40_fit is not None:
+    slope_k40 = np.polyval(np.polyder(model_coef), k40_fit["mu"])
+    k40_E_mesuree = chan_to_E(k40_fit["mu"])
+    k40_E_err = k40_fit["mu_err"] * slope_k40
+    print(f"\nBruit de fond: pic dominant a {k40_E_mesuree:.1f} +/- {k40_E_err:.1f} keV "
+          f"(K-40 attendu: {K40_ENERGY:.1f} keV)")
+else:
+    print("\nBruit de fond: pic du K-40 non trouve automatiquement.")
+
+fig, ax = plt.subplots(figsize=(8.5, 5))
+E_bg = E_bg_grid
+cps_bg = d_bg["counts"] / d_bg["live"]
+ax.step(E_bg, cps_bg, where="mid", color="0.35", lw=0.8)
+ax.set_yscale("log")
+mask_bg = (E_bg >= bg_xlim[0]) & (E_bg <= bg_xlim[1])
+floor_bg = cps_bg[(cps_bg > 0) & mask_bg].min()
+ax.set_ylim(floor_bg * 0.5, cps_bg[mask_bg].max() * 5)
+ax.set_xlim(*bg_xlim)
+if k40_fit is not None:
+    idx_k40 = np.argmin(np.abs(E_bg - k40_E_mesuree))
+    y_k40 = cps_bg[max(0, idx_k40 - 3):idx_k40 + 4].max()
+    ax.axvline(k40_E_mesuree, color="red", ls=":", lw=1.2)
+    ax.annotate(
+        f"$^{{40}}$K, {k40_E_mesuree:.0f} keV",
+        xy=(k40_E_mesuree, y_k40),
+        xytext=(k40_E_mesuree - 430, y_k40 * 12),
+        fontsize=9, color="red", ha="left", va="center",
+        arrowprops=dict(arrowstyle="->", color="red", lw=1),
+        bbox=dict(facecolor="white", edgecolor="none", alpha=0.8, pad=1.5),
+    )
+ax.set_xlabel("Energie (keV)")
+ax.set_ylabel("Taux de comptage (coups/s)")
+ax.set_title("Bruit de fond ambiant: identification du $^{40}$K", pad=14)
+fig.tight_layout()
+fig.savefig(os.path.join(OUT_DIR, f"{plot_num:02d}_background_K40.png"), dpi=200)
+plt.close(fig)
+plot_num += 1
+
+# ---------------------------------------------------------------------------
+# 7) Anatomie d'un spectre gamma: front Compton et pic de retrodiffusion
+#    (illustre sur le spectre du Cs-137, qui n'a qu'une seule raie a 661.7 keV)
+# ---------------------------------------------------------------------------
+MC2 = 511.0  # keV, energie de masse au repos de l'electron
+E_CS137 = 661.7
+E_compton_edge = 2 * E_CS137**2 / (MC2 + 2 * E_CS137)
+E_backscatter = E_CS137 - E_compton_edge
+
+print(f"\nCs-137: front Compton attendu a {E_compton_edge:.1f} keV, "
+      f"pic de retrodiffusion attendu a {E_backscatter:.1f} keV")
+
+d_cs = data["CS_137_1"]
+E_cs = chan_to_E(d_cs["channels"])
+cps_cs = d_cs["counts"] / d_cs["live"]
+
+fig, ax = plt.subplots(figsize=(9, 5.5))
+ax.step(E_cs, cps_cs, where="mid", color="tab:blue", lw=1.1)
+ax.set_xlim(0, 750)
+mask_cs = (E_cs >= 0) & (E_cs <= 750)
+ymax_cs = cps_cs[mask_cs].max()
+ax.set_ylim(0, ymax_cs * 1.5)
+
+photopeak_cs = [p for p in peak_results["CS_137_1"] if abs(p["energy"] - E_CS137) < 1][0]
+
+# (energie de la ligne, texte, couleur, decalage vertical du label au-dessus
+#  du point local, position horizontale du label en fraction de l'axe des x)
+annotations = [
+    (E_CS137, "Photopic (effet\nphotoelectrique)\n661,7 keV", "tab:red", 0.16, E_CS137),
+    (E_backscatter, "Pic de\nretrodiffusion\n" + f"$\\approx${E_backscatter:.0f} keV", "tab:green", 0.16, E_backscatter - 55),
+    (E_compton_edge, "Front Compton\n" + f"$\\approx${E_compton_edge:.0f} keV", "tab:purple", 0.16, E_compton_edge + 55),
+]
+
+for E_line, label, color, dy_frac, x_text in annotations:
+    idx = np.argmin(np.abs(E_cs - E_line))
+    y_local = cps_cs[max(0, idx - 3):idx + 4].max()
+    ax.axvline(E_line, color=color, ls=":", lw=1.3, alpha=0.8)
+    ax.annotate(
+        label, xy=(E_line, y_local), xytext=(x_text, y_local + dy_frac * ymax_cs),
+        fontsize=8, color=color, ha="center", va="bottom",
+        arrowprops=dict(arrowstyle="->", color=color, lw=1),
+        bbox=dict(facecolor="white", edgecolor="none", alpha=0.8, pad=1),
+    )
+
+ax.axvspan(0, E_compton_edge, color="tab:orange", alpha=0.08)
+ax.text(320, ymax_cs * 1.42, "continuum Compton",
+        fontsize=9, color="tab:orange", ha="center", style="italic")
+
+ax.set_xlabel("Energie (keV)")
+ax.set_ylabel("Taux de comptage (coups/s)")
+ax.set_title("Anatomie du spectre du Cs-137: diffusion Compton et retrodiffusion", pad=14)
+fig.tight_layout()
+fig.savefig(os.path.join(OUT_DIR, f"{plot_num:02d}_compton_cs137.png"), dpi=200)
+plt.close(fig)
+plot_num += 1
+
+# ---------------------------------------------------------------------------
+# 8) Resolution en energie (FWHM/E) du scintillateur en fonction de l'energie
+# ---------------------------------------------------------------------------
+res_E, res_pct = [], []
+for key, peaks in peak_results.items():
+    for p in peaks:
+        slope_here = np.polyval(np.polyder(model_coef), p["mu"])
+        fwhm_keV = p["fwhm"] * slope_here
+        res_E.append(p["energy"])
+        res_pct.append(100 * fwhm_keV / p["energy"])
+res_E = np.array(res_E)
+res_pct = np.array(res_pct)
+
+# Regression en loi de puissance R(%) = A * E^b via les logarithmes.
+b, log_a = np.polyfit(np.log(res_E), np.log(res_pct), 1)
+A = np.exp(log_a)
+
+fig, ax = plt.subplots(figsize=(7.5, 5.2))
+ax.scatter(res_E, res_pct, s=45, color="tab:blue", zorder=3, label="Pics ajustes")
+E_fit_grid = np.linspace(res_E.min() * 0.8, res_E.max() * 1.1, 200)
+ax.plot(E_fit_grid, A * E_fit_grid**b, "k--", lw=1.3,
+        label=f"$R = {A:.0f} \\cdot E^{{{b:.2f}}}$")
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.set_xlabel("Energie (keV)")
+ax.set_ylabel("Resolution $R = \\mathrm{FWHM}/E$ (%)")
+ax.set_title("Resolution en energie du scintillateur NaI(Tl)", pad=14)
+ax.legend(fontsize=9)
+fig.tight_layout()
+fig.savefig(os.path.join(OUT_DIR, f"{plot_num:02d}_resolution.png"), dpi=200)
+plt.close(fig)
+plot_num += 1
+
+print(f"\nResolution: R(%) = {A:.0f} * E^{b:.3f}  (E en keV)")
 
 print("\nGraphiques sauvegardes dans:", OUT_DIR)
