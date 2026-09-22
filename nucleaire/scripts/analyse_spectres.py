@@ -11,8 +11,8 @@ from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SPEC_DIR = os.path.join(BASE, "Spectres")
-OUT_DIR = os.environ.get("ANALYSE_OUT_DIR", os.path.dirname(os.path.abspath(__file__)))
+SPEC_DIR = os.path.join(BASE, "data")
+OUT_DIR = os.environ.get("ANALYSE_OUT_DIR", os.path.join(BASE, "figures"))
 os.makedirs(OUT_DIR, exist_ok=True)
 
 plt.rcParams.update({
