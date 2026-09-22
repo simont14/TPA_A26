@@ -1,0 +1,30 @@
+# Environnements virtuels
+venv/
+.venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.ipynb_checkpoints/
+
+# Jupyter
+*.ipynb_checkpoints
+
+# Éditeurs / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Données volumineuses ou temporaires (décommenter/adapter au besoin)
+# *.csv
+# *.tdms
+# *.h5
+# data/**/*.zip
+
+# Sorties
+*.log
