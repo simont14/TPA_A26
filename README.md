@@ -8,6 +8,8 @@ courbes (fits).
 
 ```
 TPA_A26/
+├── consignes/            # Consignes générales de rédaction des rapports
+│                         # (valables pour tous les labos)
 ├── nucleaire/            # Radiations nucléaires (N1-N2)
 ├── cnd/                  # CND ultrasons et courants induits (M1-M2)
 ├── geophysique/          # Géophysique
@@ -18,6 +20,11 @@ TPA_A26/
 ├── requirements.txt
 └── .gitignore
 ```
+
+`consignes/` contient les documents généraux du cours qui s'appliquent à tous
+les rapports (consignes de rédaction, grille d'évaluation, etc.), par
+opposition à `protocole/` dans chaque labo qui contient le protocole
+spécifique à ce labo.
 
 Chaque dossier de labo suit la même structure :
 
