@@ -1,0 +1,113 @@
+\documentclass[11pt,letterpaper]{article}
+%graph pour image H
+\usepackage{float}
+
+%Highlight
+\usepackage{soul}
+
+%Pour vecteur unitaire
+\newcommand{\uvec}[1]{\boldsymbol{\hat{\textbf{#1}}}}
+
+% Pour Dessin
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{mathrsfs}
+
+% Pour Braket de Quantique
+\usepackage{braket}
+
+% Pour circle red
+\usetikzlibrary{shapes,
+tikzmark}
+\tikzset{every tikzmarknode/.style={%
+draw=red, semithick, inner sep=2pt}
+}
+
+
+% Pour box paragraph
+\usepackage{fancybox,framed}
+
+% packetages pour ecrire en français
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% pour les maths, les graphiques et la navigation dans le pdf
+\usepackage{amsmath, amssymb, mathtools, mathrsfs, bm, array, units, amsthm, dsfont}
+\usepackage{graphicx,caption}
+\graphicspath{{./}}
+\usepackage{hyperref}
+\hypersetup{
+    pdftitle={Détecteurs de radiations nucléaires},
+    pdfauthor={L-F. Brodeur (LFBRO1), S. L-Tremblay (SILAT10)}
+}
+\usepackage{physics} %très utile pour ecrire plus rapidement des matrices, des derivees, etc. Allez voir la documentation!
+
+% marges, police de caractère et header
+\usepackage{geometry}
+\geometry{top=30mm, bottom=30mm, left=20mm, right=20mm}
+\usepackage{cochineal}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\parindent=0mm % pas d'indentation
+
+\lhead{L-F. Brodeur (IDUL : LFBRO1) et S. L-Tremblay (IDUL : SILAT10)}
+\rhead{Détecteurs de radiations nucléaires}
+\fancyheadoffset{0 cm}
+
+\setlength{\headheight}{13.6pt}
+
+% commandes pour ecrire des equations plus vite avec leur label
+\newcommand{\beq}[1]{\begin{equation} \label{#1}}
+\def\enq{\end{equation}}
+
+% C'est parti!
+\begin{document}  	
+\thispagestyle{empty} % pas de header sur la première page
+\begin{center}
+
+\noindent
+\begin{minipage}[t]{0.5\textwidth}
+\raggedright
+{\large GPH--3000 \textit{Travaux pratiques avancés}}\\
+{\large Automne 2026 $\vert$ GPH-3000 (Groupe : 85213)}
+\end{minipage}%
+\begin{minipage}[t]{0.5\textwidth}
+\raggedleft
+{\large \textsc{L-F. Brodeur (IDUL : LFBRO1)}}\\
+{\large \textsc{S. L-Tremblay (IDUL : SILAT10)}}
+\end{minipage}
+\\~\\
+\vspace{1em}
+{\Large \textbf{Détecteurs de radiations nucléaires} } \\
+{\large \today}
+						
+\end{center}
+
+\section{Nom de la section}
+\section*{Nom de la section pas de numero}
+\subsection{Sous section}
+\subsubsection{Sous sous section}
+
+\flushleft{
+Dans cette étude de cas sur les ondes sonores et la résonance dans les tubes, nous nous concentrons sur l'impact du diamètre des tubes sur les fréquences de résonance. Les ondes sonores, qui sont des vibrations de pression se propageant à travers des milieux comme l'air, interagissent avec les limites physiques des tubes, qu'ils soient ouverts ou fermés à une extrémité.
+}
+
+
+
+\section*{Test des chemins relatifs pour les figures}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../Analyse/07_spectre_background.png}
+    \caption{Spectre de fond (background), généré par le code Python dans le dossier \texttt{Analyse} (chemin relatif remontant d'un niveau depuis le dossier \texttt{Rapport}).}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figures/Test.png}
+    \caption{Image \texttt{Test.png} située dans le dossier \texttt{Figures}, au même niveau que le fichier \texttt{.tex}.}
+\end{figure}
+
+\end{document}
