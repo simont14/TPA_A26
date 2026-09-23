@@ -7,6 +7,7 @@ import os
 import re
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 
@@ -21,6 +22,42 @@ plt.rcParams.update({
     "axes.grid": True,
     "grid.alpha": 0.3,
 })
+
+
+def fr(x, fmt="g"):
+    """Formate un nombre avec une virgule decimale (convention francaise),
+    pour rester coherent avec le texte du rapport LaTeX."""
+    return format(x, fmt).replace(".", ",")
+
+
+def fr_sci(x, sig=3):
+    """Formate un nombre en notation scientifique a-la-LaTeX (a * 10^n),
+    avec virgule decimale, pour les legendes matplotlib (mathtext)."""
+    if x == 0:
+        return "0"
+    exp = int(np.floor(np.log10(abs(x))))
+    mant = x / 10**exp
+    return f"{fr(mant, f'.{sig - 1}f')} \\times 10^{{{exp}}}"
+
+
+def _fr_tick(x, pos=None):
+    return fr(x)
+
+
+def signed_term(x, fmt="0.2f"):
+    """Terme '+ 1,23' ou '- 1,23' pour construire une somme sans double
+    signe disgracieux (evite '+ -3,01')."""
+    s = fr(abs(x), fmt)
+    return f"+ {s}" if x >= 0 else f"- {s}"
+
+
+def use_fr_ticks(ax):
+    """Applique le formatage a virgule decimale sur les axes lineaires
+    (les axes logarithmiques gardent leur formatage standard)."""
+    if ax.get_xscale() == "linear":
+        ax.xaxis.set_major_formatter(FuncFormatter(_fr_tick))
+    if ax.get_yscale() == "linear":
+        ax.yaxis.set_major_formatter(FuncFormatter(_fr_tick))
 
 
 def parse_spe(path):
@@ -204,13 +241,16 @@ print("Calibration quadratique: E = {:.5e}*canal^2 + {:.5e}*canal + {:.3f}  (R^2
 USE_QUAD = quad_rmse < 0.7 * lin_rmse
 if USE_QUAD:
     model_coef, pred, resid, r2, rmse = quad_coef, quad_pred, quad_resid, quad_r2, quad_rmse
-    model_label = (f"E = {quad_coef[0]:.3e}·canal² + {quad_coef[1]:.4f}·canal + {quad_coef[2]:.2f}\n"
-                   f"$R^2$ = {r2:.5f}, RMSE = {rmse:.1f} keV")
+    model_label = (f"$E = {fr_sci(quad_coef[0])} \\cdot \\mathrm{{canal}}^2 "
+                   f"{signed_term(quad_coef[1], '.4f')} \\cdot \\mathrm{{canal}} "
+                   f"{signed_term(quad_coef[2], '.2f')}$\n"
+                   f"$R^2$ = {fr(r2, '.5f')}, RMSE = {fr(rmse, '.1f')} keV")
     print(f"\n-> Modele retenu: QUADRATIQUE (amelioration nette du RMSE, non-linearite detectee)")
 else:
     model_coef, pred, resid, r2, rmse = lin_coef, lin_pred, lin_resid, lin_r2, lin_rmse
-    model_label = (f"E = {lin_coef[0]:.4f}·canal + {lin_coef[1]:.2f}\n"
-                   f"$R^2$ = {r2:.5f}, RMSE = {rmse:.1f} keV")
+    model_label = (f"$E = {fr(lin_coef[0], '.4f')} \\cdot \\mathrm{{canal}} "
+                   f"{signed_term(lin_coef[1], '.2f')}$\n"
+                   f"$R^2$ = {fr(r2, '.5f')}, RMSE = {fr(rmse, '.1f')} keV")
     print(f"\n-> Modele retenu: LINEAIRE (le quadratique n'ameliore pas assez le fit)")
 
 
@@ -222,7 +262,7 @@ def chan_to_E(ch):
 # 4) Graphique de calibration
 # ---------------------------------------------------------------------------
 fig, (ax1, ax2) = plt.subplots(
-    2, 1, figsize=(7.5, 7.5), sharex=True,
+    2, 1, figsize=(6.6, 5.4), sharex=True,
     gridspec_kw={"height_ratios": [3, 1]}
 )
 
@@ -238,22 +278,24 @@ for lab in unique_labels:
 xfit = np.linspace(0, max(chans) * 1.08, 200)
 if USE_QUAD:
     ax1.plot(xfit, np.polyval(lin_coef, xfit), color="0.6", ls=":", lw=1.2,
-              label=f"Ajust. lineaire (RMSE={lin_rmse:.1f} keV)")
+              label=f"Ajust. linéaire (RMSE={fr(lin_rmse, '.1f')} keV)")
 ax1.plot(xfit, chan_to_E(xfit), "k--", lw=1.3, label=model_label)
-ax1.set_ylabel("Energie (keV)")
-ax1.set_title("Calibration en energie du scintillateur")
+ax1.set_ylabel("Énergie (keV)")
+ax1.set_title("Étalonnage en énergie du scintillateur")
 ax1.legend(loc="upper left", fontsize=9)
+use_fr_ticks(ax1)
 
 local_slope = np.polyval(np.polyder(model_coef), chans)
 ax2.axhline(0, color="k", lw=1)
-ax2.axhspan(-rmse, rmse, color="gray", alpha=0.15, label=f"±RMSE ({rmse:.1f} keV)")
+ax2.axhspan(-rmse, rmse, color="gray", alpha=0.15, label=f"±RMSE ({fr(rmse, '.1f')} keV)")
 for lab in unique_labels:
     idxs = [i for i, l in enumerate(labels) if l == lab]
     ax2.errorbar(chans[idxs], resid[idxs], yerr=np.abs(chan_errs[idxs] * local_slope[idxs]),
                  fmt="o", ms=6, capsize=3, color=color_of[lab])
-ax2.set_ylabel("Residu (keV)")
-ax2.set_xlabel("Numero de canal")
+ax2.set_ylabel("Résidu (keV)")
+ax2.set_xlabel("Numéro de canal")
 ax2.legend(loc="upper right", fontsize=8)
+use_fr_ticks(ax2)
 
 fig.tight_layout()
 fig.savefig(os.path.join(OUT_DIR, "01_calibration.png"), dpi=200)
@@ -315,15 +357,16 @@ def plot_spectrum(key, title, filename, xlim, mark_peaks=None, bg_key=None, ysca
 
             label_y = local_max * 2.2 if yscale == "log" else local_max + ymax * 0.08
             ax.axvline(E_line, color="red", ls=":", lw=1, alpha=0.7)
-            ax.annotate(f"{Epk:.2f} keV",
+            ax.annotate(f"{fr(Epk, '.2f')} keV",
                         xy=(E_line, local_max), xytext=(E_line, label_y),
                         ha="center", va="bottom",
                         fontsize=8, color="red",
                         bbox=dict(facecolor="white", edgecolor="none", alpha=0.75, pad=1))
 
-    ax.set_xlabel("Energie (keV)")
+    ax.set_xlabel("Énergie (keV)")
     ax.set_ylabel("Taux de comptage (coups/s)")
     ax.set_title(title, pad=14)
+    use_fr_ticks(ax)
     ax.legend(loc="upper right", fontsize=9)
     fig.tight_layout()
     fig.savefig(os.path.join(OUT_DIR, filename), dpi=200)
@@ -375,16 +418,17 @@ if k40_fit is not None:
     y_k40 = cps_bg[max(0, idx_k40 - 3):idx_k40 + 4].max()
     ax.axvline(k40_E_mesuree, color="red", ls=":", lw=1.2)
     ax.annotate(
-        f"$^{{40}}$K, {k40_E_mesuree:.0f} keV",
+        f"$^{{40}}$K, {fr(k40_E_mesuree, '.0f')} keV",
         xy=(k40_E_mesuree, y_k40),
         xytext=(k40_E_mesuree - 430, y_k40 * 12),
         fontsize=9, color="red", ha="left", va="center",
         arrowprops=dict(arrowstyle="->", color="red", lw=1),
         bbox=dict(facecolor="white", edgecolor="none", alpha=0.8, pad=1.5),
     )
-ax.set_xlabel("Energie (keV)")
+ax.set_xlabel("Énergie (keV)")
 ax.set_ylabel("Taux de comptage (coups/s)")
 ax.set_title("Bruit de fond ambiant: identification du $^{40}$K", pad=14)
+use_fr_ticks(ax)
 fig.tight_layout()
 fig.savefig(os.path.join(OUT_DIR, f"{plot_num:02d}_background_K40.png"), dpi=200)
 plt.close(fig)
@@ -402,6 +446,13 @@ E_backscatter = E_CS137 - E_compton_edge
 print(f"\nCs-137: front Compton attendu a {E_compton_edge:.1f} keV, "
       f"pic de retrodiffusion attendu a {E_backscatter:.1f} keV")
 
+# Positions mesurees sur le spectre (point mi-hauteur du front, centroide de
+# la bosse de retrodiffusion), telles que rapportees dans le texte du
+# rapport: valeurs fixes, non re-derivees ici, pour eviter toute divergence
+# avec la discussion.
+E_compton_edge_mesure = 462.0
+E_backscatter_mesure = 195.0
+
 d_cs = data["CS_137_1"]
 E_cs = chan_to_E(d_cs["channels"])
 cps_cs = d_cs["counts"] / d_cs["live"]
@@ -415,32 +466,43 @@ ax.set_ylim(0, ymax_cs * 1.5)
 
 photopeak_cs = [p for p in peak_results["CS_137_1"] if abs(p["energy"] - E_CS137) < 1][0]
 
-# (energie de la ligne, texte, couleur, decalage vertical du label au-dessus
-#  du point local, position horizontale du label en fraction de l'axe des x)
-annotations = [
-    (E_CS137, "Photopic (effet\nphotoelectrique)\n661,7 keV", "tab:red", 0.16, E_CS137),
-    (E_backscatter, "Pic de\nretrodiffusion\n" + f"$\\approx${E_backscatter:.0f} keV", "tab:green", 0.16, E_backscatter - 55),
-    (E_compton_edge, "Front Compton\n" + f"$\\approx${E_compton_edge:.0f} keV", "tab:purple", 0.16, E_compton_edge + 55),
-]
 
-for E_line, label, color, dy_frac, x_text in annotations:
+def _mark(E_line, label, color, xytext, ls=":"):
     idx = np.argmin(np.abs(E_cs - E_line))
     y_local = cps_cs[max(0, idx - 3):idx + 4].max()
-    ax.axvline(E_line, color=color, ls=":", lw=1.3, alpha=0.8)
+    ax.axvline(E_line, color=color, ls=ls, lw=1.3, alpha=0.8)
     ax.annotate(
-        label, xy=(E_line, y_local), xytext=(x_text, y_local + dy_frac * ymax_cs),
+        label, xy=(E_line, y_local), xytext=xytext,
         fontsize=8, color=color, ha="center", va="bottom",
         arrowprops=dict(arrowstyle="->", color=color, lw=1),
         bbox=dict(facecolor="white", edgecolor="none", alpha=0.8, pad=1),
     )
 
+
+# Photopic: theorie et mesure coincident (c'est la calibration elle-meme).
+_mark(E_CS137, "Photopic (effet\nphotoélectrique)\n661,7 keV", "tab:red",
+      (E_CS137, cps_cs[np.argmin(np.abs(E_cs - E_CS137))] + 0.16 * ymax_cs))
+
+# Front Compton et retrodiffusion: ligne pointillee = position theorique
+# (eq. 1/2), fleche separee = position mesuree sur le spectre.
+_mark(E_compton_edge, f"Front Compton\nthéorique (éq. 1)\n{fr(E_compton_edge, '.0f')} keV",
+      "tab:purple", (E_compton_edge + 90, ymax_cs * 0.62), ls=":")
+_mark(E_compton_edge_mesure, f"mesuré\n$\\approx${fr(E_compton_edge_mesure, '.0f')} keV",
+      "tab:purple", (E_compton_edge_mesure + 90, ymax_cs * 0.30), ls="-.")
+
+_mark(E_backscatter, f"Pic de rétrodiffusion\nthéorique (éq. 2)\n{fr(E_backscatter, '.0f')} keV",
+      "tab:green", (E_backscatter - 60, ymax_cs * 0.95), ls=":")
+_mark(E_backscatter_mesure, f"mesuré\n$\\approx${fr(E_backscatter_mesure, '.0f')} keV",
+      "tab:green", (E_backscatter_mesure - 60, ymax_cs * 0.65), ls="-.")
+
 ax.axvspan(0, E_compton_edge, color="tab:orange", alpha=0.08)
 ax.text(320, ymax_cs * 1.42, "continuum Compton",
         fontsize=9, color="tab:orange", ha="center", style="italic")
 
-ax.set_xlabel("Energie (keV)")
+ax.set_xlabel("Énergie (keV)")
 ax.set_ylabel("Taux de comptage (coups/s)")
-ax.set_title("Anatomie du spectre du Cs-137: diffusion Compton et retrodiffusion", pad=14)
+ax.set_title("Anatomie du spectre du Cs-137: diffusion Compton et rétrodiffusion", pad=14)
+use_fr_ticks(ax)
 fig.tight_layout()
 fig.savefig(os.path.join(OUT_DIR, f"{plot_num:02d}_compton_cs137.png"), dpi=200)
 plt.close(fig)
@@ -464,16 +526,17 @@ b, log_a = np.polyfit(np.log(res_E), np.log(res_pct), 1)
 A = np.exp(log_a)
 
 fig, ax = plt.subplots(figsize=(7.5, 5.2))
-ax.scatter(res_E, res_pct, s=45, color="tab:blue", zorder=3, label="Pics ajustes")
+ax.scatter(res_E, res_pct, s=45, color="tab:blue", zorder=3, label="Pics ajustés")
 E_fit_grid = np.linspace(res_E.min() * 0.8, res_E.max() * 1.1, 200)
 ax.plot(E_fit_grid, A * E_fit_grid**b, "k--", lw=1.3,
-        label=f"$R = {A:.0f} \\cdot E^{{{b:.2f}}}$")
+        label=f"$R = {fr(A, '.0f')} \\cdot E^{{{fr(b, '.2f')}}}$")
 ax.set_xscale("log")
 ax.set_yscale("log")
-ax.set_xlabel("Energie (keV)")
-ax.set_ylabel("Resolution $R = \\mathrm{FWHM}/E$ (%)")
-ax.set_title("Resolution en energie du scintillateur NaI(Tl)", pad=14)
+ax.set_xlabel("Énergie (keV)")
+ax.set_ylabel("Résolution $R = \\mathrm{FWHM}/E$ (%)")
+ax.set_title("Résolution en énergie du scintillateur NaI(Tl)", pad=14)
 ax.legend(fontsize=9)
+use_fr_ticks(ax)
 fig.tight_layout()
 fig.savefig(os.path.join(OUT_DIR, f"{plot_num:02d}_resolution.png"), dpi=200)
 plt.close(fig)

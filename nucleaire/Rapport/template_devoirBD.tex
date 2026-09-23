@@ -35,7 +35,8 @@ draw=red, semithick, inner sep=2pt}
 
 % pour les maths, les graphiques et la navigation dans le pdf
 \usepackage{amsmath, amssymb, mathtools, mathrsfs, bm, array, units, amsthm, dsfont}
-\usepackage{graphicx,caption}
+\usepackage{icomma} % virgule decimale en mode math sans espace parasite (0,99997 plutot que 0, 99997)
+\usepackage{graphicx,caption,subcaption}
 \graphicspath{{./}}
 \usepackage{hyperref}
 \hypersetup{
@@ -46,7 +47,7 @@ draw=red, semithick, inner sep=2pt}
 
 % marges, police de caractère et header
 \usepackage{geometry}
-\geometry{top=30mm, bottom=30mm, left=20mm, right=20mm}
+\geometry{top=23mm, bottom=23mm, left=20mm, right=20mm}
 \usepackage{cochineal}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -84,7 +85,7 @@ draw=red, semithick, inner sep=2pt}
 \vspace{1em}
 {\Large \textbf{De l'étalonnage à la traque du potassium-40:} } \\
 {\Large \textbf{spectroscopie gamma avec un scintillateur NaI(Tl)} } \\[0.3em]
-{\large Date d'expérimentation: 17 septembre 2026 \quad $\vert$ \quad Remis le \today}
+{\large Dates d'expérimentation: 10 et 17 septembre 2026 \quad $\vert$ \quad Remis le \today}
 
 \end{center}
 
@@ -98,7 +99,7 @@ La radioactivité est présente presque partout dans notre environnement, mais e
 
 L'objectif de cette expérience était double. D'abord, étalonner un scintillateur à l'iodure de sodium (NaI(Tl)) à l'aide de cinq sources $\gamma$ d'énergies connues, afin de convertir la sortie brute de l'électronique (un numéro de canal) en une grandeur physique utile (une énergie en keV). Ensuite, utiliser cet instrument fraîchement calibré pour répondre à une question concrète: quelle est la source de la radioactivité ambiante mesurée dans le laboratoire, en l'absence de toute source radioactive volontairement introduite?
 
-Le présent rapport est organisé comme suit. La section~2 rappelle brièvement les mécanismes d'interaction d'un rayon gamma avec la matière (essentiels pour interpréter la forme des spectres) et le principe de fonctionnement du scintillateur. La section~3 décrit le montage et la procédure d'analyse. La section~4 présente les résultats: la courbe d'étalonnage, l'anatomie détaillée d'un spectre (avec une attention particulière portée au front Compton et au pic de rétrodiffusion), la résolution en énergie du détecteur, et l'identification de la raie dominante du bruit de fond. La section~5 discute la qualité de ces résultats et leurs limites, avant une conclusion.
+Les mécanismes d'interaction d'un rayon gamma avec la matière, essentiels pour interpréter la forme des spectres, sont d'abord rappelés brièvement (section~2), avant de décrire le montage et la procédure d'analyse (section~3). Les résultats (section~4) couvrent dans l'ordre l'étalonnage et la résolution en énergie du détecteur, l'anatomie détaillée du spectre du \textsuperscript{137}Cs (front Compton et pic de rétrodiffusion), puis l'identification de la raie dominante du bruit de fond. La qualité de ces résultats et leurs limites sont ensuite discutées (section~5), avant une conclusion.
 
 \section{Théorie}
 
@@ -125,18 +126,14 @@ Ce pic apparaît donc sous forme d'une bosse dans le continuum, juste en deçà 
 
 Au-dessus de $1,022~\text{MeV}$ ($= 2 m_e c^2$), un troisième mécanisme, la production de paires électron-positon, devient possible mais reste négligeable dans nos spectres, dont l'énergie maximale (1332,5~keV, \textsuperscript{60}Co) est trop proche du seuil pour que ce processus contribue de façon mesurable.
 
-\subsection{Le scintillateur NaI(Tl) et la chaîne de détection}
-
-Le cristal de NaI dopé au thallium émet une brève scintillation lumineuse (temps de désexcitation $\approx 0,25~\mu\text{s}$) chaque fois qu'un photon $\gamma$ y dépose de l'énergie, avec un nombre de photons de scintillation proportionnel à cette énergie déposée \cite{protocole}. Un tube photomultiplicateur convertit cette lumière en une impulsion électrique, elle-même mise en forme par un préamplificateur puis un amplificateur. L'analyseur multicanaux (MCA) classe ensuite chaque impulsion selon son amplitude dans l'un de ses 4096 canaux, construisant ainsi un histogramme (le spectre) du nombre de photons détectés en fonction du canal. La relation entre le numéro de canal et l'énergie déposée dépend du gain de l'électronique et doit être établie empiriquement: c'est l'objet de l'étalonnage.
-
 \subsection{Radioactivité ambiante}
 
-Même en l'absence de toute source radioactive « volontaire », un détecteur $\gamma$ enregistre toujours un signal. Ce bruit de fond provient à la fois du rayonnement cosmique et de la radioactivité naturelle présente dans notre environnement immédiat: les matériaux de construction (béton, brique, granite) contiennent des traces d'éléments radioactifs à longue durée de vie, principalement le \textsuperscript{40}K et les descendants des chaînes de désintégration de l'\textsuperscript{238}U et du \textsuperscript{232}Th. Le \textsuperscript{40}K est particulièrement intéressant: il représente environ 0,012~\% du potassium naturel, a une demi-vie de 1,25 milliard d'années, et se désintègre 11~\% du temps par capture électronique vers un état excité du \textsuperscript{40}Ar, lequel se désexcite en émettant un photon $\gamma$ à 1460,8~keV \cite{nndc}. Le potassium étant abondant dans le corps humain, les os et les matériaux de construction, cette raie est presque toujours la signature dominante du bruit de fond ambiant dans un laboratoire universitaire.
+Même en l'absence de toute source radioactive « volontaire », un détecteur $\gamma$ enregistre toujours un signal. Ce bruit de fond provient à la fois du rayonnement cosmique et de la radioactivité naturelle présente dans notre environnement immédiat: les matériaux de construction (béton, brique, granite) contiennent des traces d'éléments radioactifs à longue durée de vie, principalement le \textsuperscript{40}K et les descendants des chaînes de désintégration de l'\textsuperscript{238}U et du \textsuperscript{232}Th \cite{unscear}. Le \textsuperscript{40}K est particulièrement intéressant: il représente environ 0,012~\% du potassium naturel, a une demi-vie de 1,25 milliard d'années, et se désintègre 11~\% du temps par capture électronique vers un état excité du \textsuperscript{40}Ar, lequel se désexcite en émettant un photon $\gamma$ à 1460,8~keV \cite{nndc}. Le potassium étant abondant dans le corps humain, les os et les matériaux de construction, cette raie est presque toujours la signature dominante du bruit de fond ambiant dans un laboratoire universitaire.
 
 \section{Méthodologie}
 
 \subsubsection*{Montage}
-La chaîne d'acquisition (Figure~\ref{fig:montage}) est celle décrite au protocole \cite{protocole}: une source scellée est placée devant un scintillateur NaI(Tl) couplé à un tube photomultiplicateur. Le signal passe par un préamplificateur puis un amplificateur avant d'être numérisé par un analyseur multicanaux Easy-MCA-8k (PHY-0040-AA), relié à un ordinateur et piloté par le logiciel Maestro (v7.01). Le gain de l'amplificateur a été fixé une fois pour toutes en début de séance, comme le recommande le protocole, et n'a plus été retouché par la suite. Il s'agit d'une précaution essentielle, puisque tout changement de gain invaliderait l'étalonnage.
+Le cristal de NaI dopé au thallium émet une brève scintillation lumineuse (temps de désexcitation $\approx 0,25~\mu\text{s}$) chaque fois qu'un photon $\gamma$ y dépose de l'énergie, avec un nombre de photons de scintillation proportionnel à cette énergie déposée \cite{protocole}. La chaîne d'acquisition (Figure~\ref{fig:montage}), décrite au protocole \cite{protocole}, convertit cette lumière en une grandeur exploitable: une source scellée est placée devant le scintillateur NaI(Tl) couplé à un tube photomultiplicateur, dont l'impulsion électrique est mise en forme par un préamplificateur puis un amplificateur avant d'être numérisée par un analyseur multicanaux Easy-MCA-8k (PHY-0040-AA). Le MCA classe chaque impulsion selon son amplitude dans l'un de ses 4096 canaux, construisant ainsi un histogramme (le spectre) du nombre de photons détectés en fonction du canal, le tout piloté par le logiciel Maestro (v7.01) sur un ordinateur relié au MCA. Cette relation entre numéro de canal et énergie déposée dépend du gain de l'électronique et doit être établie empiriquement: c'est l'objet de l'étalonnage. Le gain de l'amplificateur a donc été fixé une fois pour toutes en début de séance, comme le recommande le protocole, et n'a plus été retouché par la suite: tout changement de gain en cours de route aurait invalidé l'étalonnage.
 
 \begin{figure}[H]
     \centering
@@ -165,27 +162,27 @@ La chaîne d'acquisition (Figure~\ref{fig:montage}) est celle décrite au protoc
 Cinq sources scellées (\textsuperscript{133}Ba, \textsuperscript{57}Co, \textsuperscript{60}Co, \textsuperscript{137}Cs, \textsuperscript{22}Na) ont été acquises individuellement, fournissant onze raies $\gamma$ de référence réparties entre 30,85~keV et 1332,50~keV (Tableau~\ref{tab:acquisitions}). Chaque source a été placée devant le détecteur pour un temps d'acquisition suffisant pour obtenir un photopic net (de 3 à 11~minutes selon l'activité de la source), tandis qu'une acquisition beaucoup plus longue (36~minutes) a été faite sans aucune source, pour caractériser le bruit de fond, conformément à la recommandation du protocole de faire cette longue acquisition en parallèle des autres manipulations \cite{protocole}.
 
 \subsubsection*{Analyse}
-L'ensemble du traitement a été fait en Python (NumPy/SciPy), voir le script \texttt{analyse\_spectres.py} du dépôt du cours. Pour chaque raie de référence, la région du spectre autour du canal attendu est d'abord localisée par une recherche de maximum local, puis ajustée par une gaussienne sur fond linéaire,
+L'ensemble du traitement a été fait en Python (NumPy/SciPy), voir le script \texttt{analyse\_spectres.py} (Annexe~B). Pour chaque raie de référence, la région du spectre autour du canal attendu est d'abord localisée par une recherche de maximum local, puis ajustée par une gaussienne sur fond linéaire,
 \beq{eq:gauss}
     N(x) = A \exp\!\left[-\frac{(x-\mu)^2}{2\sigma^2}\right] + mx + b ,
 \enq
-par moindres carrés non linéaires (\texttt{scipy.optimize.curve\_fit}), ce qui donne le centroïde $\mu$ (canal), son incertitude statistique $\Delta\mu$ (tirée de la matrice de covariance de l'ajustement) et la largeur à mi-hauteur $\text{FWHM} = 2,3548\,\sigma$. Les onze couples (canal, énergie) sont ensuite utilisés pour ajuster une relation d'étalonnage $E(\text{canal})$, à la fois linéaire et quadratique. Le modèle quadratique n'est retenu que s'il réduit sensiblement l'erreur quadratique moyenne (RMSE), pour éviter de sur-ajuster onze points avec un paramètre superflu. Un point important: plutôt que de tracer le nombre de coups bruts, tous les spectres sont présentés en taux de comptage (coups/s), obtenus en divisant par le \emph{temps vif} (« live time ») rapporté par le MCA plutôt que par le temps réel écoulé. Le temps vif exclut automatiquement les intervalles où l'électronique était occupée à traiter une impulsion précédente (temps mort). Cette normalisation corrige donc directement pour le temps mort sans calcul supplémentaire, ce qui est particulièrement important pour la source de \textsuperscript{137}Cs, dont le taux de comptage élevé a occasionné une fraction de temps mort de 22~\% (Tableau~\ref{tab:acquisitions}).
+par moindres carrés non linéaires (\texttt{scipy.optimize.curve\_fit}) \cite{bevington}, ce qui donne le centroïde $\mu$ (canal), son incertitude statistique $\Delta\mu$ (tirée de la matrice de covariance de l'ajustement) et la largeur à mi-hauteur $\text{FWHM} = 2,3548\,\sigma$. Les onze couples (canal, énergie) sont ensuite utilisés pour ajuster une relation d'étalonnage $E(\text{canal})$, à la fois linéaire et quadratique; le modèle quadratique n'est retenu que s'il réduit sensiblement l'erreur quadratique moyenne (RMSE), pour éviter de sur-ajuster onze points avec un paramètre superflu. Tous les spectres présentés plus bas sont en taux de comptage (coups/s) plutôt qu'en nombre de coups brut, obtenu en divisant par le \emph{temps vif} (« live time ») rapporté par le MCA plutôt que par le temps réel écoulé: le temps vif exclut automatiquement les intervalles où l'électronique était occupée à traiter une impulsion précédente (temps mort), ce qui corrige donc directement pour le temps mort sans calcul supplémentaire. Cette normalisation est particulièrement importante pour la source de \textsuperscript{137}Cs, dont le taux de comptage élevé a occasionné une fraction de temps mort de 22~\% (Tableau~\ref{tab:acquisitions}).
 
 \begin{table}[htbp]
 \centering
-\caption{Sources utilisées, raies de référence et statistiques d'acquisition. Le temps vif est celui utilisé pour normaliser les spectres (taux de comptage). La fraction de temps mort quantifie l'écart entre temps réel et temps vif.}
+\caption{Sources utilisées, raies de référence et statistiques d'acquisition. Le temps vif (utilisé pour normaliser les spectres en taux de comptage) et le temps réel sont donnés ensemble avec la fraction de temps mort qu'ils impliquent.}
 \label{tab:acquisitions}
 \small
-\begin{tabular}{lccc}
+\begin{tabular}{lcc}
 \hline
-Source & Raies utilisées (keV) & Temps vif / réel (s) & Temps mort (\%) \\
+Source & Raies utilisées (keV) & Temps vif / réel (s), temps mort \\
 \hline
-\textsuperscript{133}Ba & 30,85 / 81,00 / 302,85 / 356,02 & 372 / 383 & 2,9 \\
-\textsuperscript{57}Co  & 122,06 & 675 / 687 & 1,7 \\
-\textsuperscript{60}Co  & 1173,20 / 1332,50 & 896 / 909 & 1,4 \\
-\textsuperscript{137}Cs & 32,00\textsuperscript{a} / 661,70 & 180 / 232 & 22,4 \\
-\textsuperscript{22}Na  & 511,00 / 1274,50 & 186 / 196 & 5,1 \\
-Bruit de fond & aucune (identification a posteriori) & 2155 / 2157 & 0,1 \\
+\textsuperscript{133}Ba & 30,85 / 81,00 / 302,85 / 356,02 & 372 / 383~s (2,9~\%) \\
+\textsuperscript{57}Co  & 122,06 & 675 / 687~s (1,7~\%) \\
+\textsuperscript{60}Co  & 1173,20 / 1332,50 & 896 / 909~s (1,4~\%) \\
+\textsuperscript{137}Cs & 32,00\textsuperscript{a} / 661,70 & 180 / 232~s (22,4~\%) \\
+\textsuperscript{22}Na  & 511,00 / 1274,50 & 186 / 196~s (5,1~\%) \\
+Bruit de fond & aucune (identification a posteriori) & 2155 / 2157~s (0,1~\%) \\
 \hline
 \end{tabular}
 \\[0.3em]
@@ -194,76 +191,80 @@ Bruit de fond & aucune (identification a posteriori) & 2155 / 2157 & 0,1 \\
 
 \section{Résultats}
 
-\subsection{Étalonnage en énergie}
+\subsection{Étalonnage et résolution en énergie}
 
-La Figure~\ref{fig:calib} montre les onze points d'étalonnage ainsi que les modèles linéaire et quadratique. Le modèle quadratique,
+La Figure~\ref{fig:calib}a montre les onze points d'étalonnage ainsi que les modèles linéaire et quadratique. Le modèle quadratique,
 \beq{eq:calib}
     E(\text{canal}) = (4,515 \times 10^{-6})\,\text{canal}^2 + 0,3902\,\text{canal} - 3,01~\text{keV} ,
 \enq
-réduit l'erreur quadratique moyenne de $5,0~\text{keV}$ (modèle linéaire) à $2,6~\text{keV}$ ($R^2 = 0,99997$), une amélioration suffisamment nette pour être retenue plutôt que d'ajouter un paramètre libre sans bénéfice réel. Cette légère composante quadratique est un effet bien documenté de non-linéarité de la réponse du couple scintillateur/photomultiplicateur, particulièrement visible aux basses énergies \cite{knoll}. Le Tableau~\ref{tab:peaks} détaille chaque raie individuellement.
+réduit l'erreur quadratique moyenne de $5,0~\text{keV}$ (modèle linéaire) à $2,6~\text{keV}$ ($R^2 = 0,99997$), une amélioration suffisamment nette pour être retenue plutôt que d'ajouter un paramètre libre sans bénéfice réel. Cette légère composante quadratique est un effet bien documenté de non-linéarité de la réponse du couple scintillateur/photomultiplicateur, particulièrement visible aux basses énergies \cite{knoll,engelkemeir}. Le Tableau~\ref{tab:peaks} détaille chaque raie individuellement.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.56\textwidth]{../figures/01_calibration.png}
-    \caption{Étalonnage du scintillateur: énergie (littérature) en fonction du canal ajusté, pour les onze raies des cinq sources. Le panneau du bas montre les résidus par rapport au modèle quadratique retenu. Ils demeurent compatibles avec le RMSE global de 2,6~keV, sans tendance systématique évidente d'une source à l'autre.}
-    \label{fig:calib}
-\end{figure}
-
-\begin{table}[htbp]
-\centering
-\caption{Détail des onze raies d'étalonnage: énergie de référence, canal ajusté, résidu par rapport au modèle quadratique, et résolution en énergie ($R = \text{FWHM}/E$).}
-\label{tab:peaks}
-\footnotesize
-\begin{tabular}{lccccc}
-\hline
-Source & $E_{\text{lit.}}$ (keV) & Canal & Résidu (keV) & FWHM (keV) & $R$ (\%) \\
-\hline
-\textsuperscript{133}Ba & 30,85  & $82,15 \pm 0,05$   & $-1,8$ & 8,1  & 27,7 \\
-\textsuperscript{133}Ba & 81,00  & $220,70 \pm 0,08$  & $+2,3$ & 12,6 & 15,1 \\
-\textsuperscript{133}Ba & 302,85 & $780,71 \pm 1,52$  & $+1,5$ & 25,6 & 8,4  \\
-\textsuperscript{133}Ba & 356,02 & $920,93 \pm 0,93$  & $+4,1$ & 42,1 & 11,7 \\
-\textsuperscript{57}Co  & 122,06 & $319,16 \pm 0,05$  & $-0,1$ & 16,2 & 13,3 \\
-\textsuperscript{60}Co  & 1173,20& $2909,89 \pm 5,20$ & $-2,6$ & 61,6 & 5,3  \\
-\textsuperscript{60}Co  & 1332,50& $3296,26 \pm 7,73$ & $-0,3$ & 66,8 & 5,0  \\
-\textsuperscript{137}Cs & 32,00  & $83,14 \pm 0,07$   & $-2,5$ & 9,9  & 33,7 \\
-\textsuperscript{137}Cs & 661,70 & $1659,48 \pm 0,40$ & $-4,8$ & 57,8 & 8,8  \\
-\textsuperscript{22}Na  & 511,00 & $1299,96 \pm 1,40$ & $+0,8$ & 54,5 & 10,7 \\
-\textsuperscript{22}Na  & 1274,50& $3166,48 \pm 7,07$ & $+3,3$ & 57,9 & 4,5  \\
-\hline
-\end{tabular}
-\end{table}
-
-\subsection{Anatomie d'un spectre: effet photoélectrique, diffusion Compton et rétrodiffusion}
-
-Le spectre du \textsuperscript{137}Cs (Figure~\ref{fig:compton}) est particulièrement instructif parce que la source n'émet essentiellement qu'une seule raie $\gamma$ (661,7~keV). Toutes les structures observées sous le photopic proviennent donc de la physique de l'interaction gamma-matière, et non d'un mélange de plusieurs énergies. On y distingue nettement:
-\begin{itemize}
-    \item le \emph{photopic} à 661,7~keV (effet photoélectrique, Tableau~\ref{tab:peaks}).
-    \item un \emph{plateau Compton} entre $\sim 50$ et $\sim 430$~keV, relativement plat comme attendu pour une diffusion à petit angle sur des électrons quasi libres.
-    \item une \emph{chute abrupte} du continuum, dont le point mi-hauteur se situe à $\approx 462~\text{keV}$, en bon accord avec le front Compton théorique de $477,4~\text{keV}$ (éq.~\ref{eq:compton_edge}) compte tenu de la résolution du détecteur à cette énergie (d'environ 8 à 9~\%, soit un $\text{FWHM}$ d'environ 40~keV). L'écart de 15~keV est donc inférieur à une demi-largeur à mi-hauteur.
-    \item une \emph{bosse de rétrodiffusion} centrée vers $\approx 195~\text{keV}$, cohérente avec la prédiction de $184,3~\text{keV}$ (éq.~\ref{eq:backscatter}) à la résolution près.
-\end{itemize}
-On note aussi un pic étroit à 32,0~keV, trop bas en énergie pour être un photopic Compton. Il s'agit de la raie X caractéristique du baryum (produit de désintégration du \textsuperscript{137}Cs), émise lors du réarrangement électronique qui suit la désexcitation nucléaire.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{../figures/09_compton_cs137.png}
-    \caption{Spectre du \textsuperscript{137}Cs annoté: le photopic (effet photoélectrique), le front Compton et le pic de rétrodiffusion prédits par la cinématique de la diffusion Compton coïncident avec les structures observées, à la résolution du détecteur près. La zone ombragée délimite le continuum Compton, sous le front théorique.}
-    \label{fig:compton}
-\end{figure}
-
-\subsection{Résolution en énergie}
-
-La résolution relative $R = \text{FWHM}/E$ de chaque photopic (Tableau~\ref{tab:peaks}) diminue systématiquement avec l'énergie, d'environ 28 à 34~\% pour les raies sous 35~keV jusqu'à environ 4,5 à 5~\% pour les raies du \textsuperscript{60}Co au-delà de 1,1~MeV (Figure~\ref{fig:resolution}). Un ajustement en loi de puissance donne
+La résolution relative $R = \text{FWHM}/E$ de chaque photopic (Tableau~\ref{tab:peaks}), tracée à la Figure~\ref{fig:calib}b, diminue de façon monotone avec l'énergie: d'environ 28 à 34~\% pour les raies sous 35~keV, jusqu'à 4,5 à 5~\% pour les raies du \textsuperscript{60}Co au-delà de 1,1~MeV. Un ajustement en loi de puissance donne
 \beq{eq:resolution}
     R(E) = (122 \pm 15) \cdot E^{-0,44 \pm 0,03}~\% \quad (E \text{ en keV}) ,
 \enq
 proche de la dépendance $E^{-1/2}$ attendue pour un détecteur limité par la statistique de comptage des photons de scintillation \cite{knoll}.
 
+\begin{table}[htbp]
+\centering
+\caption{Détail des onze raies d'étalonnage: énergie de référence, canal ajusté, résidu par rapport au modèle quadratique ($E_{\text{lit.}} - E_{\text{modèle}}$, même convention qu'à la Figure~\ref{fig:calib}), et résolution en énergie ($R = \text{FWHM}/E$).}
+\label{tab:peaks}
+\footnotesize
+\renewcommand{\arraystretch}{0.85}
+\begin{tabular}{lccccc}
+\hline
+Source & $E_{\text{lit.}}$ (keV) & Canal & Résidu (keV) & FWHM (keV) & $R$ (\%) \\
+\hline
+\textsuperscript{133}Ba & 30,85  & $82,15 \pm 0,05$   & $+1,8$ & 8,1  & 27,7 \\
+\textsuperscript{133}Ba & 81,00  & $220,70 \pm 0,08$  & $-2,3$ & 12,6 & 15,1 \\
+\textsuperscript{133}Ba & 302,85 & $780,71 \pm 1,52$  & $-1,5$ & 25,6 & 8,4  \\
+\textsuperscript{133}Ba & 356,02 & $920,93 \pm 0,93$  & $-4,1$ & 42,1 & 11,7 \\
+\textsuperscript{57}Co  & 122,06 & $319,16 \pm 0,05$  & $+0,1$ & 16,2 & 13,3 \\
+\textsuperscript{60}Co  & 1173,20& $2909,89 \pm 5,20$ & $+2,6$ & 61,6 & 5,3  \\
+\textsuperscript{60}Co  & 1332,50& $3296,26 \pm 7,73$ & $+0,3$ & 66,8 & 5,0  \\
+\textsuperscript{137}Cs & 32,00  & $83,14 \pm 0,07$   & $+2,5$ & 9,9  & 33,7 \\
+\textsuperscript{137}Cs & 661,70 & $1659,48 \pm 0,40$ & $+4,8$ & 57,8 & 8,8  \\
+\textsuperscript{22}Na  & 511,00 & $1299,96 \pm 1,40$ & $-0,8$ & 54,5 & 10,7 \\
+\textsuperscript{22}Na  & 1274,50& $3166,48 \pm 7,07$ & $-3,3$ & 57,9 & 4,5  \\
+\hline
+\end{tabular}
+\renewcommand{\arraystretch}{1}
+\end{table}
+
+\begin{figure}[tbp]
+    \centering
+    \begin{subfigure}[t]{0.44\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../figures/01_calibration.png}
+        \caption{Énergie (littérature) en fonction du canal ajusté, pour les onze raies. Le panneau du bas montre les résidus par rapport au modèle quadratique, compatibles avec le RMSE global de 2,6~keV.}
+        \label{fig:calib}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../figures/10_resolution.png}
+        \caption{Résolution en énergie pour les mêmes onze photopics. L'exposant mesuré ($-0,44$) est proche de $-0,5$, attendu pour un régime limité par le bruit statistique de comptage.}
+        \label{fig:resolution}
+    \end{subfigure}
+    \caption{Étalonnage (a) et résolution en énergie (b) du scintillateur, ajustés sur les onze raies des cinq sources.}
+    \label{fig:calib_resolution}
+\end{figure}
+
+\subsection{Anatomie d'un spectre: effet photoélectrique, diffusion Compton et rétrodiffusion}
+
+Le spectre du \textsuperscript{137}Cs (Figure~\ref{fig:compton}) est particulièrement instructif parce que la source n'émet essentiellement qu'une seule raie $\gamma$ (661,7~keV): toutes les structures observées sous le photopic proviennent donc de la physique de l'interaction gamma-matière, et non d'un mélange de plusieurs énergies. On y distingue nettement:
+\begin{itemize}
+    \item le \emph{photopic} à 661,7~keV (effet photoélectrique, Tableau~\ref{tab:peaks}).
+    \item un \emph{plateau Compton} entre $\sim 50$ et $\sim 430$~keV, relativement plat comme attendu pour une diffusion à petit angle sur des électrons quasi libres.
+    \item une \emph{chute abrupte} du continuum, dont le point mi-hauteur mesuré ($\approx 462~\text{keV}$) est proche du front Compton théorique (éq.~\ref{eq:compton_edge}, $477,4~\text{keV}$).
+    \item une \emph{bosse de rétrodiffusion} mesurée vers $\approx 195~\text{keV}$, proche de la prédiction de $184,3~\text{keV}$ (éq.~\ref{eq:backscatter}).
+\end{itemize}
+Un pic étroit apparaît aussi à 32,0~keV, trop bas en énergie pour être un photopic Compton: c'est la raie X caractéristique du baryum (produit de désintégration du \textsuperscript{137}Cs), émise lors du réarrangement électronique qui suit la désexcitation nucléaire.
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.68\textwidth]{../figures/10_resolution.png}
-    \caption{Résolution en énergie du scintillateur en fonction de l'énergie, pour les onze photopics ajustés. L'exposant mesuré ($-0,44$) est proche de la valeur $-0,5$ attendue pour un régime dominé par le bruit statistique de comptage des photons.}
-    \label{fig:resolution}
+    \includegraphics[width=0.74\textwidth]{../figures/09_compton_cs137.png}
+    \caption{Spectre du \textsuperscript{137}Cs annoté: les lignes pointillées courtes marquent les positions théoriques du front Compton et du pic de rétrodiffusion (éq.~\ref{eq:compton_edge},~\ref{eq:backscatter}), les lignes mixtes leurs positions mesurées sur le spectre. La zone ombragée délimite le continuum Compton, sous le front théorique.}
+    \label{fig:compton}
 \end{figure}
 
 \subsection{Identification du bruit de fond ambiant}
@@ -272,7 +273,7 @@ Le spectre du bruit de fond (Figure~\ref{fig:background}), accumulé sur 36~minu
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.78\textwidth]{../figures/08_background_K40.png}
+    \includegraphics[width=0.68\textwidth]{../figures/08_background_K40.png}
     \caption{Spectre du bruit de fond ambiant (échelle logarithmique, 36~minutes d'acquisition). La raie identifiée à $1485 \pm 3~\text{keV}$ est attribuée au \textsuperscript{40}K (1460,8~keV), présent naturellement dans le béton, la brique et le corps humain.}
     \label{fig:background}
 \end{figure}
@@ -280,19 +281,19 @@ Le spectre du bruit de fond (Figure~\ref{fig:background}), accumulé sur 36~minu
 \section{Discussion}
 
 \subsubsection*{Qualité de l'étalonnage}
-Le choix du modèle quadratique plutôt que linéaire est appuyé quantitativement (RMSE réduit de près de moitié) et qualitativement (les résidus du modèle linéaire montrent une courbure systématique, typique d'un défaut de linéarité du couple PM/amplificateur aux basses énergies, bien documenté dans la littérature \cite{knoll}). Les résidus individuels du Tableau~\ref{tab:peaks} restent tous inférieurs à 5~keV, cohérents avec le RMSE global. Aucune source ne se démarque par un biais systématique, ce qui suggère que l'erreur dominante est bien la non-linéarité résiduelle du détecteur plutôt qu'une erreur d'identification de raie propre à une source.
+Deux arguments soutiennent le choix du modèle quadratique. D'abord, le RMSE chute de près de moitié par rapport au modèle linéaire. Ensuite, les résidus de ce dernier présentent une courbure caractéristique, la signature typique d'un défaut de linéarité du couple PM/amplificateur aux basses énergies \cite{knoll}. Les résidus individuels du Tableau~\ref{tab:peaks} restent par ailleurs tous inférieurs à 5~keV, cohérents avec le RMSE global, et aucune source ne se démarque par un biais particulier: l'erreur dominante semble donc bien être la non-linéarité résiduelle du détecteur, plutôt qu'une erreur d'identification de raie propre à une source.
 
 \subsubsection*{Incertitudes}
-Les incertitudes statistiques sur les centroïdes ajustés (issues de la matrice de covariance du fit gaussien, Tableau~\ref{tab:peaks}) sont systématiquement plus petites, souvent de un à deux ordres de grandeur, que les résidus du modèle d'étalonnage. Autrement dit, ce n'est pas le bruit de comptage qui limite la précision de notre étalonnage, mais bien des effets systématiques: légère dérive de linéarité, largeur finie des raies qui rend le centroïde sensible à la forme exacte du fond sous le pic, et pour les deux raies sous 35~keV, la proximité du seuil d'absorption K de l'iode ($\sim 33,2~\text{keV}$), où la section efficace photoélectrique du NaI varie brusquement et déforme le pic. Ceci offre une explication plausible à leur résolution nettement moins bonne (28~\% et 34~\%) que ne le prédit la tendance générale en $E^{-0,44}$ (Figure~\ref{fig:resolution}).
+Les incertitudes statistiques sur les centroïdes ajustés (issues de la matrice de covariance du fit gaussien, Tableau~\ref{tab:peaks}) sont systématiquement plus petites, souvent de un à deux ordres de grandeur, que les résidus du modèle d'étalonnage. Autrement dit, ce n'est pas le bruit de comptage qui limite la précision de notre étalonnage, mais bien des effets systématiques: légère dérive de linéarité, largeur finie des raies qui rend le centroïde sensible à la forme exacte du fond sous le pic, et pour les deux raies sous 35~keV, la proximité du seuil d'absorption K de l'iode ($\sim 33,2~\text{keV}$), où la section efficace photoélectrique du NaI varie brusquement et déforme le pic. Cela expliquerait, du moins en partie, pourquoi leur résolution (28~\% et 34~\%) est nettement moins bonne que ne le prédit la tendance générale en $E^{-0,44}$ (Figure~\ref{fig:resolution}).
 
 \subsubsection*{Front Compton et rétrodiffusion}
-L'accord entre les positions prédites et mesurées (Section~4.2) confirme que la cinématique de diffusion Compton à un seul choc décrit bien la physique en jeu, et que les écarts résiduels ($\sim 15$~keV pour le front, $\sim 11$~keV pour la rétrodiffusion) sont pleinement explicables par la résolution finie du détecteur, qui « étale » ces structures normalement abruptes sur une largeur comparable au FWHM local. Ce test est en un sens plus exigeant que l'étalonnage lui-même: il ne repose sur aucun point ajusté, seulement sur la physique de la diffusion Compton appliquée à une énergie de raie connue indépendamment.
+Ce test est, en un sens, plus exigeant que l'étalonnage lui-même: il ne repose sur aucun point ajusté, seulement sur la physique de la diffusion Compton appliquée à une énergie de raie connue indépendamment. L'accord entre les positions prédites et mesurées (Section~4.2) valide donc directement la cinématique de diffusion Compton à un seul choc, et les écarts résiduels ($\sim 15$~keV pour le front, $\sim 11$~keV pour la rétrodiffusion) s'expliquent pleinement par la résolution finie du détecteur, qui « étale » ces structures normalement abruptes sur une largeur comparable au FWHM local.
 
 \subsubsection*{Identification du \textsuperscript{40}K}
 L'écart entre la valeur mesurée ($1485 \pm 3~\text{keV}$) et la valeur de référence ($1460,8~\text{keV}$) est de $24~\text{keV}$, soit environ un écart-type de la largeur du pic à cette énergie ($\sigma \approx \text{FWHM}/2,35 \approx 31~\text{keV}$, d'après l'équation~\ref{eq:resolution}). L'identification demeure donc solide, mais l'écart est plus grand que pour les raies d'étalonnage elles-mêmes. L'explication la plus probable est que $1461~\text{keV}$ se situe au-delà de la raie d'étalonnage la plus énergétique utilisée (1332,5~keV, \textsuperscript{60}Co): le modèle quadratique extrapole donc légèrement hors de son domaine de validation à cette énergie, ce qui est une limite connue de ce genre d'ajustement. Une source de \textsuperscript{40}K ou une autre source proche de 1461~keV n'était toutefois pas disponible pour ancrer directement l'étalonnage à cette énergie.
 
 \subsubsection*{Limites et améliorations}
-Le montage utilisé ne permet pas de mesurer une activité absolue (aucune information sur la distance source-détecteur ni sur l'angle solide n'a été consignée durant la manipulation, celle-ci n'étant pas nécessaire pour un étalonnage en énergie). Une prochaine itération de l'expérience gagnerait à documenter systématiquement la géométrie pour permettre, en plus de l'identification, une estimation quantitative de l'activité des sources. La résolution modeste du NaI(Tl) (comparée par exemple à un détecteur au germanium hyperpur) limite aussi la capacité à distinguer des raies proches en énergie. Un détecteur HPGe aurait permis de résoudre plus finement la région du \textsuperscript{40}K et de vérifier la présence, ou l'absence, des raies plus faibles des chaînes de l'uranium et du thorium, généralement en dessous du bruit statistique ici. Enfin, une acquisition de bruit de fond plus longue (au-delà de 36~minutes) réduirait l'incertitude statistique sur la position du pic de \textsuperscript{40}K et permettrait de confirmer sa position avec plus de confiance.
+Le montage utilisé ne permet pas de mesurer une activité absolue (aucune information sur la distance source-détecteur ni sur l'angle solide n'a été consignée durant la manipulation, celle-ci n'étant pas nécessaire pour un étalonnage en énergie). Une prochaine itération de l'expérience gagnerait à consigner la géométrie source-détecteur à chaque manipulation, ce qui permettrait, en plus de l'identification, une estimation quantitative de l'activité des sources. La résolution modeste du NaI(Tl) (comparée par exemple à un détecteur au germanium hyperpur) limite aussi la capacité à distinguer des raies proches en énergie. Un détecteur HPGe aurait permis de résoudre plus finement la région du \textsuperscript{40}K et de vérifier la présence, ou l'absence, des raies plus faibles des chaînes de l'uranium et du thorium, généralement en dessous du bruit statistique ici. Enfin, une acquisition de bruit de fond plus longue (au-delà de 36~minutes) réduirait l'incertitude statistique sur la position du pic de \textsuperscript{40}K et permettrait de confirmer sa position avec plus de confiance.
 
 \section{Conclusion}
 
@@ -315,9 +316,15 @@ National Nuclear Data Center, Brookhaven National Laboratory. \textit{NuDat 3.0:
 \bibitem{protocole}
 Département de physique, de génie physique et d'optique, Université Laval. \textit{GPH-3000, Travaux pratiques avancés: Détecteurs de radiations nucléaires}, version 2019-09-23, et \textit{Résumé des manipulations}, version 2022-09-22.
 
+\bibitem{engelkemeir}
+Engelkemeir, D. Nonlinear response of NaI(Tl) to photons. \textit{Review of Scientific Instruments} \textbf{27}, 589--591 (1956).
+
+\bibitem{unscear}
+United Nations Scientific Committee on the Effects of Atomic Radiation (UNSCEAR). \textit{Sources and Effects of Ionizing Radiation: UNSCEAR 2000 Report to the General Assembly, with Scientific Annexes, Volume I: Sources}. United Nations, New York, 2000.
+
 \end{thebibliography}
 
-\section*{Annexe: spectres individuels des sources d'étalonnage}
+\section*{Annexe A: spectres individuels des sources d'étalonnage}
 
 Les quatre figures suivantes montrent les spectres complets des sources utilisées pour l'étalonnage (à l'exception du \textsuperscript{137}Cs, présenté en détail à la Figure~\ref{fig:compton}), avec les raies de référence identifiées. Elles sont fournies à titre complémentaire. Le corps du rapport est compréhensible sans s'y référer.
 
@@ -344,5 +351,9 @@ Les quatre figures suivantes montrent les spectres complets des sources utilisé
     \includegraphics[width=0.72\textwidth]{../figures/06_spectre_Na22.png}
     \caption{Spectre du \textsuperscript{22}Na, incluant le pic d'annihilation à 511,00~keV et la raie nucléaire à 1274,50~keV.}
 \end{figure}
+
+\section*{Annexe B: script d'analyse}
+
+L'ensemble du traitement (localisation et ajustement des pics, régression d'étalonnage, génération des figures) est implémenté dans \texttt{nucleaire/scripts/analyse\_spectres.py} du dépôt du cours. Le script n'est pas reproduit intégralement ici (près de 500 lignes) afin de respecter la longueur cible du rapport; il demeure disponible dans le dépôt pour consultation ou reproduction des résultats.
 
 \end{document}
