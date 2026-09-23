@@ -44,3 +44,64 @@ qui priment sur les consignes standard ci-dessus :**
   structure des paragraphes, éviter les tournures répétitives d'un rapport
   à l'autre
 
+## Éviter un style trop visiblement généré par IA
+
+- Jamais de point-virgule (`;`) dans le texte courant : scinder en deux
+  phrases, ou utiliser une virgule.
+- Jamais de tiret cadratin/demi-cadratin (`—`, `--`, `---`) comme ponctuation
+  de pause : utiliser une virgule, des parenthèses, ou une nouvelle phrase.
+  Un trait d'union simple pour un mot composé (`canal-énergie`) reste correct.
+- Jamais d'espace avant `:`, toujours un espace après (`titre: texte`). C'est
+  l'inverse de la convention typographique française standard, donc à forcer
+  explicitement : avec `babel[french]`, ajouter `\shorthandoff{;:!?}`
+  **après** `\begin{document}` (pas dans le préambule, babel réactive les
+  raccourcis à `\begin{document}`).
+- Jamais de mot en gras au milieu d'un paragraphe ou d'un item de liste
+  (pas de `\textbf{}` en pseudo-titre). Utiliser `\emph{}` pour l'emphase, et
+  de vrais sous-titres (`\subsubsection*{}`, `\paragraph{}`) pour structurer.
+- Pas de vocabulaire dramatique ou marketing (« un véritable outil »,
+  « transformer X en Y », « à part entière », « porteur de sens/d'information »)
+  et pas de motivation/narratif inventé plus grandiose que la réalité (ex. ne
+  pas écrire que « le but de l'expérience était de transformer un cristal en
+  véritable outil » quand l'objectif réel est simplement d'étalonner un
+  détecteur). Rester factuel et sobre, comme un·e étudiant·e écrit vraiment
+  un rapport.
+- Éviter la tournure contrastive « ce n'était pas seulement X, mais Y » : un
+  tic d'écriture IA reconnaissable. Énoncer le fait directement.
+
+### Écrire comme un·e étudiant·e l'expliquerait, pas comme un manuel
+
+Le `\subsection*{Résumé}` de `nucleaire/rapport/template_devoirBD.tex` (après
+sa réécriture du 23 septembre 2026) est l'exemple de référence à suivre. Ce
+qui en ressort :
+
+- Ne pas empiler les détails techniques précis dans une phrase de synthèse.
+  Le niveau de détail du genre « onze raies de 30,85 keV à 1332,50 keV » va
+  dans les résultats, pas dans le résumé ou l'introduction : une phrase de
+  synthèse dit *quoi* et *pourquoi*, pas *toutes les valeurs*.
+- Préférer une phrase explicite et déroulée à une formulation compressée ou
+  nominalisée. Dire « Le modèle utilisé pour faire la correspondance entre
+  les canaux et l'énergie a été un modèle quadratique » plutôt que « Un
+  modèle quadratique canal-énergie a été retenu ».
+- Préférer un mot courant à un terme technique précis quand le mot courant
+  reste correct. « Les mathématiques de la diffusion Compton » plutôt que
+  « la cinématique de diffusion Compton » ; « qui correspond à » plutôt que
+  « compatible avec ».
+- Préférer une expression parlée à une expression soutenue pour exprimer un
+  accord approximatif. « Plus ou moins la résolution du détecteur » plutôt
+  que « à la résolution du détecteur près ».
+- Ne pas ajouter de fioriture « poétique » même factuellement vraie (ex.
+  éviter un clin d'œil du genre « ... et même de nous-mêmes » ; rester dans
+  l'énumération factuelle plate : « le béton, la brique et le sol »).
+- Ne jamais remplacer une anecdote concrète et vérifiable par une liste
+  générique d'applications (« utilisé en sécurité, en médecine, en
+  environnement... »). Chercher un exemple réel, spécifique, si possible
+  historique ou surprenant, et le citer. Ex. : la centrale de Forsmark qui a
+  détecté la catastrophe de Tchernobyl deux jours après qu'elle ait eu lieu,
+  grâce au même principe de spectroscopie combiné à une analyse du vent.
+- Ne pas présenter un résultat de façon plus définitive ou plus certaine que
+  ce que le texte a réellement démontré à ce point du rapport.
+- Corriger l'orthographe et la grammaire de ce qui est écrit, mais toujours
+  en gardant le sens et le registre voulus : le but est un français correct
+  qui sonne quand même comme écrit par une personne, pas par un logiciel.
+
