@@ -309,14 +309,18 @@ def plot_spectrum(key, title, filename, xlim, mark_peaks=None, bg_key=None, ysca
     E = chan_to_E(d["channels"])
     cps = d["counts"] / d["live"]
 
+    if bg_key is not None:
+        # Meme MCA, meme gain, meme decoupage en canaux pour toutes les
+        # acquisitions (le gain n'a pas ete retouche pendant la seance):
+        # la soustraction se fait donc canal a canal, sans interpolation,
+        # directement sur les taux de comptage (coups/s - coups/s = taux
+        # de comptage net, valide car ce sont deux processus de Poisson
+        # independants).
+        cps_bg = data[bg_key]["counts"] / data[bg_key]["live"]
+        cps = cps - cps_bg
+
     fig, ax = plt.subplots(figsize=(8.5, 5))
     ax.step(E, cps, where="mid", color="tab:blue", lw=1.0, label=title)
-
-    if bg_key is not None:
-        db = data[bg_key]
-        Eb = chan_to_E(db["channels"])
-        cpsb = db["counts"] / db["live"]
-        ax.step(Eb, cpsb, where="mid", color="gray", lw=0.8, alpha=0.7, label="Bruit de fond")
 
     mask = (E >= xlim[0]) & (E <= xlim[1])
     ymax = cps[mask].max() if np.any(mask) else cps.max()
@@ -364,7 +368,8 @@ def plot_spectrum(key, title, filename, xlim, mark_peaks=None, bg_key=None, ysca
                         bbox=dict(facecolor="white", edgecolor="none", alpha=0.75, pad=1))
 
     ax.set_xlabel("Énergie (keV)")
-    ax.set_ylabel("Taux de comptage (coups/s)")
+    ax.set_ylabel("Taux de comptage net (coups/s)" if bg_key is not None
+                  else "Taux de comptage (coups/s)")
     ax.set_title(title, pad=14)
     use_fr_ticks(ax)
     ax.legend(loc="upper right", fontsize=9)
@@ -377,7 +382,7 @@ plot_num = 2
 for key, info in SOURCES.items():
     fname = f"{plot_num:02d}_spectre_{info['label'].replace('-', '')}.png"
     plot_spectrum(key, f"Spectre {info['label']}", fname, info["xlim"],
-                  mark_peaks=peak_results[key])
+                  mark_peaks=peak_results[key], bg_key=BACKGROUND_FILE)
     plot_num += 1
 
 bg_xlim = (0, chan_to_E(data[BACKGROUND_FILE]["channels"].max()))
@@ -455,7 +460,7 @@ E_backscatter_mesure = 195.0
 
 d_cs = data["CS_137_1"]
 E_cs = chan_to_E(d_cs["channels"])
-cps_cs = d_cs["counts"] / d_cs["live"]
+cps_cs = d_cs["counts"] / d_cs["live"] - data[BACKGROUND_FILE]["counts"] / data[BACKGROUND_FILE]["live"]
 
 fig, ax = plt.subplots(figsize=(9, 5.5))
 ax.step(E_cs, cps_cs, where="mid", color="tab:blue", lw=1.1)
@@ -500,7 +505,7 @@ ax.text(320, ymax_cs * 1.42, "continuum Compton",
         fontsize=9, color="tab:orange", ha="center", style="italic")
 
 ax.set_xlabel("Énergie (keV)")
-ax.set_ylabel("Taux de comptage (coups/s)")
+ax.set_ylabel("Taux de comptage net (coups/s)")
 ax.set_title("Anatomie du spectre du Cs-137: diffusion Compton et rétrodiffusion", pad=14)
 use_fr_ticks(ax)
 fig.tight_layout()
