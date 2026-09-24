@@ -71,7 +71,7 @@ qui priment sur les consignes standard ci-dessus :**
 
 ### Écrire comme un·e étudiant·e l'expliquerait, pas comme un manuel
 
-Le `\subsection*{Résumé}` de `nucleaire/rapport/template_devoirBD.tex` (après
+Le `\subsection*{Résumé}` de `nucleaire/Rapport/TPA_Lab1.tex` (après
 sa réécriture du 23 septembre 2026) est l'exemple de référence à suivre. Ce
 qui en ressort :
 
@@ -104,4 +104,39 @@ qui en ressort :
 - Corriger l'orthographe et la grammaire de ce qui est écrit, mais toujours
   en gardant le sens et le registre voulus : le but est un français correct
   qui sonne quand même comme écrit par une personne, pas par un logiciel.
+
+### Autres principes (tirés de la réécriture de l'introduction, 23 septembre 2026)
+
+- Ne pas commencer une section par une phrase de mise en contexte générique
+  et vide de contenu (« X est important dans notre société », « on sait
+  tous que... »). Aller directement au premier fait concret.
+- Préférer deux verbes coordonnés par « et » à une construction en gérondif
+  qui compresse deux actions en une seule. « Se désintègrent et émettent »
+  plutôt que « se désintègrent en émettant ».
+- Couper les propositions ou phrases qui ne font que reformuler ce qui vient
+  d'être dit. Ex. : ne pas ajouter « tous les événements produisent le même
+  signal » juste après avoir dit qu'il n'y a « aucune information sur
+  l'énergie » — c'est la même idée redite deux fois.
+- Couper les adjectifs et adverbes qui ne portent pas d'information réelle.
+  « Une question concrète » → « une question » ; « cet instrument
+  fraîchement calibré » → « ce système calibré » ; « cinq sources
+  d'énergies connues » → « cinq sources connues ».
+- Préférer une formulation directe à une définition entre parenthèses quand
+  c'est possible. « Convertir les numéros de canal en une énergie en keV »
+  plutôt que « convertir la sortie brute de l'électronique (un numéro de
+  canal) en une grandeur physique utile (une énergie en keV) ».
+- Énoncer un compte plutôt que de le qualifier abstraitement : « Il y avait
+  deux objectifs » plutôt que « L'objectif était double », puis énumérer
+  avec « Premièrement... Deuxièmement... » plutôt que « D'abord... Ensuite... ».
+- Un paragraphe qui annonce le plan du rapport doit être une suite de
+  phrases courtes et déclaratives, chacune avec sa propre référence de
+  section, plutôt qu'une ou deux phrases longues qui empilent plusieurs
+  sections avec des clauses complexes.
+- **Toute référence à une section, figure, tableau ou équation doit être une
+  vraie référence LaTeX (`\label{}`/`\ref{}`), jamais un numéro écrit en
+  dur.** Ajouter un `\label{sec:xxx}` juste après chaque `\section{}` ou
+  `\subsection{}` visée et écrire `Section~\ref{sec:xxx}` (pas
+  `section 2` ni `Section~4.2` en dur). La référence reste juste si les
+  sections changent de numéro, et devient cliquable dans le PDF
+  (`hyperref` est déjà chargé dans le préambule).
 
