@@ -237,6 +237,8 @@ print("\nCalibration lineaire:    E = {:.5e}*canal + {:.3f}  (R^2={:.6f}, RMSE={
     lin_coef[0], lin_coef[1], lin_r2, lin_rmse))
 print("Calibration quadratique: E = {:.5e}*canal^2 + {:.5e}*canal + {:.3f}  (R^2={:.6f}, RMSE={:.2f} keV)".format(
     quad_coef[0], quad_coef[1], quad_coef[2], quad_r2, quad_rmse))
+quad_err = np.sqrt(np.diag(quad_cov))
+print("  incertitudes: a={:.2e}, b={:.2e}, c={:.2f}".format(*quad_err))
 
 USE_QUAD = quad_rmse < 0.7 * lin_rmse
 if USE_QUAD:
@@ -262,7 +264,7 @@ def chan_to_E(ch):
 # 4) Graphique de calibration
 # ---------------------------------------------------------------------------
 fig, (ax1, ax2) = plt.subplots(
-    2, 1, figsize=(6.6, 5.4), sharex=True,
+    2, 1, figsize=(8.2, 5.4), sharex=True,
     gridspec_kw={"height_ratios": [3, 1]}
 )
 
@@ -281,8 +283,7 @@ if USE_QUAD:
               label=f"Ajust. linéaire (RMSE={fr(lin_rmse, '.1f')} keV)")
 ax1.plot(xfit, chan_to_E(xfit), "k--", lw=1.3, label=model_label)
 ax1.set_ylabel("Énergie (keV)")
-ax1.set_title("Étalonnage en énergie du scintillateur")
-ax1.legend(loc="upper left", fontsize=9)
+ax1.legend(loc="upper left", bbox_to_anchor=(1.01, 1.0), borderaxespad=0, fontsize=9)
 use_fr_ticks(ax1)
 
 local_slope = np.polyval(np.polyder(model_coef), chans)
@@ -298,7 +299,7 @@ ax2.legend(loc="upper right", fontsize=8)
 use_fr_ticks(ax2)
 
 fig.tight_layout()
-fig.savefig(os.path.join(OUT_DIR, "01_calibration.png"), dpi=200)
+fig.savefig(os.path.join(OUT_DIR, "01_calibration.png"), dpi=200, bbox_inches="tight")
 plt.close(fig)
 
 # ---------------------------------------------------------------------------
@@ -370,7 +371,6 @@ def plot_spectrum(key, title, filename, xlim, mark_peaks=None, bg_key=None, ysca
     ax.set_xlabel("Énergie (keV)")
     ax.set_ylabel("Taux de comptage net (coups/s)" if bg_key is not None
                   else "Taux de comptage (coups/s)")
-    ax.set_title(title, pad=14)
     use_fr_ticks(ax)
     ax.legend(loc="upper right", fontsize=9)
     fig.tight_layout()
@@ -406,6 +406,8 @@ if k40_fit is not None:
     k40_E_err = k40_fit["mu_err"] * slope_k40
     print(f"\nBruit de fond: pic dominant a {k40_E_mesuree:.1f} +/- {k40_E_err:.1f} keV "
           f"(K-40 attendu: {K40_ENERGY:.1f} keV)")
+    print(f"  (canal {k40_fit['mu']:.1f}; modele lineaire au meme canal: "
+          f"{np.polyval(lin_coef, k40_fit['mu']):.1f} keV)")
 else:
     print("\nBruit de fond: pic du K-40 non trouve automatiquement.")
 
@@ -432,7 +434,6 @@ if k40_fit is not None:
     )
 ax.set_xlabel("Énergie (keV)")
 ax.set_ylabel("Taux de comptage (coups/s)")
-ax.set_title("Bruit de fond ambiant: identification du $^{40}$K", pad=14)
 use_fr_ticks(ax)
 fig.tight_layout()
 fig.savefig(os.path.join(OUT_DIR, f"{plot_num:02d}_background_K40.png"), dpi=200)
@@ -451,16 +452,41 @@ E_backscatter = E_CS137 - E_compton_edge
 print(f"\nCs-137: front Compton attendu a {E_compton_edge:.1f} keV, "
       f"pic de retrodiffusion attendu a {E_backscatter:.1f} keV")
 
-# Positions mesurees sur le spectre (point mi-hauteur du front, centroide de
-# la bosse de retrodiffusion), telles que rapportees dans le texte du
-# rapport: valeurs fixes, non re-derivees ici, pour eviter toute divergence
-# avec la discussion.
-E_compton_edge_mesure = 462.0
-E_backscatter_mesure = 195.0
-
 d_cs = data["CS_137_1"]
 E_cs = chan_to_E(d_cs["channels"])
 cps_cs = d_cs["counts"] / d_cs["live"] - data[BACKGROUND_FILE]["counts"] / data[BACKGROUND_FILE]["live"]
+
+# Front Compton mesure: energie ou le spectre lisse croise la mi-hauteur entre
+# le plateau (380-430 keV) et le creux qui suit le front (500-560 keV).
+# Incertitude: bruit du spectre lisse au point de croisement, propage par
+# dE = dN / |dN/dE|, puis combine en quadrature avec le RMSE d'etalonnage.
+N_SMOOTH = 15
+cps_cs_lisse = np.convolve(cps_cs, np.ones(N_SMOOTH) / N_SMOOTH, mode="same")
+plateau = (E_cs >= 380) & (E_cs <= 430)
+creux = (E_cs >= 500) & (E_cs <= 560)
+N_mi = 0.5 * (cps_cs_lisse[plateau].mean() + cps_cs_lisse[creux].mean())
+zone = np.flatnonzero((E_cs >= 430) & (E_cs <= 500))
+i_x = zone[np.flatnonzero(cps_cs_lisse[zone] < N_mi)[0]]
+E_compton_edge_mesure = float(np.interp(N_mi, [cps_cs_lisse[i_x], cps_cs_lisse[i_x - 1]],
+                                        [E_cs[i_x], E_cs[i_x - 1]]))
+voisins = slice(i_x - 20, i_x + 20)
+pente_front = np.polyfit(E_cs[voisins], cps_cs_lisse[voisins], 1)[0]
+bruit_lisse = np.std(cps_cs[plateau] - cps_cs_lisse[plateau]) / np.sqrt(N_SMOOTH)
+dE_front_stat = bruit_lisse / abs(pente_front)
+dE_front = np.hypot(dE_front_stat, rmse)
+
+# Pic de retrodiffusion mesure: gaussienne sur fond lineaire, en energie.
+fen_bs = (E_cs >= 140) & (E_cs <= 260)
+p_bs, cov_bs = curve_fit(gauss_lin, E_cs[fen_bs], cps_cs[fen_bs],
+                         p0=[4.0, 195.0, 20.0, 0.0, 10.0], maxfev=40000)
+E_backscatter_mesure = float(p_bs[1])
+dE_bs_stat = float(np.sqrt(cov_bs[1, 1]))
+dE_bs = np.hypot(dE_bs_stat, rmse)
+
+print(f"Cs-137 mesure: front Compton {E_compton_edge_mesure:.1f} +/- {dE_front:.1f} keV "
+      f"(stat {dE_front_stat:.2f}, mi-hauteur {N_mi:.2f} c/s, pente {pente_front:.3f} c/s/keV); "
+      f"retrodiffusion {E_backscatter_mesure:.1f} +/- {dE_bs:.1f} keV (stat {dE_bs_stat:.2f}, "
+      f"sigma {p_bs[2]:.1f} keV)")
 
 fig, ax = plt.subplots(figsize=(9, 5.5))
 ax.step(E_cs, cps_cs, where="mid", color="tab:blue", lw=1.1)
@@ -489,16 +515,21 @@ _mark(E_CS137, "Photopic (effet\nphotoélectrique)\n661,7 keV", "tab:red",
       (E_CS137, cps_cs[np.argmin(np.abs(E_cs - E_CS137))] + 0.16 * ymax_cs))
 
 # Front Compton et retrodiffusion: ligne pointillee = position theorique
-# (eq. 1/2), fleche separee = position mesuree sur le spectre.
+# (eq. 1/2), fleche separee = position mesuree sur le spectre. Pour chaque
+# paire, les deux etiquettes sont placees de part et d'autre du petit
+# intervalle separant les deux lignes (theorique/mesure): comme cet
+# intervalle est vide de courbe, les deux fleches n'ont alors aucune plage
+# de x en commun et ne peuvent pas se croiser, ni chevaucher l'autre
+# etiquette ou la courbe du spectre.
+_mark(E_compton_edge_mesure, f"mesuré\n{fr(E_compton_edge_mesure, '.0f')} ± {fr(dE_front, '.0f')} keV",
+      "tab:purple", (E_compton_edge_mesure - 72, ymax_cs * 0.36), ls="-.")
 _mark(E_compton_edge, f"Front Compton\nthéorique (éq. 1)\n{fr(E_compton_edge, '.0f')} keV",
-      "tab:purple", (E_compton_edge + 90, ymax_cs * 0.62), ls=":")
-_mark(E_compton_edge_mesure, f"mesuré\n$\\approx${fr(E_compton_edge_mesure, '.0f')} keV",
-      "tab:purple", (E_compton_edge_mesure + 90, ymax_cs * 0.30), ls="-.")
+      "tab:purple", (E_compton_edge + 45, ymax_cs * 0.65), ls=":")
 
 _mark(E_backscatter, f"Pic de rétrodiffusion\nthéorique (éq. 2)\n{fr(E_backscatter, '.0f')} keV",
-      "tab:green", (E_backscatter - 60, ymax_cs * 0.95), ls=":")
-_mark(E_backscatter_mesure, f"mesuré\n$\\approx${fr(E_backscatter_mesure, '.0f')} keV",
-      "tab:green", (E_backscatter_mesure - 60, ymax_cs * 0.65), ls="-.")
+      "tab:green", (E_backscatter - 70, ymax_cs * 0.35), ls=":")
+_mark(E_backscatter_mesure, f"mesuré\n{fr(E_backscatter_mesure, '.0f')} ± {fr(dE_bs, '.0f')} keV",
+      "tab:green", (E_backscatter_mesure + 40, ymax_cs * 0.95), ls="-.")
 
 ax.axvspan(0, E_compton_edge, color="tab:orange", alpha=0.08)
 ax.text(320, ymax_cs * 1.42, "continuum Compton",
@@ -506,7 +537,6 @@ ax.text(320, ymax_cs * 1.42, "continuum Compton",
 
 ax.set_xlabel("Énergie (keV)")
 ax.set_ylabel("Taux de comptage net (coups/s)")
-ax.set_title("Anatomie du spectre du Cs-137: diffusion Compton et rétrodiffusion", pad=14)
 use_fr_ticks(ax)
 fig.tight_layout()
 fig.savefig(os.path.join(OUT_DIR, f"{plot_num:02d}_compton_cs137.png"), dpi=200)
@@ -523,12 +553,17 @@ for key, peaks in peak_results.items():
         fwhm_keV = p["fwhm"] * slope_here
         res_E.append(p["energy"])
         res_pct.append(100 * fwhm_keV / p["energy"])
+        print(f"  {p['energy']:8.2f} keV: FWHM={fwhm_keV:.1f} keV, R={100 * fwhm_keV / p['energy']:.1f} %, "
+              f"dE(centroide)={p['mu_err'] * slope_here:.2f} keV")
 res_E = np.array(res_E)
 res_pct = np.array(res_pct)
 
 # Regression en loi de puissance R(%) = A * E^b via les logarithmes.
-b, log_a = np.polyfit(np.log(res_E), np.log(res_pct), 1)
+# dA = |dA/d(lnA)| * d(lnA) = A * d(lnA)
+(b, log_a), cov_res = np.polyfit(np.log(res_E), np.log(res_pct), 1, cov=True)
 A = np.exp(log_a)
+db, dA = np.sqrt(cov_res[0, 0]), A * np.sqrt(cov_res[1, 1])
+print(f"Resolution: A = {A:.1f} +/- {dA:.1f}, b = {b:.3f} +/- {db:.3f}")
 
 fig, ax = plt.subplots(figsize=(7.5, 5.2))
 ax.scatter(res_E, res_pct, s=45, color="tab:blue", zorder=3, label="Pics ajustés")
@@ -539,7 +574,6 @@ ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel("Énergie (keV)")
 ax.set_ylabel("Résolution $R = \\mathrm{FWHM}/E$ (%)")
-ax.set_title("Résolution en énergie du scintillateur NaI(Tl)", pad=14)
 ax.legend(fontsize=9)
 use_fr_ticks(ax)
 fig.tight_layout()
