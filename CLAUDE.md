@@ -39,10 +39,69 @@ qui priment sur les consignes standard ci-dessus :**
   une espace insécable entre le nombre et l'unité
 - Parenthèses/crochets de grande taille : `\left(`/`\right)`,
   `\left[`/`\right]`
-- Toute incertitude doit être justifiée et propagée par dérivées partielles
+- Toute incertitude doit être justifiée et propagée par dérivées partielles,
+  mais rester simple : une seule équation de propagation pour les résultats
+  principaux suffit. Pas d'incertitude sur des numéros de canal (ce sont des
+  entiers), pas de propagation pour chaque paramètre secondaire (ex. le
+  préfacteur d'une loi de puissance), pas de sous-section « Incertitudes »
+  générique dans la discussion.
 - Éviter le ton trop lisse/générique dans les sections rédigées : varier la
   structure des paragraphes, éviter les tournures répétitives d'un rapport
   à l'autre
+
+### Principes tirés de la révision du rapport nucléaire (24 septembre 2026)
+
+Ces principes viennent de la révision ligne par ligne faite par l'auteur sur
+`nucleaire/Rapport/TPA_Lab1.tex`. Ils s'appliquent à tous les rapports.
+
+- Rapporter ce qui a été utilisé, pas ce qui a été testé. Pas de modèle
+  rejeté (ex. linéaire contre quadratique), pas de critère de sélection de
+  modèle, pas de figure ou de phrase qui compare au modèle abandonné. Pour
+  justifier le modèle retenu, une phrase suffit (« Le modèle quadratique est
+  un bon choix, avec $R^2 = 0{,}99997$... »), sans argumentaire défensif du
+  type « une amélioration suffisamment nette pour être retenue plutôt que ».
+- Pas de résidus : ni colonne de résidus dans les tableaux, ni panneau de
+  résidus sous les figures, sauf si le protocole le demande.
+- Pas de section « Montage » qui recopie la chaîne d'acquisition du
+  protocole (le lecteur a le protocole). Citer le protocole une fois dans la
+  méthodologie.
+- Méthodologie courte : décrire l'idée (« la région autour du canal attendu
+  est analysée pour trouver un maximum local ») et non l'implémentation
+  (pas de NumPy/SciPy, pas de nom de fonction ni de script, pas de formule de
+  la gaussienne d'ajustement). « Curve fit » suffit pour nommer l'ajustement.
+- Pas de détails entre parenthèses qui n'apportent rien (« canal par canal,
+  même détecteur et même gain », « échelle logarithmique, 36 minutes
+  d'acquisition » dans une légende).
+- Pas de guillemets d'emphase ou d'ironie (« volontaire »).
+- Couper ce qui est hors sujet ou négligeable, même si c'est vrai (ex. un
+  paragraphe sur la production de paires qui « reste négligeable », un
+  paragraphe sur ce qu'un détecteur HPGe aurait permis, un rappel de
+  « l'indice donné dans le protocole »).
+- Ne pas énumérer en texte des valeurs déjà dans un tableau (« d'environ 26
+  à 31 % pour les raies sous 35 keV, jusqu'à 4,5 à 5,2 %... »). Dire la
+  tendance (« diminue avec l'énergie ») et renvoyer au tableau.
+- Pour chaque pic identifié dans un spectre, donner la valeur théorique ET
+  la valeur mesurée, dans le texte et sur la figure.
+- Légendes de figures courtes et descriptives : ce que la figure montre, pas
+  l'interprétation ni la méthode (« Énergie en fonction du numéro de canal
+  pour les onze raies. »). Nommer la couleur réelle (« la zone orange ») plutôt
+  qu'un terme vague (« la zone ombragée »).
+- Pas de phrases méta sur l'annexe (« fournies à titre complémentaire », « le
+  corps du rapport est compréhensible sans s'y référer »).
+- Conclusion et perspectives courtes et concrètes : ne pas redonner les
+  chiffres de détail, une amélioration par phrase (« Aussi, une source
+  d'étalonnage au-dessus de 1332,5 keV permettrait de réaliser un meilleur
+  étalonnage. »).
+- Vocabulaire simple, exemples de remplacements faits par l'auteur :
+  « moindre » → « plus petite », « abruptement » → « rapidement », « en deçà »
+  → « en dessous », « lequel » → « qui », « acquises individuellement » →
+  « mesurées », « particulièrement instructif » → « intéressant », « On y
+  distingue nettement » → « On y voit », « centroïde » (dans le texte courant)
+  → « centre », « à comparer à » → « similaire à », « a occasionné une
+  fraction de temps mort » → « a totalisé un temps mort », « une prochaine
+  itération de l'expérience gagnerait à consigner » → « une prochaine
+  expérience pourrait prendre en compte », « un continuum qui décroît
+  globalement » → « une tendance qui décroît ».
 
 ## Figures générées (scripts Python)
 
@@ -95,8 +154,14 @@ lecteur peut aller le consulter quelque part.
   **après** `\begin{document}` (pas dans le préambule, babel réactive les
   raccourcis à `\begin{document}`).
 - Jamais de mot en gras au milieu d'un paragraphe ou d'un item de liste
-  (pas de `\textbf{}` en pseudo-titre). Utiliser `\emph{}` pour l'emphase, et
-  de vrais sous-titres (`\subsubsection*{}`, `\paragraph{}`) pour structurer.
+  (pas de `\textbf{}` en pseudo-titre). Utiliser de vrais sous-titres
+  (`\subsubsection*{}`, `\paragraph{}`) pour structurer.
+- Jamais de mot en italique (`\emph{}`, `\textit{}`) au milieu du texte pour
+  mettre en valeur un terme (ex. « le *photopic* », « une *bosse de
+  rétrodiffusion* », « cède *toute* son énergie ») : un·e étudiant·e n'écrit
+  pas comme ça, le terme se suffit à lui-même. L'italique reste correct
+  seulement là où c'est une convention : titres d'ouvrages dans la
+  bibliographie, nom du cours dans l'en-tête.
 - Pas de vocabulaire dramatique ou marketing (« un véritable outil »,
   « transformer X en Y », « à part entière », « porteur de sens/d'information »)
   et pas de motivation/narratif inventé plus grandiose que la réalité (ex. ne

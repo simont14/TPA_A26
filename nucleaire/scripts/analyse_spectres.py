@@ -263,10 +263,7 @@ def chan_to_E(ch):
 # ---------------------------------------------------------------------------
 # 4) Graphique de calibration
 # ---------------------------------------------------------------------------
-fig, (ax1, ax2) = plt.subplots(
-    2, 1, figsize=(8.2, 5.4), sharex=True,
-    gridspec_kw={"height_ratios": [3, 1]}
-)
+fig, ax1 = plt.subplots(figsize=(9, 4.8))
 
 unique_labels = sorted(set(labels))
 cmap = plt.get_cmap("tab10")
@@ -274,29 +271,14 @@ color_of = {lab: cmap(i) for i, lab in enumerate(unique_labels)}
 
 for lab in unique_labels:
     idxs = [i for i, l in enumerate(labels) if l == lab]
-    ax1.errorbar(chans[idxs], energies[idxs], xerr=chan_errs[idxs],
-                 fmt="o", ms=7, capsize=3, color=color_of[lab], label=lab)
+    ax1.plot(chans[idxs], energies[idxs], "o", ms=7, color=color_of[lab], label=lab)
 
 xfit = np.linspace(0, max(chans) * 1.08, 200)
-if USE_QUAD:
-    ax1.plot(xfit, np.polyval(lin_coef, xfit), color="0.6", ls=":", lw=1.2,
-              label=f"Ajust. linéaire (RMSE={fr(lin_rmse, '.1f')} keV)")
 ax1.plot(xfit, chan_to_E(xfit), "k--", lw=1.3, label=model_label)
 ax1.set_ylabel("Énergie (keV)")
-ax1.legend(loc="upper left", bbox_to_anchor=(1.01, 1.0), borderaxespad=0, fontsize=9)
+ax1.set_xlabel("Numéro de canal")
+ax1.legend(loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=3, fontsize=9)
 use_fr_ticks(ax1)
-
-local_slope = np.polyval(np.polyder(model_coef), chans)
-ax2.axhline(0, color="k", lw=1)
-ax2.axhspan(-rmse, rmse, color="gray", alpha=0.15, label=f"±RMSE ({fr(rmse, '.1f')} keV)")
-for lab in unique_labels:
-    idxs = [i for i, l in enumerate(labels) if l == lab]
-    ax2.errorbar(chans[idxs], resid[idxs], yerr=np.abs(chan_errs[idxs] * local_slope[idxs]),
-                 fmt="o", ms=6, capsize=3, color=color_of[lab])
-ax2.set_ylabel("Résidu (keV)")
-ax2.set_xlabel("Numéro de canal")
-ax2.legend(loc="upper right", fontsize=8)
-use_fr_ticks(ax2)
 
 fig.tight_layout()
 fig.savefig(os.path.join(OUT_DIR, "01_calibration.png"), dpi=200, bbox_inches="tight")
@@ -525,6 +507,17 @@ _mark(E_compton_edge_mesure, f"mesuré\n{fr(E_compton_edge_mesure, '.0f')} ± {f
       "tab:purple", (E_compton_edge_mesure - 72, ymax_cs * 0.36), ls="-.")
 _mark(E_compton_edge, f"Front Compton\nthéorique (éq. 1)\n{fr(E_compton_edge, '.0f')} keV",
       "tab:purple", (E_compton_edge + 45, ymax_cs * 0.65), ls=":")
+
+# Raie X K du baryum (32,0 keV): valeur theorique et position mesuree
+# (centroide ajuste converti par l'etalonnage).
+E_XBA = 32.0
+pk_xba = [p for p in peak_results["CS_137_1"] if abs(p["energy"] - E_XBA) < 1][0]
+E_xba_mesure = float(chan_to_E(pk_xba["mu"]))
+print(f"Cs-137: raie X du Ba mesuree a {E_xba_mesure:.1f} keV (theorique {E_XBA:.1f} keV)")
+_mark(E_xba_mesure, f"mesuré\n{fr(E_xba_mesure, '.1f')} keV",
+      "tab:brown", (75, ymax_cs * 1.22), ls="-.")
+_mark(E_XBA, f"Raie X du Ba\nthéorique {fr(E_XBA, '.1f')} keV",
+      "tab:brown", (130, ymax_cs * 0.98), ls=":")
 
 _mark(E_backscatter, f"Pic de rétrodiffusion\nthéorique (éq. 2)\n{fr(E_backscatter, '.0f')} keV",
       "tab:green", (E_backscatter - 70, ymax_cs * 0.35), ls=":")
