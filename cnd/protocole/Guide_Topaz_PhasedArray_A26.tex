@@ -1,0 +1,516 @@
+\documentclass[11pt,letterpaper]{article}
+
+% Pour les figures et les schémas
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
+\usepackage{graphicx,caption,subcaption}
+\graphicspath{{./}}
+\usepackage{enumitem}
+\setlist[itemize]{label=\textbullet}
+\usepackage{booktabs, array}
+
+% Packages pour écrire en français
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\addto\captionsfrench{\renewcommand{\tablename}{Tableau}}
+
+% Maths et navigation dans le pdf
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+\hypersetup{
+    pdftitle={Contrôle non destructif des matériaux -- 3. Utilisation du Topaz (ultrasons phased array)},
+    pdfauthor={Louis-Félix Brodeur, Simon Larouche-Tremblay}
+}
+
+% Marges, police de caractère et pied de page
+\usepackage{geometry}
+\geometry{top=23mm, bottom=23mm, left=20mm, right=20mm}
+\usepackage{cochineal}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{13.6pt}
+\cfoot{\small VERSION A26 \qquad GPH-3000 TRAVAUX PRATIQUES AVANC\'ES \qquad Page \thepage}
+
+\parindent=0mm % pas d'indentation
+
+% Encadré pointillé décrivant une photo à insérer plus tard
+\newcommand{\placeholder}[3]{%
+  \begin{center}
+  \begin{tikzpicture}
+    \node[draw, dashed, thick, minimum width=#1, minimum height=#2,
+          align=center, text width=#1-1cm, font=\itshape\small, inner sep=8pt]
+          {Photo \`a ins\'erer: #3};
+  \end{tikzpicture}
+  \end{center}
+}
+
+\begin{document}
+\shorthandoff{;:!?}
+
+\begin{center}
+{\Large Contr\^ole non destructif des mat\'eriaux}\\[2mm]
+{\huge 3. Utilisation du Topaz (ultrasons phased array)}\\[6mm]
+{\sc GPH-3000}\\
+{\sc Louis-F\'elix Brodeur, Simon Larouche-Tremblay}\\
+{\sc Septembre 2026}
+\end{center}
+
+\vspace{4mm}
+
+\section{Introduction}
+
+Le document Ultrasons de ce cours pr\'esente la th\'eorie de base de la propagation des ondes ultrasonores, soit l'imp\'edance acoustique, la r\'eflexion, la r\'efraction et l'att\'enuation, ainsi que leur g\'en\'eration et leur d\'etection par effet pi\'ezo\'electrique. Il propose aussi une s\'erie de manipulations r\'ealis\'ees avec une sonde \`a un seul \'el\'ement branch\'ee \`a un oscilloscope.
+
+Ce document compl\`ete le pr\'ec\'edent en pr\'esentant un second appareil disponible au laboratoire, le Topaz de Zetec, utilis\'e avec son logiciel UltraVision Touch. Le Topaz pilote une sonde \`a r\'eseau phas\'e (phased array), c'est-\`a-dire une sonde compos\'ee de plusieurs \'el\'ements pi\'ezo\'electriques ind\'ependants plut\^ot que d'un seul. La th\'eorie de base des ultrasons n'est pas reprise ici. Ce document couvre plut\^ot le principe de fonctionnement d'une sonde phased array, la mise en marche et la calibration du Topaz, puis propose deux manipulations: une reprise des manipulations du document Ultrasons avec le Topaz, et une manipulation propre au phased array.
+
+\section{Principe du phased array}
+\label{sec:theorie}
+
+Une sonde \`a ultrasons conventionnelle, comme celle utilis\'ee dans le document Ultrasons, contient un seul \'el\'ement pi\'ezo\'electrique. Cet \'el\'ement \'emet un faisceau dont la direction est fix\'ee par la g\'eom\'etrie de la sonde et ne peut \^etre chang\'ee qu'en la d\'epla\c cant physiquement.
+
+Une sonde phased array contient plusieurs \'el\'ements pi\'ezo\'electriques ind\'ependants, align\'es en r\'eseau. Chaque \'el\'ement peut \^etre excit\'e s\'epar\'ement, avec un d\'elai qui lui est propre. Si tous les \'el\'ements sont excit\'es en m\^eme temps, leurs ondes s'additionnent comme si un seul \'el\'ement avait \'et\'e utilis\'e. Mais si l'excitation de chaque \'el\'ement est retard\'ee d'une quantit\'e pr\'ecise par rapport \`a ses voisins, les fronts d'onde \'emis par chaque \'el\'ement ne sont plus en phase au moment de leur \'emission. Ils peuvent alors interf\'erer de fa\c con constructive dans une direction diff\'erente de la normale \`a la sonde, ou converger vers un point de focalisation \`a une profondeur donn\'ee. L'ensemble de ces d\'elais s'appelle une loi focale. C'est ce principe qui permet de diriger et de focaliser \'electroniquement le faisceau, sans d\'eplacer la sonde.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1]
+  \foreach \i in {0,...,6} {
+    \draw[fill=gray!30] (\i*0.7,0) rectangle ++(0.5,0.3);
+  }
+  % Délais proportionnels à (d_max - d_i), d_i = distance de l'élément i au point focal F
+  \foreach \i/\h in {0/0.15,1/0.56,2/0.90,3/1.17,4/1.33,5/1.36,6/1.27} {
+    \draw[-{Latex[length=2mm]}, thick] (\i*0.7+0.25,0.3) -- ++(0,\h);
+  }
+  \draw[dashed, gray] plot[smooth] coordinates {(0.25,0.45) (0.95,0.86) (1.65,1.20) (2.35,1.47) (3.05,1.63) (3.75,1.66) (4.45,1.57)};
+  \coordinate (F) at (3.6,-3.2);
+  \foreach \i in {0,...,6} {
+    \draw[blue, thick] (\i*0.7+0.25,0) -- (F);
+  }
+  \fill (F) circle (2pt);
+  \node[below] at (F) {Point focal};
+  \node[left] at (-0.3,0.7) {D\'elais};
+  \node[left] at (-0.3,-1.5) {Faisceaux};
+\end{tikzpicture}
+\caption{D\'elais d'excitation des \'el\'ements (fl\`eches noires) pour focaliser le faisceau en un point focal. L'\'el\'ement le plus loin du point focal est excit\'e en premier, et le plus proche en dernier.}
+\label{fig:loi-focale}
+\end{figure}
+
+Le logiciel UltraVision Touch permet de combiner plusieurs lois focales pour balayer une pi\`ece de deux fa\c cons diff\'erentes. Dans un balayage sectoriel, l'angle de r\'efraction du faisceau varie d'une loi focale \`a l'autre alors que le groupe d'\'el\'ements utilis\'e, appel\'e l'ouverture, reste le m\^eme: ceci demande normalement un sabot \`a angle, taill\'e pour permettre plusieurs angles de r\'efraction utiles. Dans un balayage lin\'eaire, c'est plut\^ot l'ouverture active qui se d\'eplace \'electroniquement le long du r\'eseau, \`a angle de r\'efraction constant. Ce deuxi\`eme mode revient \`a d\'eplacer une sonde conventionnelle le long d'une pi\`ece, mais sans aucun mouvement m\'ecanique.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1]
+  \foreach \i in {0,...,15} {
+    \draw (\i*0.4,0) rectangle ++(0.3,0.3);
+  }
+  \foreach \i in {1,...,4} {
+    \draw[fill=blue!30] (\i*0.4,0) rectangle ++(0.3,0.3);
+  }
+  \draw[blue, thick, -{Latex[length=2mm]}] (2.5*0.4+0.15,0) -- ++(0,-1.2);
+  \foreach \i in {6,...,9} {
+    \draw[fill=orange!40] (\i*0.4,0) rectangle ++(0.3,0.3);
+  }
+  \draw[orange!80!black, thick, -{Latex[length=2mm]}] (7.5*0.4+0.15,0) -- ++(0,-1.2);
+  \foreach \i in {11,...,14} {
+    \draw[fill=green!30] (\i*0.4,0) rectangle ++(0.3,0.3);
+  }
+  \draw[green!50!black, thick, -{Latex[length=2mm]}] (12.5*0.4+0.15,0) -- ++(0,-1.2);
+  \node[below] at (2.5*0.4+0.15,-1.2) {\small 1};
+  \node[below] at (7.5*0.4+0.15,-1.2) {\small 2};
+  \node[below] at (12.5*0.4+0.15,-1.2) {\small 3};
+\end{tikzpicture}
+\caption{Trois positions de l'ouverture active (en couleur) lors d'un balayage lin\'eaire \`a 0\textdegree. Au laboratoire, l'ouverture avance d'un seul \'el\'ement entre deux faisceaux.}
+\label{fig:e-scan}
+\end{figure}
+
+Le sabot disponible pour ce laboratoire est un sabot droit, adapt\'e \`a une onde longitudinale \`a incidence normale. C'est donc le balayage lin\'eaire, illustr\'e \`a la Figure~\ref{fig:e-scan}, qui est utilis\'e dans les manipulations d\'ecrites \`a la Section~\ref{sec:manipulations}.
+
+\section{Fonctionnement du Topaz}
+
+\subsection{Pr\'esentation de l'appareil}
+
+Le Topaz est un appareil portable qui int\`egre le pulseur-r\'ecepteur, l'\'electronique de traitement et un \'ecran tactile permettant de faire fonctionner UltraVision Touch directement sur l'appareil, sans ordinateur externe. Il peut \^etre aliment\'e par une batterie amovible ou directement au secteur.
+
+\begin{figure}[H]
+\centering
+\placeholder{9cm}{5.5cm}{vue d'ensemble du panneau avant du Topaz, montrant l'\'ecran tactile, le bouton marche/arr\^et et la poign\'ee.}
+\caption{Panneau avant du Topaz.}
+\label{fig:panneau-avant}
+\end{figure}
+
+Le panneau lat\'eral gauche regroupe les connecteurs: un connecteur d\'edi\'e \`a la sonde phased array, verrouill\'e par un loquet, ainsi que des connecteurs conventionnels non utilis\'es dans ce document.
+
+\begin{figure}[H]
+\centering
+\placeholder{9cm}{5.5cm}{panneau lat\'eral gauche du Topaz, montrant le connecteur de la sonde phased array et son loquet.}
+\caption{Panneau lat\'eral gauche du Topaz.}
+\label{fig:panneau-lateral}
+\end{figure}
+
+\subsection{Mise sous tension}
+
+Avant de mettre le Topaz sous tension, v\'erifier qu'une batterie charg\'ee est install\'ee ou brancher le cordon d'alimentation. Appuyer ensuite sur le bouton marche/arr\^et: le voyant d'alimentation s'allume en vert et la s\'equence de d\'emarrage s'amorce. Il est recommand\'e de laisser l'appareil se stabiliser une dizaine de minutes avant de commencer les mesures.
+
+\begin{figure}[H]
+\centering
+\placeholder{8cm}{5cm}{Topaz allum\'e, voyant d'alimentation vert visible sur le panneau avant.}
+\caption{Topaz sous tension.}
+\label{fig:sous-tension}
+\end{figure}
+
+\subsection{Connexion de la sonde}
+
+Pour connecter la sonde phased array, retirer d'abord le capot de protection du connecteur en faisant glisser le loquet de la position verrouill\'ee vers la position d\'everrouill\'ee. Aligner ensuite le connecteur de la sonde avec celui du panneau lat\'eral et verrouiller le loquet.
+
+\begin{figure}[H]
+\centering
+\placeholder{8cm}{5cm}{connexion de la sonde phased array au Topaz, gros plan sur le loquet du connecteur.}
+\caption{Connexion de la sonde phased array.}
+\label{fig:connexion-sonde}
+\end{figure}
+
+Si le connecteur de la sonde est reconnu par l'appareil, le Topaz la d\'etecte au branchement et affiche la fen\^etre New Probe Detected. Le manuel recommande de choisir la configuration du canal avant de brancher la sonde, pour que cette d\'etection se fasse correctement. Si la sonde n'est pas d\'ej\`a branch\'ee en d\'ebut de s\'eance, il vaut donc mieux attendre l'\'etape~2 de la Section~\ref{sec:configuration} pour la brancher.
+
+\subsection{Interface UltraVision Touch}
+
+Une fois la s\'equence de d\'emarrage termin\'ee, l'interface UltraVision Touch appara\^it. Elle est organis\'ee en quelques zones principales: le nom du fichier ouvert et le r\'eglage du gain en haut, une zone d'information sur l'\'etat de l'appareil (charge de la batterie, \'etat des calibrations), la zone d'affichage des donn\'ees au centre, puis en bas un menu permettant de choisir la fonction voulue (sp\'ecimen, canal, calibration, etc.) et des sous-menus donnant acc\`es aux param\`etres de cette fonction.
+
+\begin{figure}[H]
+\centering
+\placeholder{9cm}{6cm}{fen\^etre principale d'UltraVision Touch, avec les principales zones de l'\'ecran identifi\'ees.}
+\caption{Fen\^etre principale d'UltraVision Touch.}
+\label{fig:interface}
+\end{figure}
+
+Les indicateurs de calibration, dans la zone d'\'etat, sont gris tant qu'aucune calibration n'a \'et\'e faite, jaunes si elle est incompl\`ete pour certains faisceaux et verts lorsqu'elle est compl\`ete pour tous les faisceaux de la configuration. Ces indicateurs permettent de v\'erifier rapidement l'\'etat de calibration avant de commencer une acquisition.
+
+\subsection{Configuration d'une inspection}
+\label{sec:configuration}
+
+Avant de pouvoir calibrer l'appareil ou faire une mesure, une configuration d'inspection doit \^etre d\'efinie dans UltraVision Touch. Les valeurs donn\'ees dans cette section sont celles de la configuration utilis\'ee au laboratoire avec la sonde lin\'eaire LM de Zetec (5~MHz, 64~\'el\'ements) et le sabot droit LM-0LW. Les noms de menus et de boutons sont ceux de l'interface en anglais, tels qu'ils apparaissent \`a l'\'ecran.
+
+\subsubsection*{Option rapide: charger la configuration du laboratoire}
+
+Si le fichier LFB\_ET\_SIMlT\_LM5MHz\_LM0LW\_ALU.UVSetup est pr\'esent dans le dossier Setups de l'appareil, il suffit de le charger: menu File, bouton Load Setup, choisir le fichier, puis Accept. Toutes les valeurs des tableaux qui suivent sont alors d\'ej\`a entr\'ees. Il reste \`a v\'erifier l'\'epaisseur de la pi\`ece dans le menu Specimen (\'etape~1) et \`a refaire la calibration (Section~\ref{sec:calibration}), qui doit \^etre refaite \`a chaque s\'eance. Les \'etapes suivantes permettent de refaire la configuration au complet, ou de v\'erifier celle qui a \'et\'e charg\'ee.
+
+\subsubsection*{\'Etape 1: d\'efinir le sp\'ecimen}
+
+\begin{enumerate}
+  \item Appuyer sur le bouton de s\'election du menu (en bas de l'\'ecran) et choisir Specimen.
+  \item Appuyer sur Geometry. Dans la fen\^etre Shape Editor, r\'egler les param\`etres du Tableau~\ref{tab:specimen}, puis appuyer sur Accept.
+  \item Appuyer sur Material, choisir l'aluminium dans la liste, puis Accept. Les champs LW Velocity et SW Velocity doivent afficher les vitesses du Tableau~\ref{tab:specimen}.
+\end{enumerate}
+
+\begin{table}[H]
+\centering
+\caption{Param\`etres du sp\'ecimen (menu Specimen).}
+\label{tab:specimen}
+\begin{tabular}{llp{7cm}}
+\toprule
+Param\`etre & Valeur & Remarque \\
+\midrule
+Shape Type & Plate & bloc \`a faces planes \\
+Weld Type & None & aucune soudure \\
+Thickness & \'epaisseur mesur\'ee & au pied \`a coulisse \\
+Material & aluminium & \\
+LW Velocity & 6320~m/s & onde longitudinale, affich\'ee automatiquement \\
+SW Velocity & 3130~m/s & onde transversale, non utilis\'ee ici \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection*{\'Etape 2: d\'efinir le canal, la sonde et le sabot}
+
+\begin{enumerate}
+  \item Choisir le menu Channel. Appuyer sur Configuration et choisir Phased Array-Pulse Echo. Le manuel recommande de faire ce choix avant de brancher la sonde.
+  \item Si la sonde n'est pas encore branch\'ee, la brancher comme d\'ecrit \`a la section pr\'ec\'edente. Si la fen\^etre New Probe Detected appara\^it, appuyer sur Use Probe and Wedge, puis choisir le sabot LM-0LW dans la liste.
+  \item Si la sonde \'etait d\'ej\`a branch\'ee, ou si la fen\^etre New Probe Detected n'appara\^it pas, appuyer sur Probe, puis Database, et choisir la sonde LM de 5~MHz \`a 64~\'el\'ements. Appuyer ensuite sur Wedge, puis Database, et choisir LM-0LW.
+  \item Si la sonde ou le sabot n'apparaissent pas dans la base de donn\'ees, les d\'efinir \`a la main avec Probe, puis Edit (ou Wedge, puis Edit), en entrant les valeurs du Tableau~\ref{tab:sonde}.
+\end{enumerate}
+
+\begin{table}[H]
+\centering
+\caption{Caract\'eristiques de la sonde et du sabot du laboratoire.}
+\label{tab:sonde}
+\begin{tabular}{lll}
+\toprule
+& Param\`etre & Valeur \\
+\midrule
+Sonde & Type & Linear \\
+& Frequency & 5~MHz \\
+& Element Quantity & 64 \\
+& Pitch & 0,6~mm \\
+& Primary Axis Element Size & 0,5~mm \\
+& Secondary Axis Element Size & 10~mm \\
+\midrule
+Sabot & Name & LM-0LW \\
+& Wave Type & Longitudinal \\
+& Wedge Angle & 0\textdegree \\
+& Length $\times$ Width $\times$ Height & $51 \times 28 \times 30$~mm \\
+& First Element Height & 30~mm \\
+& First Element Primary Axis Offset & 6,6~mm \\
+& First Element Secondary Axis Offset & 14~mm \\
+& Velocity & 2330~m/s \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection*{\'Etape 3: d\'efinir la loi focale}
+
+Dans le menu Channel, appuyer sur Calculator, r\'egler les param\`etres du Tableau~\ref{tab:calculateur}, puis appuyer sur Accept. Chaque fois qu'un param\`etre de la sonde, du sabot ou de la loi focale change, le message \og Focal law parameters have been changed \fg{} appara\^it: appuyer alors sur Recompute.
+
+\begin{table}[H]
+\centering
+\caption{Param\`etres de la loi focale (fen\^etre Calculator).}
+\label{tab:calculateur}
+\begin{tabular}{llp{7.5cm}}
+\toprule
+Param\`etre & Valeur & Remarque \\
+\midrule
+Skew Angle & 90\textdegree & valeur utilis\'ee au laboratoire \\
+Scan Reference & d\'efaut & \\
+Index Reference & d\'efaut & \\
+Wave Type & Longitudinal & compatible avec le sabot droit \\
+Sweep & Linear & l'ouverture se d\'eplace le long du r\'eseau \\
+Angle & 0\textdegree & incidence normale \\
+Aperture & 16 & nombre maximal d'\'el\'ements actifs du Topaz du laboratoire \\
+First Element & 1 & \\
+Last Element & 64 & \\
+Focal Point & Half Path & \\
+Position & 20~mm & profondeur de focalisation \\
+Timebase Type & True Depth & axe vertical gradu\'e en profondeur \\
+Timebase Start & 0~mm & \\
+Timebase Range & 60~mm & au moins $2e + 5$~mm, pour voir le deuxi\`eme \'echo de fond d'un bloc d'\'epaisseur $e$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Avec ces valeurs, l'ouverture de 16~\'el\'ements se d\'eplace d'un \'el\'ement \`a la fois de la position 1 \`a 16 jusqu'\`a la position 49 \`a 64, ce qui donne $64 - 16 + 1 = 49$ faisceaux. UltraVision Touch les nomme L~1-16 \`a L~49-64.
+
+\begin{figure}[H]
+\centering
+\placeholder{9cm}{6cm}{fen\^etre Calculator avec les param\`etres du Tableau~\ref{tab:calculateur} et la repr\'esentation graphique des 49 faisceaux sous le sabot.}
+\caption{Fen\^etre Calculator dans UltraVision Touch.}
+\label{fig:calculateur}
+\end{figure}
+
+\subsubsection*{\'Etape 4: r\'eglages ultrasonores}
+
+Dans le menu UT Settings, r\'egler les param\`etres du Tableau~\ref{tab:ut}. Le gain est ensuite ajust\'e avec le bouton Gain en haut de l'\'ecran, en posant la sonde avec du couplant sur le bloc: l'\'echo de fond doit atteindre environ 80~\% de la hauteur de l'\'ecran sans saturer.
+
+\begin{table}[H]
+\centering
+\caption{R\'eglages ultrasonores (menu UT Settings).}
+\label{tab:ut}
+\begin{tabular}{lllp{5cm}}
+\toprule
+Sous-menu & Param\`etre & Valeur & Remarque \\
+\midrule
+General & Gain & environ 6~dB & \`a ajuster sur l'\'echo de fond \\
+Pulser \& Receiver & Pulse Width & 100~ns & demi-p\'eriode \`a 5~MHz (ou Auto) \\
+& Filter & 2 \`a 10~MHz & passe-bande \\
+& Rectification & Bipolar & signal non redress\'e \\
+Digitizer & Recurrence & 2500~Hz & fr\'equence de r\'ep\'etition des tirs \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection*{\'Etape 5: s\'equence d'acquisition}
+
+Au laboratoire, la sonde est d\'eplac\'ee \`a la main, sans encodeur de position. Dans le menu Mechanical, r\'egler Sequence Type \`a One Line, puis, dans le sous-menu Encoder, r\'egler Encoder ID \`a Clock: la position de balayage avance alors avec l'horloge interne de l'appareil. Si l'affichage d\'efile trop vite, diminuer Acquisition Rate dans UT Settings, sous-menu Digitizer.
+
+\subsubsection*{\'Etape 6: sauvegarder la configuration}
+
+Dans le menu File, appuyer sur Save Setup et donner un nom propre \`a l'\'equipe, pour ne pas \'ecraser la configuration du laboratoire ni celle d'une autre \'equipe.
+
+\subsection{Calibration}
+\label{sec:calibration}
+
+La calibration fait en sorte que la profondeur et l'amplitude affich\'ees soient correctes pour les 49 faisceaux, et non seulement pour un seul. Sans calibration, deux faisceaux voisins peuvent afficher une profondeur ou une amplitude l\'eg\`erement diff\'erentes pour un m\^eme d\'efaut, parce que leur trajet dans le sabot et la r\'eponse de leurs \'el\'ements ne sont pas rigoureusement identiques. La calibration doit \^etre refaite \`a chaque s\'eance, et apr\`es tout changement de sonde, de sabot ou de loi focale.
+
+Trois calibrations sont faites, dans cet ordre: la vitesse, le d\'elai de sabot, puis la sensibilit\'e. Toutes utilisent comme r\'eflecteur l'\'echo de fond d'un bloc d'aluminium \`a faces parall\`eles dont l'\'epaisseur $e$ a \'et\'e mesur\'ee au pied \`a coulisse, et dont la surface est plus grande que le sabot ($51 \times 28$~mm). Avec un sabot droit, tous les faisceaux voient l'\'echo de fond en m\^eme temps: il n'est donc pas n\'ecessaire de d\'eplacer la sonde pendant la calibration, il suffit de la tenir immobile avec une pression constante.
+
+\subsubsection*{Pr\'eparation}
+
+\begin{enumerate}
+  \item Mettre du couplant sur le bloc et y poser la sonde, bien \`a plat.
+  \item Ajuster le gain pour que l'\'echo de fond atteigne environ 80~\% de l'\'ecran sans saturer.
+  \item Choisir le menu Calibration. La mise en page de l'\'ecran change pour la vue de calibration: la vue de tous les faisceaux en haut, le A-scan du faisceau choisi, et une courbe qui donne, pour chaque faisceau, la position ou l'amplitude maximale du r\'eflecteur.
+\end{enumerate}
+
+Les param\`etres du r\'eflecteur communs aux trois calibrations sont donn\'es au Tableau~\ref{tab:reflecteur}.
+
+\begin{table}[H]
+\centering
+\caption{Param\`etres du r\'eflecteur communs aux trois calibrations (sous-menu Reflector).}
+\label{tab:reflecteur}
+\begin{tabular}{llp{6.5cm}}
+\toprule
+Param\`etre & Valeur & Remarque \\
+\midrule
+Reflector Type & Depth & le r\'eflecteur est \`a la m\^eme profondeur pour tous les faisceaux \\
+Detection Mode & Maximum Amplitude & demand\'e pour la vitesse seulement \\
+Detection Threshold & 20~\% & seuil de la porte de d\'etection \\
+Diameter & 0~mm & si demand\'e, \'echo de fond et non un trou \\
+Start & $e - 5$~mm & d\'ebut de la zone de recherche \\
+Range & 10~mm & largeur de la zone de recherche \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\placeholder{9cm}{6cm}{sonde pos\'ee sur le bloc de calibration avec du couplant, tenue \`a plat pendant une calibration.}
+\caption{Montage pour une calibration.}
+\label{fig:montage-calibration}
+\end{figure}
+
+\subsubsection*{Calibration de la vitesse}
+
+Cette calibration fixe la vitesse du son qui sert \`a convertir le temps de vol en profondeur. Elle demande deux r\'eflecteurs \`a des profondeurs diff\'erentes: le premier \'echo de fond, \`a la profondeur $e$, et le deuxi\`eme \'echo de fond, qui appara\^it \`a la profondeur $2e$ apr\`es un aller-retour de plus dans le bloc.
+
+\begin{enumerate}
+  \item Dans le menu Calibration, choisir Velocity.
+  \item Dans le sous-menu Reflector~1, entrer les param\`etres du Tableau~\ref{tab:reflecteur} avec Target~$= e$.
+  \item Dans le sous-menu Reflector~2, entrer les m\^emes param\`etres avec Target~$= 2e$ et Start~$= 2e - 5$~mm.
+  \item Dans le sous-menu Calibrate, choisir comme Current Beam un faisceau du centre de la sonde, par exemple le faisceau~25.
+  \item Appuyer sur Clear Envelope, attendre une ou deux secondes sans bouger la sonde, puis appuyer sur Compute~1.
+  \item Appuyer sur Compute~2. L'appareil calcule la vitesse qui place les deux \'echos \`a leur profondeur cible.
+  \item V\'erifier que la vitesse obtenue est proche de 6320~m/s (\`a quelques pour cent pr\`es), puis appuyer sur Accept.
+\end{enumerate}
+
+Une vitesse tr\`es diff\'erente indique en g\'en\'eral une erreur dans les cibles (\'epaisseur mal mesur\'ee, ou deuxi\`eme \'echo en dehors de la zone de recherche).
+
+\subsubsection*{Calibration du d\'elai de sabot}
+
+Cette calibration corrige, pour chaque faisceau, le d\'elai propre \`a son trajet dans le sabot, pour qu'un m\^eme r\'eflecteur apparaisse \`a la m\^eme profondeur peu importe le faisceau.
+
+\begin{enumerate}
+  \item Dans le menu Calibration, choisir Wedge Delay.
+  \item Dans le sous-menu Reflector, entrer les param\`etres du Tableau~\ref{tab:reflecteur} avec Target~$= e$. Laisser la tol\'erance \`a sa valeur par d\'efaut.
+  \item Dans le sous-menu Calibrate, appuyer sur Clear Envelope, attendre une ou deux secondes sans bouger la sonde, puis appuyer sur Compute.
+  \item Pour v\'erifier le r\'esultat, appuyer de nouveau sur Clear Envelope et attendre une ou deux secondes. La courbe rouge de la vue de calibration doit alors \^etre plate \`a la profondeur $e$ pour les 49 faisceaux. Appuyer sur Accept.
+\end{enumerate}
+
+\subsubsection*{Calibration de la sensibilit\'e}
+
+Cette calibration ajuste le gain de chaque faisceau pour qu'un m\^eme r\'eflecteur donne la m\^eme amplitude peu importe le faisceau.
+
+\begin{enumerate}
+  \item Dans le menu Calibration, choisir Sensitivity.
+  \item Dans le sous-menu Reflector, entrer les param\`etres du Tableau~\ref{tab:reflecteur} avec Target~$= 80$~\% et Tolerance~$= 5$~\%.
+  \item Dans le sous-menu Calibrate, appuyer sur Sector et s\'electionner tous les faisceaux (1 \`a 49).
+  \item Appuyer sur Clear Envelope, attendre une ou deux secondes sans bouger la sonde, puis appuyer sur Compute.
+  \item Pour v\'erifier le r\'esultat, appuyer de nouveau sur Clear Envelope et attendre une ou deux secondes. La courbe rouge doit alors \^etre plate \`a 80~\% pour tous les faisceaux, \`a l'int\'erieur de la tol\'erance. Appuyer sur Accept.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\placeholder{9cm}{6cm}{\'ecran de calibration en cours, montrant la vue des faisceaux, le A-scan et la courbe rouge plate sur les 49 faisceaux.}
+\caption{\'Ecran de calibration en cours.}
+\label{fig:ecran-calibration}
+\end{figure}
+
+Une fois les trois calibrations accept\'ees, les indicateurs V (vitesse), us (d\'elai de sabot) et dB (sensibilit\'e) de la zone d'\'etat doivent \^etre verts. Un indicateur jaune signifie qu'au moins un faisceau n'a pas \'et\'e calibr\'e.
+
+La correction de gain en fonction du temps (TCG) permet en plus de compenser l'att\'enuation avec la profondeur, pour qu'un m\^eme r\'eflecteur donne la m\^eme amplitude peu importe sa profondeur. Elle n'est pas utilis\'ee dans les manipulations propos\'ees ici.
+
+\subsection{Mesures et acquisition}
+\label{sec:mesure}
+
+\subsubsection*{Lire l'\'ecran}
+
+En balayage lin\'eaire, la vue principale (appel\'ee VC sectorial scan dans UltraVision Touch) prend la forme d'une image rectangulaire: l'axe horizontal correspond aux 49 faisceaux c\^ote \`a c\^ote le long de la sonde, et l'axe vertical \`a la profondeur. La couleur donne l'amplitude de l'\'echo. Le A-scan affich\'e \`a c\^ot\'e est celui du faisceau choisi avec le curseur de loi (ligne noire dans la vue principale), qu'on d\'eplace avec le doigt.
+
+\begin{figure}[H]
+\centering
+\placeholder{9cm}{6cm}{vue principale en balayage lin\'eaire avec l'\'echo de fond sur tous les faisceaux, le curseur de loi et le A-scan du faisceau choisi.}
+\caption{Vue principale et A-scan en balayage lin\'eaire.}
+\label{fig:vue-sectorielle}
+\end{figure}
+
+\subsubsection*{Mesurer une profondeur et une amplitude}
+
+\begin{enumerate}
+  \item Dans le menu UT Settings, sous-menu Gates, choisir Gate~1 et r\'egler State \`a On, Trigger \`a Crossing et Threshold \`a 25~\%.
+  \item R\'egler Start et Range, dans le m\^eme sous-menu, pour que la porte (le trait horizontal sur le A-scan) couvre l'\'echo \`a mesurer, et seulement lui.
+  \item Appuyer dans la zone des champs d'information (en haut de l'\'ecran) et choisir les champs D(G1), qui donne la profondeur de l'\'echo dans la porte, et \%(G1), qui donne son amplitude en pourcentage de l'\'ecran. S'ils ne font pas partie du groupe affich\'e, les ajouter avec Define Custom.
+\end{enumerate}
+
+Pour lire un temps de vol plut\^ot qu'une profondeur, comme dans le document Ultrasons, r\'egler le type de base de temps \`a Time of flight dans UT Settings, sous-menu General.
+
+\subsubsection*{Enregistrer les donn\'ees}
+
+\begin{enumerate}
+  \item Choisir le menu Inspection et r\'egler Action On Start \`a None.
+  \item Appuyer sur Start. L'appareil enregistre les donn\'ees.
+  \item Appuyer sur Stop. Dans la fen\^etre Save Data, entrer un nom de fichier et appuyer sur Accept. Le fichier .UVData est enregistr\'e dans le dossier Data.
+  \item Pour garder une image de l'\'ecran (utile pour le rapport), choisir le menu Tools et appuyer sur Save Screen. L'image .PNG est enregistr\'ee dans le dossier Screens.
+\end{enumerate}
+
+Les fichiers peuvent ensuite \^etre copi\'es sur une cl\'e USB branch\'ee sur le panneau lat\'eral gauche.
+
+\section{Manipulations}
+\label{sec:manipulations}
+
+\subsection{Reprise des manipulations classiques avec le Topaz}
+
+Les manipulations d\'ecrites \`a la section~3 du document Ultrasons, soit la mesure d'une \'epaisseur, la r\'eflexion sur une surface courb\'ee, la d\'etection d'une cavit\'e et la mesure de l'att\'enuation, peuvent toutes \^etre refaites avec le Topaz, avec la configuration et la calibration des Sections~\ref{sec:configuration} et~\ref{sec:calibration}.
+
+Pour travailler avec un seul faisceau, comme avec une sonde \`a un seul \'el\'ement, placer le curseur de loi sur un faisceau du centre de la sonde (par exemple le faisceau~25, qui utilise les \'el\'ements 25 \`a 40). L'\'epaisseur se lit directement avec le champ D(G1) en pla\c cant la porte sur l'\'echo de fond (Section~\ref{sec:mesure}). Pour la mesure de l'att\'enuation, l'amplitude se lit avec \%(G1). Le gain doit alors rester le m\^eme pour tous les \'echantillons compar\'es.
+
+\subsection{Balayage lin\'eaire d'un d\'efaut simul\'e}
+
+Cette manipulation utilise le balayage lin\'eaire d\'ecrit \`a la Section~\ref{sec:theorie}. La sonde reste immobile, et c'est l'ouverture active qui se d\'eplace le long du r\'eseau.
+
+\subsubsection*{Montage et mesure}
+
+\begin{enumerate}
+  \item Configurer l'appareil avec les valeurs de la Section~\ref{sec:configuration} et le calibrer comme d\'ecrit \`a la Section~\ref{sec:calibration}.
+  \item Mettre du couplant sur le bloc contenant le d\'efaut simul\'e fourni par le laboratoire, et poser la sonde de fa\c con \`a ce que le d\'efaut se trouve environ sous le milieu de la sonde. Les centres des 49 faisceaux couvrent une longueur de $48 \times 0{,}6 = 28{,}8$~mm.
+  \item Sans bouger la sonde, rep\'erer dans la vue principale les faisceaux qui montrent l'\'echo du d\'efaut, entre la surface et l'\'echo de fond.
+  \item Avec le curseur de loi, chercher le faisceau $n$ pour lequel l'\'echo du d\'efaut est le plus fort. Placer la porte sur cet \'echo et noter sa profondeur D(G1) et son amplitude \%(G1).
+  \item Enregistrer les donn\'ees et une image de l'\'ecran (Section~\ref{sec:mesure}).
+\end{enumerate}
+
+Le faisceau $n$ utilise les \'el\'ements $n$ \`a $n+15$. Le centre de son ouverture se trouve donc \`a une distance
+\begin{equation}
+x_n = \left(n + 6{,}5\right) p
+\label{eq:position}
+\end{equation}
+du centre du premier \'el\'ement, o\`u $p = 0{,}6$~mm est le pas de la sonde. Cette relation donne la position du d\'efaut le long de la sonde, et D(G1) donne sa profondeur.
+
+\begin{figure}[H]
+\centering
+\placeholder{9cm}{6cm}{sonde pos\'ee sur le bloc contenant le d\'efaut simul\'e, avec la position du premier \'el\'ement de la sonde visible.}
+\caption{Montage pour le balayage lin\'eaire d'un d\'efaut simul\'e.}
+\label{fig:montage-manip}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\placeholder{9cm}{6cm}{vue principale montrant l'\'echo du d\'efaut simul\'e sur quelques faisceaux seulement, entre la surface et l'\'echo de fond.}
+\caption{\'Echo du d\'efaut simul\'e en balayage lin\'eaire.}
+\label{fig:resultat-manip}
+\end{figure}
+
+\subsubsection*{Questions}
+
+\begin{itemize}
+  \item La position du d\'efaut obtenue avec l'\'Equation~\ref{eq:position} et D(G1) correspond-elle \`a sa position r\'eelle, mesur\'ee sur le bloc?
+  \item L'\'echo du d\'efaut appara\^it sur plusieurs faisceaux voisins, alors que les faisceaux ne sont d\'ecal\'es que de 0,6~mm. Pourquoi? Comment la largeur de l'ouverture (16~\'el\'ements, soit 9,6~mm) intervient-elle?
+  \item L'\'echo de fond change-t-il pour les faisceaux situ\'es sous le d\'efaut? Pourquoi?
+  \item Quel est l'avantage pratique de ce mode de balayage par rapport au d\'eplacement d'une sonde conventionnelle sur la m\^eme distance?
+  \item Que devrait-on observer si le d\'efaut se trouvait en dehors de la longueur couverte par les 49 faisceaux?
+\end{itemize}
+
+\section{Bibliographie}
+
+Zetec, Inc. \emph{TOPAZ User Manual}, r\'evision 10046055-R08.
+
+Voir aussi le document \emph{Ultrasons} de ce cours pour la th\'eorie de base de la propagation, de la r\'eflexion et de l'att\'enuation des ultrasons.
+
+\end{document}
