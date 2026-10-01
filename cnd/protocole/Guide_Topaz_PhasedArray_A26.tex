@@ -66,6 +66,10 @@
 {\sc Septembre 2026}
 \end{center}
 
+\begin{center}
+\includegraphics[width=9cm]{../figures/Photos_Lab/PageTitreProtocole3.jpg}
+\end{center}
+
 \vspace{4mm}
 
 \section{Introduction}
@@ -139,21 +143,14 @@ Le sabot disponible pour ce laboratoire est un sabot droit, adapt\'e \`a une ond
 
 \subsection{Pr\'esentation de l'appareil}
 
-Le Topaz est un appareil portable qui int\`egre le pulseur-r\'ecepteur, l'\'electronique de traitement et un \'ecran tactile permettant de faire fonctionner UltraVision Touch directement sur l'appareil, sans ordinateur externe. Il peut \^etre aliment\'e par une batterie amovible ou directement au \hl{secteur}. % what?
+Le Topaz est un appareil portable qui int\`egre le pulseur-r\'ecepteur, l'\'electronique de traitement et un \'ecran tactile permettant de faire fonctionner UltraVision Touch directement sur l'appareil, sans ordinateur externe (Figure~\ref{fig:interface}). Il peut \^etre aliment\'e par une batterie amovible ou directement au \hl{secteur}. % what?
+
+Le panneau lat\'eral droit regroupe les connecteurs: un connecteur d\'edi\'e \`a la sonde phased array, verrouill\'e par un loquet, ainsi que des connecteurs conventionnels non utilis\'es dans ce document.
 
 \begin{figure}[H]
 \centering
-\placeholder{9cm}{5.5cm}{vue d'ensemble du panneau avant du Topaz, montrant l'\'ecran tactile, le bouton marche/arr\^et et la poign\'ee.}
-\caption{Panneau avant du Topaz.}
-\label{fig:panneau-avant}
-\end{figure}
-
-Le panneau lat\'eral gauche regroupe les connecteurs: un connecteur d\'edi\'e \`a la sonde phased array, verrouill\'e par un loquet, ainsi que des connecteurs conventionnels non utilis\'es dans ce document.
-
-\begin{figure}[H]
-\centering
-\placeholder{9cm}{5.5cm}{panneau lat\'eral gauche du Topaz, montrant le connecteur de la sonde phased array et son loquet.}
-\caption{Panneau lat\'eral gauche du Topaz.}
+\includegraphics[height=9cm]{../figures/Photos_Lab/TopazCoteDroit.jpg}
+\caption{Panneau lat\'eral droit du Topaz.}
 \label{fig:panneau-lateral}
 \end{figure}
 
@@ -161,25 +158,41 @@ Le panneau lat\'eral gauche regroupe les connecteurs: un connecteur d\'edi\'e \`
 
 Avant de mettre le Topaz sous tension, v\'erifier qu'une batterie charg\'ee est install\'ee ou brancher le cordon d'alimentation. Appuyer ensuite sur le bouton marche/arr\^et: le voyant d'alimentation s'allume en vert et la s\'equence de d\'emarrage s'amorce. Il est recommand\'e de laisser l'appareil se stabiliser une dizaine de minutes avant de commencer les mesures.
 
-\begin{figure}[H]
-\centering
-\placeholder{8cm}{5cm}{Topaz allum\'e, voyant d'alimentation vert visible sur le panneau avant.}
-\caption{Topaz sous tension.}
-\label{fig:sous-tension}
-\end{figure}
-
 \subsection{D\'epannage au d\'emarrage}
 \label{sec:depannage}
 
 Les points suivants sont des constats faits au laboratoire. Ils ne sont pas tous expliqu\'es de fa\c con confirm\'ee.
 
 \begin{enumerate}
-  \item Si l'\'ecran reste bloqu\'e sur le BIOS, brancher un clavier USB dans le Topaz et red\'emarrer l'appareil. Appuyer sur Suppr \`a r\'ep\'etition pendant le d\'emarrage. Une fen\^etre Enter Password appara\^it: appuyer simplement sur Enter, il n'y a pas de mot de passe. Dans le BIOS, corriger la date et l'heure, puis choisir Save and Exit et confirmer avec Enter. UltraVision Touch d\'emarre alors et propose de choisir la sonde: prendre la LM de 5~MHz et le sabot LM-0LW. Charger ensuite la configuration du laboratoire (menu File, Load Setup, fichier LFB\_ET\_SIMlT\_...) si elle est pr\'esente. Sinon, refaire la configuration compl\`ete de la Section~\ref{sec:configuration}.
+  \item Si l'\'ecran reste bloqu\'e sur le BIOS, brancher un clavier USB dans le Topaz et red\'emarrer l'appareil. Appuyer sur Suppr \`a r\'ep\'etition pendant le d\'emarrage. Une fen\^etre Enter Password appara\^it: appuyer simplement sur Enter, il n'y a pas de mot de passe. Dans le BIOS, corriger la date et l'heure, puis choisir Save and Exit et confirmer avec Enter. UltraVision Touch d\'emarre alors et propose de choisir la sonde: prendre la LM de 5~MHz et le sabot LM-0LW. Charger ensuite la configuration du laboratoire (menu File, Load Setup, fichier LFB\_ET\_SIMlT\_...) si elle est pr\'esente. Sinon, refaire la configuration compl\`ete de la Section~\ref{sec:configuration}. Les \'ecrans du BIOS sont montr\'es \`a la Figure~\ref{fig:bios}.
   \item V\'erifier la date du BIOS \`a chaque d\'emarrage. Au laboratoire, elle \'etait revenue en 2012. L'appareil d\'emarrait, mais aucune mesure ne s'affichait tant que la date n'avait pas \'et\'e corrig\'ee. La cause probable est \hl{une pile interne déchargée}.\todo{Cause non confirm\'ee: demander \`a Eddyfi, dossier 00053839.} \hl{Le lien entre la date et l'absence de mesure} n'est pas expliqu\'e non plus.\todo{Pourquoi la date bloque-t-elle la mesure? Non expliqu\'e.}
   \item Ne pas brancher de splitter pendant le d\'emarrage. Si une fen\^etre propose une mise \`a jour FPGA, la refuser. L'accepter emp\^eche la connexion \`a UltraVision et oblige \`a r\'einstaller le logiciel (anomalie B1833 du document \og Limitations and Remaining Anomalies \fg{} de la version 3.8R11).
   \item Si les vues n'affichent rien et que la vue sectorielle est enti\`erement grise apr\`es un passage en mode remote, r\'einstaller le logiciel (anomalie B2072, TOPAZ16).
   \item Les boutons F1 et F2 du TOPAZ16 ne fonctionnent pas en version 3.8R11 (anomalie B2060).
 \end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.32\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{../figures/Photos_Lab/EnterBios1.jpg}
+  \caption{}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{../figures/Photos_Lab/Bios2.jpg}
+  \caption{}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{../figures/Photos_Lab/Bios3.jpg}
+  \caption{}
+\end{subfigure}
+\caption{Message de d\'emarrage avec Suppr pour entrer dans le BIOS (a), demande de mot de passe (b) et page principale du BIOS avec la date et l'heure (c).}
+\label{fig:bios}
+\end{figure}
 
 \subsection{Connexion de la sonde}
 
@@ -187,12 +200,19 @@ Pour connecter la sonde phased array, retirer d'abord le capot de protection du 
 
 \begin{figure}[H]
 \centering
-\placeholder{8cm}{5cm}{connexion de la sonde phased array au Topaz, gros plan sur le loquet du connecteur.}
+\includegraphics[height=9cm]{../figures/Photos_Lab/ConnecteurSonde.jpg}
 \caption{Connexion de la sonde phased array.}
 \label{fig:connexion-sonde}
 \end{figure}
 
 Si le connecteur de la sonde est reconnu par l'appareil, le Topaz la d\'etecte au branchement et affiche la fen\^etre New Probe Detected. Le manuel recommande de choisir la configuration du canal avant de brancher la sonde, pour que cette d\'etection se fasse correctement. Si la sonde n'est pas d\'ej\`a branch\'ee en d\'ebut de s\'eance, il vaut donc mieux attendre l'\'etape~2 de la Section~\ref{sec:configuration} pour la brancher.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=10cm]{../figures/Photos_Lab/EcranConnectionSonde1.jpg}
+\caption{Fen\^etre Probe(s) Detected.}
+\label{fig:sonde-detectee}
+\end{figure}
 
 \subsection{Interface UltraVision Touch}
 
@@ -200,7 +220,7 @@ Une fois la s\'equence de d\'emarrage termin\'ee, l'interface UltraVision Touch 
 
 \begin{figure}[H]
 \centering
-\placeholder{9cm}{6cm}{fen\^etre principale d'UltraVision Touch, avec les principales zones de l'\'ecran identifi\'ees.}
+\includegraphics[width=10cm]{../figures/Photos_Lab/Ecran1.jpg}
 \caption{Fen\^etre principale d'UltraVision Touch.}
 \label{fig:interface}
 \end{figure}
@@ -215,6 +235,13 @@ Avant de pouvoir calibrer l'appareil ou faire une mesure, une configuration d'in
 \subsubsection*{Option rapide: charger la configuration du laboratoire}
 
 Si le fichier LFB\_ET\_SIMlT\_LM5MHz\_LM0LW\_ALU.UVSetup est pr\'esent dans le dossier Setups de l'appareil, il suffit de le charger: menu File, bouton Load Setup, choisir le fichier, puis Accept. Toutes les valeurs des tableaux qui suivent sont alors d\'ej\`a entr\'ees. Il reste \`a v\'erifier l'\'epaisseur de la pi\`ece dans le menu Specimen (\'etape~1) et \`a refaire la calibration (Section~\ref{sec:calibration}), qui doit \^etre refaite \`a chaque s\'eance. Les \'etapes suivantes permettent de refaire la configuration au complet, ou de v\'erifier celle qui a \'et\'e charg\'ee.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=10cm]{../figures/Photos_Lab/SauvegardeSetup1.jpg}
+\caption{Fen\^etre Load Setup avec la liste des configurations.}
+\label{fig:load-setup}
+\end{figure}
 
 \subsubsection*{\'Etape 1: d\'efinir le sp\'ecimen}
 
@@ -312,7 +339,7 @@ Avec ces valeurs, l'ouverture de 16~\'el\'ements se d\'eplace d'un \'el\'ement \
 
 \begin{figure}[H]
 \centering
-\placeholder{9cm}{6cm}{fen\^etre Calculator avec les param\`etres du Tableau~\ref{tab:calculateur} et la repr\'esentation graphique des 49 faisceaux sous le sabot.}
+\includegraphics[width=10cm]{../figures/Photos_Lab/Calculateur.jpg}
 \caption{Fen\^etre Calculator dans UltraVision Touch.}
 \label{fig:calculateur}
 \end{figure}
@@ -354,15 +381,49 @@ Pour pouvoir analyser les donn\'ees plus tard (vues de coupe, 3D), il faut enreg
 
 \subsubsection*{Variante avec encodeur}
 
-Si un encodeur de position est utilis\'e, la position de balayage ne vient plus de l'horloge interne et les longueurs le long du balayage sont mesur\'ees au lieu d'\^etre estim\'ees. Il ne faut pas oublier de brancher l'encodeur au Topaz avant de commencer. Les r\'eglages qui changent par rapport au balayage \`a la main sont les suivants.
+Si un encodeur de position est utilis\'e, la position de balayage ne vient plus de l'horloge interne et les longueurs le long du balayage sont mesur\'ees au lieu d'\^etre estim\'ees. L'encodeur est fix\'e au sabot de la sonde (Figure~\ref{fig:sonde-encodeur}). Il ne faut pas oublier de le brancher au Topaz avant de commencer. Les r\'eglages qui changent par rapport au balayage \`a la main sont les suivants.
 
-\begin{itemize}
-  \item Dans le sous-menu Encoder du menu Mechanical, r\'egler Encoder ID \`a Encoder~1 plut\^ot qu'\`a Clock. Clock est r\'eserv\'e aux balayages sans encodeur.
-  \item Le fichier de la session avec encodeur contient un encodeur de type Quadrature, branch\'e \`a l'entr\'ee~0, non invers\'e, avec une r\'esolution de $5{,}35\times10^{-5}$~m par coup (environ 0,0535~mm) et un diviseur de~4. Ces valeurs viennent de l'encodeur utilis\'e au laboratoire.
+\begin{figure}[H]
+\centering
+\includegraphics[width=9cm]{../figures/Photos_Lab/SondeEncodeur1.jpg}
+\caption{Sonde phased array avec son encodeur.}
+\label{fig:sonde-encodeur}
+\end{figure}
+
+\begin{enumerate}
+  \item Brancher l'encodeur. Le Topaz affiche la fen\^etre New Scanner Detected (Figure~\ref{fig:scanner-detecte}), avec le nom Scanner Mini-Wheel et la s\'equence One Line Scan. Appuyer sur Accept.
+  \item Dans le menu Mechanical, sous-menu Scan Encoder, v\'erifier que Encoder ID est \`a~1, Type \`a Quadrature et Invert \`a Normal. La r\'esolution affich\'ee par d\'efaut est de 20~pas/mm.
+  \item Calibrer l'encodeur avec le bouton Calibrate (Figure~\ref{fig:calibration-encodeur}). Dans la fen\^etre Calibrate Encoder, appuyer sur Reset, puis sur Set Start, d\'eplacer l'encodeur sur une distance mesur\'ee \`a la r\`egle (Figure~\ref{fig:methode-calibration-encodeur}), appuyer sur Set Stop, entrer cette distance avec Set Distance, puis v\'erifier Computed Resolution et appuyer sur Accept. Au laboratoire, la r\'esolution calcul\'ee \'etait de 18,68~pas/mm, soit environ $5{,}35\times10^{-2}$~mm par pas.\todo{V\'erifier l'ordre exact des boutons Set Start, Set Stop et Set Distance sur l'appareil.}
   \item Garder Scan Stop assez grand pour tout le passage (150~mm dans les fichiers de la session avec encodeur).
   \item Dans UT Settings, sous-menu Digitizer, r\'egler Record Condition \`a No condition au lieu d'enregistrer les A-scans complets.
   \item Dans UT Settings, sous-menu General, r\'eduire le Range \`a $e + 5$~mm, au lieu de $2e + 5$~mm, pour ne voir que le premier \'echo de fond et garder des fichiers plus l\'egers.
-\end{itemize}
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.48\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{../figures/Photos_Lab/EcranConnectionEncodeur1.jpg}
+  \caption{}
+  \label{fig:scanner-detecte}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{../figures/Photos_Lab/CalibrationEncodeur1.jpg}
+  \caption{}
+  \label{fig:calibration-encodeur}
+\end{subfigure}
+\caption{D\'etection de l'encodeur (a) et fen\^etre de calibration de l'encodeur (b).}
+\label{fig:ecrans-encodeur}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[height=9cm]{../figures/Photos_Lab/Methode4.jpg}
+\caption{Calibration de l'encodeur.}
+\label{fig:methode-calibration-encodeur}
+\end{figure}
 
 Avec un encodeur, il ne faut pas d\'eplacer la sonde trop rapidement.
 
@@ -407,7 +468,7 @@ Range & 10~mm & largeur de la zone de recherche \\
 
 \begin{figure}[H]
 \centering
-\placeholder{9cm}{6cm}{sonde pos\'ee sur le bloc de calibration avec du couplant, tenue \`a plat pendant une calibration.}
+\includegraphics[width=10cm]{../figures/Photos_Lab/PageTitreProtocole1.jpg}
 \caption{Montage pour une calibration.}
 \label{fig:montage-calibration}
 \end{figure}
@@ -451,13 +512,6 @@ Cette calibration ajuste le gain de chaque faisceau pour qu'un m\^eme r\'eflecte
   \item Pour v\'erifier le r\'esultat, appuyer de nouveau sur Clear Envelope et attendre une ou deux secondes. La courbe rouge doit alors \^etre plate \`a 80~\% pour tous les faisceaux, \`a l'int\'erieur de la tol\'erance. Appuyer sur Accept.
 \end{enumerate}
 
-\begin{figure}[H]
-\centering
-\placeholder{9cm}{6cm}{\'ecran de calibration en cours, montrant la vue des faisceaux, le A-scan et la courbe rouge plate sur les 49 faisceaux.}
-\caption{\'Ecran de calibration en cours.}
-\label{fig:ecran-calibration}
-\end{figure}
-
 Une fois les trois calibrations accept\'ees, les indicateurs V (vitesse), \textmu s (d\'elai de sabot) et dB (sensibilit\'e) de la zone d'\'etat doivent \^etre verts. Un indicateur jaune signifie qu'au moins un faisceau n'a pas \'et\'e calibr\'e.
 
 La correction de gain en fonction du temps (TCG) permet en plus de compenser l'att\'enuation avec la profondeur, pour qu'un m\^eme r\'eflecteur donne la m\^eme amplitude peu importe sa profondeur. Elle n'est pas utilis\'ee dans les manipulations propos\'ees ici.
@@ -472,13 +526,6 @@ V\'erifier que les indicateurs V, \textmu s et dB sont verts, puis refaire File,
 \subsubsection*{Lire l'\'ecran}
 
 En balayage lin\'eaire, la vue principale (appel\'ee VC sectorial scan dans UltraVision Touch) prend la forme d'une image rectangulaire: l'axe horizontal correspond aux 49 faisceaux c\^ote \`a c\^ote le long de la sonde, et l'axe vertical \`a la profondeur. La couleur donne l'amplitude de l'\'echo. Le A-scan affich\'e \`a c\^ot\'e est celui du faisceau choisi avec le curseur de loi (ligne noire dans la vue principale), qu'on d\'eplace avec le doigt.
-
-\begin{figure}[H]
-\centering
-\placeholder{9cm}{6cm}{vue principale en balayage lin\'eaire avec l'\'echo de fond sur tous les faisceaux, le curseur de loi et le A-scan du faisceau choisi.}
-\caption{Vue principale et A-scan en balayage lin\'eaire.}
-\label{fig:vue-sectorielle}
-\end{figure}
 
 \subsubsection*{Pi\`eges d'interpr\'etation}
 
@@ -507,7 +554,7 @@ Pour lire un temps de vol plut\^ot qu'une profondeur, comme dans le document Ult
   \item Pour garder une image de l'\'ecran (utile pour le rapport), choisir le menu Tools et appuyer sur Save Screen. L'image .PNG est enregistr\'ee dans le dossier Screens.
 \end{enumerate}
 
-Les fichiers peuvent ensuite \^etre copi\'es sur une cl\'e USB branch\'ee sur le panneau lat\'eral gauche. Dans le Topaz, le fichier enregistr\'e se trouve dans le dossier Data, sous le nom donn\'e \`a l'enregistrement.
+Les fichiers peuvent ensuite \^etre copi\'es sur une cl\'e USB branch\'ee sur le panneau lat\'eral droit. Dans le Topaz, le fichier enregistr\'e se trouve dans le dossier Data, sous le nom donn\'e \`a l'enregistrement.
 
 \begin{itemize}
   \item On peut aussi enregistrer directement sur la cl\'e USB: menu File, Other, Naming Option, Directory, puis choisir la cl\'e.
@@ -552,16 +599,9 @@ du centre du premier \'el\'ement, o\`u $p = 0{,}6$~mm est le pas de la sonde. Ce
 
 \begin{figure}[H]
 \centering
-\placeholder{9cm}{6cm}{sonde pos\'ee sur le bloc contenant le d\'efaut simul\'e, avec la position du premier \'el\'ement de la sonde visible.}
+\includegraphics[width=10cm]{../figures/Photos_Lab/Methode2.jpg}
 \caption{Montage pour le balayage lin\'eaire d'un d\'efaut simul\'e.}
 \label{fig:montage-manip}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\placeholder{9cm}{6cm}{vue principale montrant l'\'echo du d\'efaut simul\'e sur quelques faisceaux seulement, entre la surface et l'\'echo de fond.}
-\caption{\'Echo du d\'efaut simul\'e en balayage lin\'eaire.}
-\label{fig:resultat-manip}
 \end{figure}
 
 \subsubsection*{Questions}
