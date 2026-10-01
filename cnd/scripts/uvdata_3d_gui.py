@@ -2,9 +2,21 @@
 """
 uvdata_3d_gui.py : reconstruction 3D d'une acquisition TOPAZ / UltraVision (.UVData), sans UltraVision.
 
+Le script detecte tout seul comment le balayage a ete fait (Encoder ID du setup) :
+
+  Horloge interne (sonde deplacee a la main, sans encodeur)
+    La position de balayage avance avec l'horloge du TOPAZ. Le fichier ne contient aucune distance : il faut
+    entrer la vitesse de deplacement. Le tampon circulaire est remis en ordre s'il a ete reecrit.
+
+  Encodeur de position
+    La distance n'est pas enregistree avec chaque mesure : elle est dans l'indice de la position
+    (distance = indice x ScanSamplingResolution, lu dans le fichier). Rien a entrer. Si la sonde avance de plus
+    d'un pas entre deux tirs, des cases restent vides (trous) : elles sont comblees par interpolation lineaire.
+    Pas de tampon circulaire. Les calibrations sont deja dans le setup.
+
 Deroulement :
   1. une fenetre te demande le fichier de mesure (.UVData)
-  2. une fenetre te demande les parametres du balayage manuel
+  2. une fenetre montre ce qui a ete lu dans le fichier (et ce qu'il reste a entrer, en mode horloge)
   3. une fenetre te demande ou enregistrer le fichier 3D :
        .html  vue 3D interactive, s'ouvre dans un navigateur   (demande scipy et scikit-image)
        .vtk   volume pour ParaView (logiciel gratuit)
@@ -13,11 +25,15 @@ Deroulement :
 Installation :
     pip install numpy scipy scikit-image
 Lancement :
-    python uvdata_3d_gui.py
+    python uvdata_3d_gui.py                       (fenetres)
+    python uvdata_3d_gui.py fichier.UVData        (sans fenetre, ecrit fichier_3D.html)
+        options : -o sortie.(html|vtk|npz)   --inverser   --sans-interpolation (encodeur)
+                  --vitesse mm/s   --frequence Hz   --epaisseur mm (horloge)
 
-Le fichier .UVData est lu en lecture seule. Son format a ete deduit d'un fichier
+Le fichier .UVData est lu en lecture seule. Son format a ete deduit de fichiers
 UltraVision Touch 3.8R11 (TOPAZ16, balayage lineaire) ; aucune protection de licence n'est touchee.
 """
+import argparse
 import base64
 import html
 import json
@@ -154,6 +170,12 @@ def read_acquisition(path):
         stop_at_end=None if stop is None else stop == 'true',      # false : le TOPAZ reecrit le debut (tampon)
         specimen_thickness_mm=(_tag(spec, 'Thickness', float) or 0) * 1000 or None,
     )
+    enc = re.search(r'<Encoder [^>]*mechanical:Encoder[^>]*>\s*<Name>Encoder 1</Name>\s*<Inverted>(\w*)</Inverted>'
+                    r'.*?<Resolution>([^<]*)</Resolution>', hw, re.S)
+    info['encoder_inverted'] = bool(enc) and enc.group(1) == 'true'          # sens de comptage de l'encodeur 1
+    info['encoder_res_mm'] = float(enc.group(2)) * 1000 if enc else None     # mm par coup d'encodeur
+    info['encoder_divider'] = _tag(hw, 'Divider', int, None)
+    info['velocity_setup_m_s'] = _tag(spec, 'SoundVelocityLongitudinal', float)   # vitesse du materiau avant calibration
     info.update(read_calibration(hw, comp))
 
     blob_dir = next((k.rsplit('/', 1)[0] for k in files if k.endswith('/Blob.bin')), None)
@@ -184,8 +206,9 @@ def read_acquisition(path):
         for y in range(ny):
             for x in range(nx):
                 o = int(offs[y, x])
-                if 0 < o + csize <= len(blob):
+                if o > 0 and o + csize <= len(blob):                  # offset 0 : position sans mesure
                     vol[x, y] = np.frombuffer(blob, dtype=dtype, count=ns, offset=o)
+        filled = (offs > 0).any(axis=0)                                # positions du scan qui ont une mesure
         vol *= 100.0 / vmax
         wave = _tag(defi, 'CurrentWaveType', str, 'Longitudinal')
         meta = dict(
@@ -196,6 +219,7 @@ def read_acquisition(path):
             velocity_m_s=_tag(defi, 'SpecimenLongitudinalSoundSpeed' if wave == 'Longitudinal'
                               else 'SpecimenTransversalSoundSpeed', float),
             wave_type=wave,
+            filled=filled,
         )
         vols.append((vol, meta))
     if not vols:
@@ -264,7 +288,7 @@ def process(vol, meta, params, wrap):
         v = v[::-1]
         notes.append('Axe du scan retourné (balayage fait en sens inverse).')
     v = np.ascontiguousarray(v)
-    dx = params['speed'] / params['rate']
+    dx = params['step'] if params.get('step') else params['speed'] / params['rate']   # 'step' : pas lu d'un encodeur
     dy = meta['index_res_mm']
     vel = params['velocity']
     dz = meta['sample_period_s'] * vel / 2 * 1000
@@ -281,9 +305,111 @@ def process(vol, meta, params, wrap):
             calib = dict(measured_mm=measured, velocity=vel)
     nx, ny, ns = v.shape
     return dict(v=v, dx=dx, dy=dy, dz=dz, z0=z0, vel=vel, calib=calib, notes=notes,
-                speed=params['speed'], rate=params['rate'],
+                speed=params.get('speed'), rate=params.get('rate'),
                 X=(nx - 1) * dx, Y=(ny - 1) * dy, zmin=-z0 * dz, zmax=(ns - 1 - z0) * dz,
                 thickness=params['thickness'])
+
+
+# =====================================================================  mode encodeur
+def gap_runs(filled):
+    """Longueurs des series de positions vides entre la premiere et la derniere position mesuree."""
+    idx = np.nonzero(filled)[0]
+    if len(idx) < 2:
+        return []
+    return [int(g) for g in np.diff(idx) - 1 if g > 0]
+
+
+def prepare_positions(vol, filled, interpolate=True):
+    """Garde la zone balayee (premiere a derniere position mesuree) et comble les trous par interpolation
+    lineaire entre les deux positions mesurees voisines. Sans interpolation, les trous restent a zero."""
+    idx = np.nonzero(filled)[0]
+    if len(idx) < 2:
+        raise ValueError("Moins de deux positions contiennent une mesure : rien à reconstruire.")
+    first, last = int(idx[0]), int(idx[-1])
+    v = vol[first:last + 1].copy()
+    f = filled[first:last + 1]
+    holes = np.nonzero(~f)[0]
+    if interpolate and len(holes):
+        known = np.nonzero(f)[0]
+        nxt = np.searchsorted(known, holes)
+        lo, hi = known[nxt - 1], known[nxt]
+        w = ((holes - lo) / (hi - lo)).astype(np.float32)[:, None, None]
+        v[holes] = v[lo] * (1 - w) + v[hi] * w
+    return dict(v=v, first=first, last=last, n_pos=len(f), n_holes=int(len(holes)), gaps=gap_runs(filled),
+                interpolated=bool(interpolate and len(holes)))
+
+
+def window_depth_mm(meta, ns):
+    return ns * meta['sample_period_s'] * meta['velocity_m_s'] / 2 * 1000
+
+
+def calibration_in_setup(info, meta):
+    """Vrai si la calibration est deja dans le setup : la vitesse du fichier n'est plus celle du materiau."""
+    nominal = info.get('velocity_setup_m_s')
+    return bool(info['cal_applied']) or (nominal is not None and abs(meta['velocity_m_s'] - nominal) > 1.0)
+
+
+def backwall_target(info, meta, v):
+    """Epaisseur pour recaler la vitesse, seulement si la calibration n'est pas deja dans le setup ET si
+    l'echo de fond est dans la fenetre enregistree. Retourne (epaisseur ou None, raison)."""
+    if calibration_in_setup(info, meta):
+        return None, 'calibration déjà dans le setup'
+    thick = info['cal_thickness_mm'] or info['specimen_thickness_mm']
+    if not thick:
+        return None, 'épaisseur inconnue'
+    dz = meta['sample_period_s'] * meta['velocity_m_s'] / 2 * 1000
+    z0 = find_surface(v)
+    if z0 + 1.1 * thick / dz >= v.shape[2]:
+        return None, "écho de fond hors de la fenêtre enregistrée"
+    kb = find_backwall(v, z0, dz, thick)
+    if kb is None or abs((kb - z0) * dz / thick - 1) > 0.05:
+        return None, "écho de fond introuvable près de l'épaisseur"
+    return thick, 'écho de fond trouvé'
+
+
+def build_encoder(info, vol, meta, interpolate=True, reverse=False):
+    """Tout ce qu'il faut pour afficher et exporter une acquisition faite avec encodeur."""
+    pos = prepare_positions(vol, meta['filled'], interpolate)
+    thick, why = backwall_target(info, meta, pos['v'])
+    params = dict(step=meta['scan_res_mm'], velocity=meta['velocity_m_s'], thickness=thick,
+                  unwrap=False, reverse=reverse)
+    R = process(pos['v'], meta, params, None)
+    return dict(info=info, meta=meta, pos=pos, thick=thick, thick_why=why, R=R, shape=vol.shape)
+
+
+def encoder_texts(B):
+    """Textes de la page HTML pour une acquisition avec encodeur."""
+    info, meta, pos, R = B['info'], B['meta'], B['pos'], B['R']
+    nx, ny, ns = R['v'].shape
+    start = pos['first'] * meta['scan_res_mm']
+    lede = ("%d positions × %d faisceaux × %d échantillons, lus directement dans le fichier. Les distances le long "
+            "du scan viennent de l'encodeur. Fais tourner la vue avec la souris ou le doigt, et resserre la fenêtre "
+            "de profondeur pour isoler une couche." % (nx, ny, ns))
+    cave = ["Pas du scan : %s mm par position, lu dans le fichier (encodeur), longueur %s mm à partir de %s mm. "
+            "Les longueurs le long du scan sont mesurées par l'encodeur, pas estimées à partir d'une vitesse."
+            % (_fr(R['dx'], '%.3f'), _fr(R['X'], '%.1f'), _fr(start, '%.1f'))]
+    if pos['n_holes']:
+        longest = max(pos['gaps'])
+        cave.append("%d positions sur %d (%s %%) n'avaient aucune mesure, le plus long trou faisant %d positions "
+                    "(%s mm). %s" % (pos['n_holes'], pos['n_pos'], _fr(100.0 * pos['n_holes'] / pos['n_pos'], '%.0f'),
+                                     longest, _fr(longest * R['dx'], '%.2f'),
+                                     "Elles ont été comblées par interpolation linéaire entre les positions voisines. "
+                                     "Ce ne sont pas des mesures." if pos['interpolated']
+                                     else "Elles sont laissées vides (valeur nulle) : elles apparaissent comme des "
+                                          "creux dans la surface 3D."))
+    if R['calib']:
+        cave.append("Profondeurs recalées sur l'épaisseur de %s mm : le fond sortait à %s mm, d'où une vitesse "
+                    "d'environ %d m/s." % (_fr(B['thick']), _fr(R['calib']['measured_mm']), round(R['calib']['velocity'])))
+    else:
+        cave.append("Vitesse du son utilisée : %d m/s%s. Le zéro est au centre de l'écho de surface."
+                    % (round(R['vel']), ", valeur du setup après calibration" if calibration_in_setup(info, meta)
+                       else ''))
+    ep = info['cal_thickness_mm'] or info['specimen_thickness_mm']
+    if ep and B['thick_why'] == "écho de fond hors de la fenêtre enregistrée":
+        cave.append("La fenêtre enregistrée couvre %s mm de profondeur : l'écho de fond du bloc (%s mm) n'y est pas."
+                    % (_fr(window_depth_mm(meta, ns), '%.1f'), _fr(ep)))
+    cave += R['notes']
+    return dict(lede=lede, caveats=cave)
 
 
 # =====================================================================  exports
@@ -443,6 +569,9 @@ def run_gui():
     try:
         info, vols = read_acquisition(src)
         vol, meta = vols[0]
+        if not info['internal_clock']:                     # encodeur : autre fenetre, rien a entrer
+            run_gui_encoder(root, src, info, vol, meta)
+            return
         D = file_defaults(info, vol, meta)
         # apercu avec les valeurs du fichier : vitesse recalee, profondeur couverte
         rate_f = info['rate_hz'] or 20.0
@@ -608,6 +737,167 @@ def run_gui():
     ttk.Button(btns, text='Fermer', command=root.destroy).grid(row=0, column=0, padx=(0, 8))
     ttk.Button(btns, text='Choisir où enregistrer…', command=go).grid(row=0, column=1)
     root.mainloop()
+
+
+def run_gui_encoder(root, src, info, vol, meta):
+    """Fenetre pour une acquisition faite avec encodeur : tout est lu dans le fichier, deux options a cocher."""
+    import tkinter as tk
+    from tkinter import ttk, filedialog, messagebox
+
+    B0 = build_encoder(info, vol, meta, True, False)
+    pos, R0 = B0['pos'], B0['R']
+    nx, ny, ns = vol.shape
+
+    root.deiconify()
+    root.resizable(False, False)
+    frm = ttk.Frame(root, padding=16)
+    frm.grid(sticky='nsew')
+    ttk.Label(frm, text=info['file'], font=('TkDefaultFont', 12, 'bold')).grid(row=0, column=0, sticky='w')
+    ttk.Label(frm, text="Balayage avec encodeur détecté", foreground='#2F5D7C').grid(row=1, column=0, sticky='w')
+
+    box = ttk.LabelFrame(frm, text=' Lu dans le fichier ', padding=(12, 8))
+    box.grid(row=2, column=0, sticky='ew', pady=(8, 0))
+    rows = []
+    section = lambda t: rows.append((t, None))
+    item = lambda a, b: rows.append((a, b))
+
+    section('Acquisition')
+    item('Appareil, date', ', '.join(x for x in (info['device'], info['date']) if x) or '?')
+    if info['setup']:
+        item('Setup', info['setup'])
+    item('Grille enregistrée', '%d positions × %d faisceaux × %d échantillons' % (nx, ny, ns))
+    item('Faisceaux', '%s, onde %s' % (meta['beam'] or '?', {'Longitudinal': 'longitudinale',
+         'Transversal': 'transversale'}.get(meta['wave_type'], meta['wave_type'].lower())))
+    item('Index', '%s mm entre faisceaux, %s mm de couverture' % (_fr(meta['index_res_mm']), _fr(R0['Y'], '%.1f')))
+    item('Échantillonnage', '%s ns (%s MHz)' % (_fr(meta['sample_period_s'] * 1e9, '%.0f'),
+                                                _fr(1e-6 / meta['sample_period_s'], '%.0f')))
+    section('Positions (encodeur)')
+    enc = 'encodeur'
+    if info['encoder_res_mm']:
+        enc += ', %s µm par coup' % _fr(info['encoder_res_mm'] * 1000, '%.1f')
+        if info['encoder_divider']:
+            enc += ' (diviseur %d)' % info['encoder_divider']
+    item('Source', enc)
+    item('Pas du scan', '%s mm par position (lu dans le fichier)' % _fr(meta['scan_res_mm']))
+    item('Zone balayée', 'de %s à %s mm, longueur %s mm (%d positions)'
+         % (_fr(pos['first'] * meta['scan_res_mm'], '%.1f'), _fr(pos['last'] * meta['scan_res_mm'], '%.1f'),
+            _fr(R0['X'], '%.1f'), pos['n_pos']))
+    if pos['n_holes']:
+        longest = max(pos['gaps'])
+        item('Trous', '%d positions sur %d sans mesure (%s %%), plus long trou : %d (%s mm)' % (
+            pos['n_holes'], pos['n_pos'], _fr(100.0 * pos['n_holes'] / pos['n_pos'], '%.0f'), longest,
+            _fr(longest * meta['scan_res_mm'], '%.2f')))
+        if info['rate_hz']:
+            item('Vitesse sans trou', 'au plus %s mm/s (pas × %s Hz)'
+                 % (_fr(meta['scan_res_mm'] * info['rate_hz'], '%.1f'), _fr(info['rate_hz'])))
+    else:
+        item('Trous', 'aucun, toutes les positions ont une mesure')
+    section('Matériau et calibration')
+    in_setup = calibration_in_setup(info, meta)
+    item('Vitesse du son', '%d m/s%s' % (round(meta['velocity_m_s']), (' (calibrée dans le setup, matériau %d m/s)'
+         % round(info['velocity_setup_m_s'])) if in_setup and info['velocity_setup_m_s'] else ''))
+    if info['cal_done']:
+        item('Calibrations', ', '.join('%s %s' % (k, '✓' if v else '✗') for k, v in info['cal_done'].items()))
+    ep = info['cal_thickness_mm'] or info['specimen_thickness_mm']
+    if B0['thick']:
+        item('Épaisseur', '%s mm (écho de fond trouvé, vitesse recalée)' % _fr(B0['thick']))
+    elif ep and B0['thick_why'] == "écho de fond hors de la fenêtre enregistrée":
+        item('Fenêtre', "%s mm de profondeur, sans l'écho de fond (%s mm)"
+             % (_fr(window_depth_mm(meta, ns), '%.1f'), _fr(ep)))
+    item('Profondeur couverte', "%s à %s mm (zéro au centre de l'écho de surface)"
+         % (_fr(R0['zmin'], '%.1f'), _fr(R0['zmax'], '%.1f')))
+
+    r = 0
+    for label, value in rows:
+        if value is None:
+            ttk.Label(box, text=label, font=('TkDefaultFont', 10, 'bold')).grid(
+                row=r, column=0, columnspan=2, sticky='w', pady=(6 if r else 0, 2))
+        else:
+            ttk.Label(box, text=label, foreground='#555').grid(row=r, column=0, sticky='nw', padx=(0, 14))
+            ttk.Label(box, text=value, wraplength=420).grid(row=r, column=1, sticky='w')
+        r += 1
+
+    ask = ttk.LabelFrame(frm, text=' Options ', padding=(12, 8))
+    ask.grid(row=3, column=0, sticky='ew', pady=(12, 0))
+    ttk.Label(ask, text="Rien à entrer : les distances viennent de l'encodeur.", foreground='#555').grid(
+        row=0, column=0, sticky='w', pady=(0, 6))
+    v_interp = tk.BooleanVar(value=True)
+    cb = ttk.Checkbutton(ask, text="Combler les trous par interpolation linéaire (sinon ils restent vides)",
+                         variable=v_interp)
+    cb.grid(row=1, column=0, sticky='w')
+    if not pos['n_holes']:
+        cb.state(['disabled'])
+    v_rev = tk.BooleanVar(value=False)
+    ttk.Checkbutton(ask, text="Inverser le sens du scan (si la vue est à l'envers par rapport au bloc)",
+                    variable=v_rev).grid(row=2, column=0, sticky='w')
+
+    status = ttk.Label(frm, text='', foreground='#2F5D7C')
+    status.grid(row=4, column=0, sticky='w', pady=(10, 0))
+    btns = ttk.Frame(frm)
+    btns.grid(row=5, column=0, sticky='e', pady=(8, 0))
+
+    def go():
+        base = os.path.splitext(os.path.basename(src))[0]
+        out = filedialog.asksaveasfilename(
+            title='Enregistrer le fichier 3D', initialdir=os.path.dirname(src), initialfile=base + '_3D.html',
+            defaultextension='.html',
+            filetypes=[('Vue 3D interactive', '*.html'), ('Volume ParaView', '*.vtk'), ('Volume NumPy', '*.npz')])
+        if not out:
+            return
+        status.config(text='Traitement en cours…')
+        root.config(cursor='watch')
+        root.update()
+        try:
+            B = build_encoder(info, vol, meta, v_interp.get(), v_rev.get())
+            export(out, B['R'], info, encoder_texts(B))
+        except Exception as e:
+            root.config(cursor='')
+            status.config(text='')
+            messagebox.showerror('Export impossible', str(e))
+            return
+        root.config(cursor='')
+        status.config(text='Enregistré : ' + os.path.basename(out))
+        msg = 'Fichier enregistré :\n%s\n\nPas du scan : %s mm, longueur %s mm' % (
+            out, _fr(B['R']['dx'], '%.3f'), _fr(B['R']['X'], '%.1f'))
+        if out.lower().endswith('.html'):
+            if messagebox.askyesno('Terminé', msg + '\n\nOuvrir la vue 3D dans le navigateur ?'):
+                webbrowser.open('file://' + os.path.abspath(out))
+        else:
+            messagebox.showinfo('Terminé', msg)
+
+    ttk.Button(btns, text='Fermer', command=root.destroy).grid(row=0, column=0, padx=(0, 8))
+    ttk.Button(btns, text='Choisir où enregistrer…', command=go).grid(row=0, column=1)
+    root.mainloop()
+
+
+# =====================================================================  ligne de commande
+def run_cli(a):
+    info, vols = read_acquisition(a.fichier)
+    vol, meta = vols[0]
+    out = a.o or os.path.splitext(a.fichier)[0] + '_3D.html'
+    if not info['internal_clock']:
+        B = build_encoder(info, vol, meta, not a.sans_interpolation, a.inverser)
+        export(out, B['R'], info, encoder_texts(B))
+        R, pos = B['R'], B['pos']
+        print('Mode encodeur : pas %.3f mm lu dans le fichier, longueur %.1f mm' % (R['dx'], R['X']))
+        print('%d positions dont %d trous%s' % (pos['n_pos'], pos['n_holes'],
+                                               ' (comblés)' if pos['interpolated'] else ''))
+    else:
+        D = file_defaults(info, vol, meta)
+        rate = a.frequence or info['rate_hz']
+        if not rate:
+            raise SystemExit("Fréquence d'acquisition introuvable dans le fichier : ajoute --frequence Hz.")
+        speed = a.vitesse or meta['scan_res_mm'] * rate
+        R = process(vol, meta, dict(speed=speed, rate=rate, velocity=meta['velocity_m_s'],
+                                    thickness=a.epaisseur or D['thickness'], unwrap=bool(D['wrap']),
+                                    reverse=a.inverser), D['wrap'])
+        export(out, R, info)
+        print('Mode horloge interne : vitesse %g mm/s à %g Hz, pas %.3f mm, longueur %.1f mm'
+              % (speed, rate, R['dx'], R['X']))
+    print('Vitesse du son %d m/s, profondeur %.1f à %.1f mm' % (round(R['vel']), R['zmin'], R['zmax']))
+    for n in R['notes']:
+        print('Note :', n)
+    print('Enregistré :', out)
 
 
 # =====================================================================  page HTML
@@ -834,4 +1124,13 @@ button:focus-visible, input:focus-visible { outline:2px solid var(--signal); out
 
 
 if __name__ == '__main__':
-    run_gui()
+    ap = argparse.ArgumentParser(description='Reconstruction 3D d\'un .UVData (horloge ou encodeur, détecté seul)')
+    ap.add_argument('fichier', nargs='?', help='fichier .UVData (sans argument : ouvre les fenêtres)')
+    ap.add_argument('-o', help='fichier de sortie (.html, .vtk ou .npz)')
+    ap.add_argument('--inverser', action='store_true', help='inverser le sens du scan')
+    ap.add_argument('--sans-interpolation', action='store_true', help='encodeur : laisser les trous vides')
+    ap.add_argument('--vitesse', type=float, help='horloge : vitesse de déplacement (mm/s)')
+    ap.add_argument('--frequence', type=float, help="horloge : fréquence d'acquisition (Hz)")
+    ap.add_argument('--epaisseur', type=float, help='horloge : épaisseur connue (mm) pour recaler la vitesse')
+    args = ap.parse_args()
+    run_cli(args) if args.fichier else run_gui()
