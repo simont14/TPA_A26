@@ -174,7 +174,7 @@ Avant de mettre le Topaz sous tension, v\'erifier qu'une batterie charg\'ee est 
 Les points suivants sont des constats faits au laboratoire. Ils ne sont pas tous expliqu\'es de fa\c con confirm\'ee.
 
 \begin{enumerate}
-  \item Si l'\'ecran reste bloqu\'e avant la fin du d\'emarrage, brancher un clavier USB, red\'emarrer et appuyer sur Suppr pendant le d\'emarrage pour entrer dans le BIOS. Charger les param\`etres par d\'efaut, puis red\'emarrer.
+  \item Si l'\'ecran reste bloqu\'e sur le BIOS, brancher un clavier USB dans le Topaz et red\'emarrer l'appareil. Appuyer sur Suppr \`a r\'ep\'etition pendant le d\'emarrage. Une fen\^etre Enter Password appara\^it: appuyer simplement sur Enter, il n'y a pas de mot de passe. Dans le BIOS, corriger la date et l'heure, puis choisir Save and Exit et confirmer avec Enter. UltraVision Touch d\'emarre alors et propose de choisir la sonde: prendre la LM de 5~MHz et le sabot LM-0LW. Charger ensuite la configuration du laboratoire (menu File, Load Setup, fichier LFB\_ET\_SIMlT\_...) si elle est pr\'esente. Sinon, refaire la configuration compl\`ete de la Section~\ref{sec:configuration}.
   \item V\'erifier la date du BIOS \`a chaque d\'emarrage. Au laboratoire, elle \'etait revenue en 2012. L'appareil d\'emarrait, mais aucune mesure ne s'affichait tant que la date n'avait pas \'et\'e corrig\'ee. La cause probable est \hl{une pile interne déchargée}.\todo{Cause non confirm\'ee: demander \`a Eddyfi, dossier 00053839.} \hl{Le lien entre la date et l'absence de mesure} n'est pas expliqu\'e non plus.\todo{Pourquoi la date bloque-t-elle la mesure? Non expliqu\'e.}
   \item Ne pas brancher de splitter pendant le d\'emarrage. Si une fen\^etre propose une mise \`a jour FPGA, la refuser. L'accepter emp\^eche la connexion \`a UltraVision et oblige \`a r\'einstaller le logiciel (anomalie B1833 du document \og Limitations and Remaining Anomalies \fg{} de la version 3.8R11).
   \item Si les vues n'affichent rien et que la vue sectorielle est enti\`erement grise apr\`es un passage en mode remote, r\'einstaller le logiciel (anomalie B2072, TOPAZ16).
@@ -352,6 +352,20 @@ Fixer Acquisition Rate \`a une valeur pr\'ecise, par exemple 20~Hz, plut\^ot qu'
 
 Pour pouvoir analyser les donn\'ees plus tard (vues de coupe, 3D), il faut enregistrer les A-scans complets et pas seulement le C-scan. Ce r\'eglage s'appelle \hl{Record Condition et se trouve dans le sous-menu Digitizer}.\todo{V\'erifier le nom et l'emplacement sur l'appareil.}
 
+\subsubsection*{Variante avec encodeur}
+
+Si un encodeur de position est utilis\'e, la position de balayage ne vient plus de l'horloge interne et les longueurs le long du balayage sont mesur\'ees au lieu d'\^etre estim\'ees. Il ne faut pas oublier de brancher l'encodeur au Topaz avant de commencer. Les r\'eglages qui changent par rapport au balayage \`a la main sont les suivants.
+
+\begin{itemize}
+  \item Dans le sous-menu Encoder du menu Mechanical, r\'egler Encoder ID \`a Encoder~1 plut\^ot qu'\`a Clock. Clock est r\'eserv\'e aux balayages sans encodeur.
+  \item Le fichier de la session avec encodeur contient un encodeur de type Quadrature, branch\'e \`a l'entr\'ee~0, non invers\'e, avec une r\'esolution de $5{,}35\times10^{-5}$~m par coup (environ 0,0535~mm) et un diviseur de~4. Ces valeurs viennent de l'encodeur utilis\'e au laboratoire.
+  \item Garder Scan Stop assez grand pour tout le passage (150~mm dans les fichiers de la session avec encodeur).
+  \item Dans UT Settings, sous-menu Digitizer, r\'egler Record Condition \`a No condition au lieu d'enregistrer les A-scans complets.
+  \item Dans UT Settings, sous-menu General, r\'eduire le Range \`a $e + 5$~mm, au lieu de $2e + 5$~mm, pour ne voir que le premier \'echo de fond et garder des fichiers plus l\'egers.
+\end{itemize}
+
+Avec un encodeur, il ne faut pas d\'eplacer la sonde trop rapidement.
+
 \subsubsection*{\'Etape 6: sauvegarder la configuration}
 
 Dans le menu File, appuyer sur Save Setup et donner un nom propre \`a l'\'equipe, pour ne pas \'ecraser la configuration du laboratoire ni celle d'une autre \'equipe.
@@ -493,7 +507,7 @@ Pour lire un temps de vol plut\^ot qu'une profondeur, comme dans le document Ult
   \item Pour garder une image de l'\'ecran (utile pour le rapport), choisir le menu Tools et appuyer sur Save Screen. L'image .PNG est enregistr\'ee dans le dossier Screens.
 \end{enumerate}
 
-Les fichiers peuvent ensuite \^etre copi\'es sur une cl\'e USB branch\'ee sur le panneau lat\'eral gauche.
+Les fichiers peuvent ensuite \^etre copi\'es sur une cl\'e USB branch\'ee sur le panneau lat\'eral gauche. Dans le Topaz, le fichier enregistr\'e se trouve dans le dossier Data, sous le nom donn\'e \`a l'enregistrement.
 
 \begin{itemize}
   \item On peut aussi enregistrer directement sur la cl\'e USB: menu File, Other, Naming Option, Directory, puis choisir la cl\'e.
@@ -570,6 +584,7 @@ Cette manipulation reprend le bloc contenant le d\'efaut simul\'e, mais la sonde
 \begin{enumerate}
   \item Configurer l'appareil et le calibrer (Sections~\ref{sec:configuration} et~\ref{sec:calibration}), puis sauvegarder la configuration calibr\'ee.
   \item R\'egler l'\'etape~5 de la Section~\ref{sec:configuration}: Sequence Type \`a One Line, Encoder ID \`a Clock, Acquisition Rate \`a 20~Hz, Scan Start \`a 0, Scan Stop assez grand pour tout le passage (par exemple 150~mm) et une r\'esolution de scan de 0,25~mm. Activer l'enregistrement des A-scans complets.
+  \item Si un encodeur est utilis\'e, le brancher au Topaz et utiliser les r\'eglages de la variante avec encodeur de l'\'etape~5 (Section~\ref{sec:configuration}) au lieu de Clock. Les rep\`eres et la vitesse vis\'ee des \'etapes suivantes ne servent alors plus, mais il ne faut pas d\'eplacer la sonde trop rapidement.
   \item Coller des rep\`eres de ruban adh\'esif tous les 10~mm le long du bloc contenant le d\'efaut simul\'e, dans la direction perpendiculaire au r\'eseau de la sonde.
   \item Poser la sonde avec du couplant au d\'ebut du parcours, appuyer sur Start, puis la d\'eplacer \`a la main \`a vitesse constante (5~mm/s, soit un rep\`ere toutes les 2~s).
   \item Appuyer sur Stop d\`es la fin du d\'eplacement, puis enregistrer les donn\'ees et une image de l'\'ecran (Section~\ref{sec:mesure}).
@@ -622,7 +637,7 @@ Un script Python, \texttt{uvdata\_3d\_gui.py}, lit directement le fichier .UVDat
 
 \begin{itemize}
   \item Lancer le script \texttt{uvdata\_3d\_gui.py}.
-  \item Une fen\^etre affiche les informations lues dans le fichier. Entrer ensuite la vitesse de d\'eplacement et le sens du balayage.
+  \item Une fen\^etre affiche les informations lues dans le fichier. Le script d\'etecte lui-m\^eme si le balayage a \'et\'e fait \`a l'horloge ou avec un encodeur. \`A l'horloge, entrer la vitesse de d\'eplacement et le sens du balayage. Avec un encodeur, les positions sont lues dans le fichier et il n'y a pas de vitesse \`a entrer.
   \item Choisir le format de sortie: .html (vue 3D interactive), .vtk (pour ParaView ou 3D Slicer) ou .npz (volume NumPy).
   \item Dans 3D Slicer, ouvrir le fichier .vtk et utiliser Volume Rendering, ou Segment Editor avec un seuil de 30~\%.
 \end{itemize}
@@ -650,7 +665,7 @@ Quelques r\'eglages aident \`a lire le volume.
 \subsection{Limites}
 
 \begin{itemize}
-  \item Sans encodeur, les longueurs le long du balayage d\'ependent de la r\'egularit\'e du d\'eplacement.
+  \item Sans encodeur, les longueurs le long du balayage d\'ependent de la r\'egularit\'e du d\'eplacement. Avec un encodeur, elles sont mesur\'ees.
   \item Le volume ne couvre que 28,8~mm le long de la sonde. Un d\'efaut qui touche le premier ou le dernier faisceau peut continuer au-del\`a.
   \item La r\'esolution en profondeur est d'environ 0,13~mm \`a 25~MHz d'\'echantillonnage.
   \item Un d\'efaut pr\'esent d\`es la premi\`ere position conserv\'ee d'un tampon r\'e\'ecrit a une longueur minimale seulement.
