@@ -136,10 +136,15 @@ Le rapport est lu par une personne qui n'a pas accès à ce dépôt Git (ni à s
 dossiers `data/`, `figures/`, `scripts/`). Ne jamais écrire dans le texte du
 rapport une phrase qui renvoie le lecteur vers un dossier ou un chemin du
 projet (ex. une « Annexe » qui dit « voir le script dans le dossier
-`nucleaire/scripts/` du dépôt du cours »). Mentionner le nom d'un script par
-son nom de fichier (`analyse_spectres.py`) est correct s'il s'agit
-simplement d'identifier l'outil utilisé, mais ne pas prétendre que le
-lecteur peut aller le consulter quelque part.
+`nucleaire/scripts/` du dépôt du cours »).
+
+Ne jamais écrire non plus le nom d'un fichier de données (`Scan_Bloc_Laser_3`,
+`Encodeur_Bloc_Laser_6.UVData`, etc.) ni le nom d'un script (`analyse_scans.py`,
+`uvdata_3d_gui.py`, etc.) dans le rapport, que ce soit dans le texte, un
+tableau ou une légende. Un vrai rapport scientifique nomme une acquisition par
+ce qu'elle est (« horloge » contre « encodeur », « source de ¹³⁷Cs ») et décrit
+l'analyse par son idée (« analysé en Python »), parce que ce sont les résultats
+qui comptent, pas le nom des fichiers.
 
 ## Éviter un style trop visiblement généré par IA
 

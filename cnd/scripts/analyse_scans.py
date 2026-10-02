@@ -371,16 +371,32 @@ def profondeurs(S):
 
 
 # =====================================================================  figures
-def _carte(ax, S, C, lettre):
-    """Carte de la chute de l'echo de fond dans les coordonnees du CAD, contour CAD superpose."""
+def contours_par_lettre(C, LC):
+    """Range chaque contour CAD sous la lettre qui le contient."""
+    groupes = [[] for _ in LC]
+    for l in C['loops']:
+        xm = l[:, 0].mean()
+        k = int(np.argmin([0 if L['s0'] <= xm <= L['s1'] else min(abs(xm - L['s0']), abs(xm - L['s1'])) for L in LC]))
+        groupes[k].append(l)
+    return groupes
+
+
+def _carte(ax, S, C, LC, lettre):
+    """Carte de la chute de l'echo de fond, avec le contour CAD de chaque lettre place sur la mesure
+    (pointille blanc). Chaque lettre a son propre decalage et son propre etirement le long des deux axes."""
     ox, oz = np.argsort(S['x_cad']), np.argsort(S['z_cad'])
     img = S['q'][np.ix_(ox, oz)]
     x, z = S['x_cad'][ox], S['z_cad'][oz]
     ext = [x[0] - S['ds'] / 2, x[-1] + S['ds'] / 2, z[0] - S['di'] / 2, z[-1] + S['di'] / 2]
     im = ax.imshow(img.T, origin='lower', extent=ext, aspect='equal', cmap='viridis', vmin=0, vmax=1,
                    interpolation='nearest')
-    for l in C['loops']:
-        ax.plot(l[:, 0], l[:, 1], color='white', lw=0.6)
+    for k, g in enumerate(contours_par_lettre(C, LC)):
+        L, m = LC[k], S['L'][k]
+        if 'ax' not in m:                                     # lettre coupee sans placement : pas de contour
+            continue
+        for l in g:
+            ax.plot(L['centre'] + (m['centre'] - L['centre']) + m['ax'] * (l[:, 0] - L['centre']),
+                    m['zc'] + m['az'] * (l[:, 1] - L['zc']), color='white', lw=0.7, ls=(0, (2.5, 1.5)))
     ax.text(0.006, 0.93, lettre, transform=ax.transAxes, color='white', va='top', fontsize=9)
     return im
 
@@ -392,14 +408,14 @@ def _axes_bloc(ax):
     ax.set_ylabel('$z$ (mm)')
 
 
-def fig_cscans(SH, SE, C, path):
+def fig_cscans(SH, SE, C, LC, path):
     fig, axs = plt.subplots(3, 1, figsize=(7.0, 4.1), sharex=True, gridspec_kw=dict(hspace=0.08))
     ext = [C['xs'][0], C['xs'][-1], C['zs'][0], C['zs'][-1]]
     axs[0].imshow(C['M'].T, origin='lower', extent=ext, aspect='equal', cmap='Greys', vmin=0, vmax=1.6)
     axs[0].add_patch(plt.Rectangle((-70, -12), 140, 24, fill=False, color='0.4', lw=0.8))
     axs[0].text(0.006, 0.93, '(a)', transform=axs[0].transAxes, va='top', fontsize=9)
-    _carte(axs[1], SH, C, '(b)')
-    im = _carte(axs[2], SE, C, '(c)')
+    _carte(axs[1], SH, C, LC, '(b)')
+    im = _carte(axs[2], SE, C, LC, '(c)')
     vides = SE['x_cad'][~SE['filled']]
     axs[2].plot(vides, np.full(vides.size, -12.4), '|', color='#F28E2B', ms=5, mew=1.0)
     for a in axs:
@@ -457,43 +473,107 @@ def fig_positions(SH, SE, LC, path):
     plt.close(fig)
 
 
-def fig_3d(S, path, elev=50, azim=-80):
-    """Surface reconstruite : profondeur de l'echo le plus profond (dessus de la plaque ou d'une lettre)."""
-    q = np.nan_to_num(S['q'])
-    h = np.where(q >= 0.5, S['p_l'], S['p_f'])
-    ix = np.nonzero(abs(S['x_cad']) < 66)[0]                  # sans les bouts du bloc
-    iz = np.nonzero(abs(S['z_cad'] - 0.35) < 10.3)[0]         # sans les bords du bloc
-    ox, oz = ix[np.argsort(S['x_cad'][ix])], iz[np.argsort(S['z_cad'][iz])]
-    X, Z = np.meshgrid(S['x_cad'][ox], S['z_cad'][oz], indexing='ij')
-    H = gaussian_filter(h[np.ix_(ox, oz)], (0.8, 0.5))
+X3D, Z3D = (-66, 66), (-9.95, 10.65)                      # zone montree en 3D : sans les bouts ni les bords du bloc
+
+
+def _surface3d(X, Z, H, path, elev=50, azim=-80):
+    """Une surface vue en 3D, meme cadre pour toutes les surfaces (le blanc autour est rogne)."""
     fig = plt.figure(figsize=(9.0, 4.0))
     ax = fig.add_subplot(111, projection='3d')
-    H = np.clip(H, 9, 15)
-    ax.plot_surface(X, Z, H, cmap='viridis', vmin=9, vmax=15.5, rstride=1, cstride=1, linewidth=0,
+    ax.plot_surface(X, Z, np.clip(H, 9, 15), cmap='viridis', vmin=9, vmax=15.5, rstride=1, cstride=1, linewidth=0,
                     antialiased=False, shade=True)
-    ax.set_box_aspect((np.ptp(X), np.ptp(Z), 3.0 * 6))    # relief exagere 3 fois (un zoom couperait la surface)
-    ax.set_xlim(X.min(), X.max())
+    ax.set_box_aspect((X3D[1] - X3D[0], Z3D[1] - Z3D[0], 3.0 * 6))   # relief exagere 3 fois (un zoom couperait la surface)
+    ax.set_xlim(*X3D)
+    ax.set_ylim(Z3D[1], Z3D[0])
     ax.set_zlim(9, 15)                                        # profondeur vue de la sonde : lettres en relief
-    ax.set_ylim(10.5, -10.5)
     ax.set_xlabel('$x$ (mm)', labelpad=14)
     ax.set_ylabel('')
     ax.set_zlabel('')
     ax.set_zticks([9.5, 14.5])
     ax.set_yticks([])
     ax.tick_params(axis='z', pad=1)
-    ax.tick_params(axis='y', pad=0)
     ax.view_init(elev=elev, azim=azim)
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
     fig.savefig(path)
     plt.close(fig)
-    from PIL import Image                                     # une vue 3D laisse beaucoup de blanc autour
+    from PIL import Image
     im = Image.open(path).convert('RGB')
     a = np.asarray(im).min(2) < 245
     r, c = np.nonzero(a.any(1))[0], np.nonzero(a.any(0))[0]
     im.crop((max(c[0] - 15, 0), max(r[0] - 15, 0), c[-1] + 15, r[-1] + 15)).save(path)
 
 
+def surface_mesuree(S):
+    """Profondeur de l'echo le plus profond (dessus de la plaque ou d'une lettre), dans les coordonnees du CAD."""
+    q = np.nan_to_num(S['q'])
+    h = np.where(q >= 0.5, S['p_l'], S['p_f'])
+    ix = np.nonzero((S['x_cad'] > X3D[0]) & (S['x_cad'] < X3D[1]))[0]
+    iz = np.nonzero((S['z_cad'] > Z3D[0]) & (S['z_cad'] < Z3D[1]))[0]
+    ox, oz = ix[np.argsort(S['x_cad'][ix])], iz[np.argsort(S['z_cad'][iz])]
+    X, Z = np.meshgrid(S['x_cad'][ox], S['z_cad'][oz], indexing='ij')
+    return X, Z, gaussian_filter(h[np.ix_(ox, oz)], (0.8, 0.5))
+
+
+def surface_cad(C, ds=0.25, di=0.3):
+    xs, zs = np.arange(X3D[0], X3D[1] + 1e-9, ds), np.arange(Z3D[0], Z3D[1] + 1e-9, di)
+    ix = np.clip(np.round((xs - C['xs'][0]) / DX_CAD).astype(int), 0, len(C['xs']) - 1)
+    iz = np.clip(np.round((zs - C['zs'][0]) / DX_CAD).astype(int), 0, len(C['zs']) - 1)
+    X, Z = np.meshgrid(xs, zs, indexing='ij')
+    return X, Z, np.where(C['M'][np.ix_(ix, iz)], Y_HAUT - Y_FACE, Y_BASE - Y_FACE)
+
+
+def fig_3d(S, path):
+    _surface3d(*surface_mesuree(S), path)
+
+
+def fig_3d_triple(C, SE, SH, path):
+    """CAD en haut, encodeur au milieu, horloge en bas, empiles dans une seule image avec (a), (b), (c)."""
+    from PIL import Image, ImageDraw, ImageFont
+    parts = []
+    for i, (X, Z, H) in enumerate((surface_cad(C), surface_mesuree(SE), surface_mesuree(SH))):
+        p = path.replace('.png', '_%d.png' % i)
+        _surface3d(X, Z, H, p)
+        parts.append(Image.open(p).convert('RGB'))
+        os.remove(p)
+    w = max(im.width for im in parts)
+    out = Image.new('RGB', (w, sum(im.height for im in parts)), 'white')
+    try:
+        font = ImageFont.truetype('arial.ttf', 30)
+    except OSError:
+        font = ImageFont.load_default()
+    y = 0
+    for im, lab in zip(parts, ('(a)', '(b)', '(c)')):
+        out.paste(im, ((w - im.width) // 2, y))
+        ImageDraw.Draw(out).text((12, y + 10), lab, fill='black', font=font)
+        y += im.height
+    out.save(path)
+
+
 # =====================================================================  main
+PLACEMENT = os.path.join(DATA, 'placement_lettres.json')   # ecrit par placer_lettres.py
+
+
+def lettres_placees(S, lab, LC):
+    """Mesures des lettres a partir du placement manuel (placer_lettres.py), si le fichier existe et que le
+    recalage global n'a pas change. Sinon None, et l'ajustement automatique est garde."""
+    if not os.path.exists(PLACEMENT):
+        return None
+    import json
+    d = json.load(open(PLACEMENT, encoding='utf-8'))['scans'].get(lab)
+    if d is None:
+        return None
+    r = d['recalage']
+    if abs(r['x_cad0'] - S['x_cad'][0]) > 1e-6 or abs(r['z_cad0'] - S['z_cad'][0]) > 1e-6:
+        print('  %s : recalage different de celui du placement manuel, ajustement automatique garde.' % lab)
+        return None
+    out = []
+    for L, m in zip(LC, d['lettres']):
+        out.append(dict(tronquee=m['tronquee'], ax=m['ax'], az=m['az'], centre=L['centre'] + m['bx'],
+                        zc=L['zc'] + m['bz'], largeur=m['ax'] * L['largeur'], hauteur=m['az'] * L['hauteur'],
+                        rms=float('nan')))
+    return out
+
+
 def ajuster(L, LC):
     """Centre mesure = a * centre CAD + b (moindres carres), sur les lettres completes."""
     k = [i for i, l in enumerate(L) if not l['tronquee']]
@@ -520,6 +600,15 @@ def main():
             print('\nflou du faisceau (encodeur) : sigma_x = %.2f mm, sigma_z = %.2f mm (FWHM %.1f et %.1f mm)'
                   % (sx, sz, 2.355 * sx, 2.355 * sz))
         S['L'] = lettres_mesurees(S, C, LC, sx, sz)
+        manuel = lettres_placees(S, lab, LC)
+        if manuel is not None:
+            for k, (l_a, l_m) in enumerate(zip(S['L'], manuel)):
+                if not l_a['tronquee'] and not l_m['tronquee']:
+                    print('  %s %s : manuel - auto  centre %+.2f  longueur %+.2f  hauteur %+.2f mm'
+                          % (lab, LETTRES[k], l_m['centre'] - l_a['centre'], l_m['largeur'] - l_a['largeur'],
+                             l_m['hauteur'] - l_a['hauteur']))
+            S['L'] = manuel
+        S['methode'] = 'manuel' if manuel is not None else 'auto'
         S['prof'] = profondeurs(S)
         S['iou'] = iou(S, C)
         res[lab] = S
@@ -551,7 +640,7 @@ def main():
         print('  centres : pente %.4f, rms residus %.2f mm, residus %s' % (a, rms, np.round(rr, 2)))
         for k, l in enumerate(S['L']):
             if l['tronquee']:
-                print('  %s  coupee au debut ou a la fin du balayage' % LETTRES[k])
+                print('  %s  coupee au debut ou a la fin du balayage (exclue)' % LETTRES[k])
                 continue
             print('  %s  centre %7.2f  longueur %5.2f (CAD %5.2f, ecart %+5.2f)  hauteur %5.2f (CAD %5.2f, '
                   'ecart %+5.2f)  etirements %.3f %.3f  rms %.3f'
@@ -569,11 +658,11 @@ def main():
             print('  duree du balayage : %.1f s' % (S['q'].shape[0] / S['rate']))
 
     SH, SE = res['Horloge'], res['Encodeur']
-    fig_cscans(SH, SE, C, os.path.join(FIG, '01_cscans_cad.png'))
+    print('\nplacement des lettres : horloge %s, encodeur %s' % (SH['methode'], SE['methode']))
+    fig_cscans(SH, SE, C, LC, os.path.join(FIG, '01_cscans_cad.png'))
     fig_ascan(SH, SE, os.path.join(FIG, '02_ascans_profondeur.png'))
     fig_positions(SH, SE, LC, os.path.join(FIG, '03_positions_lettres.png'))
-    fig_3d(SE, os.path.join(FIG, '04_surface_3d_encodeur.png'))
-    fig_3d(SH, os.path.join(FIG, '05_surface_3d_horloge.png'))
+    fig_3d_triple(C, SE, SH, os.path.join(FIG, '04_surfaces_3d_cad_encodeur_horloge.png'))
 
 
 if __name__ == '__main__':
