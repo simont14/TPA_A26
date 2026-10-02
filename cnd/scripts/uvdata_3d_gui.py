@@ -553,6 +553,57 @@ def file_defaults(info, vol, meta):
     return dict(wrap=wrap, thickness=thick, thickness_src=thick_src, rate_ok=rate_ok)
 
 
+def _tk_style(root):
+    """Theme natif de Windows (vista) si disponible, quelques styles nommes pour le reste."""
+    from tkinter import ttk
+    s = ttk.Style(root)
+    if 'vista' in s.theme_names():
+        s.theme_use('vista')
+    s.configure('Hint.TLabel', foreground='#5c5c58')
+    s.configure('Status.TLabel', relief='sunken', padding=(6, 2))
+    s.configure('Props.Treeview', rowheight=19)
+
+
+def _props(parent, rows):
+    """Tableau Parametre / Valeur, avec une ligne repliable par section (comme une fenetre de proprietes)."""
+    from tkinter import ttk
+    n = len(rows)
+    tv = ttk.Treeview(parent, columns=('v',), show='tree headings', height=min(n, 20), style='Props.Treeview',
+                      selectmode='browse')
+    tv.heading('#0', text='Paramètre', anchor='w')
+    tv.heading('v', text='Valeur', anchor='w')
+    tv.column('#0', width=200, stretch=False)
+    tv.column('v', width=470, stretch=True)
+    tv.tag_configure('sec', background='#ecece8')
+    sec = ''
+    for label, value in rows:
+        if value is None:
+            sec = tv.insert('', 'end', text=label, open=True, tags=('sec',))
+        else:
+            tv.insert(sec, 'end', text=label, values=(value,))
+    tv.grid(row=0, column=0, sticky='nsew')
+    if n > 20:
+        sb = ttk.Scrollbar(parent, orient='vertical', command=tv.yview)
+        tv.configure(yscrollcommand=sb.set)
+        sb.grid(row=0, column=1, sticky='ns')
+    return tv
+
+
+def _barre_boutons(root, frm, row, go):
+    """Separateur, boutons a droite (Exporter par defaut, Fermer) et barre d'etat en bas de la fenetre."""
+    from tkinter import ttk
+    ttk.Separator(frm).grid(row=row, column=0, sticky='ew', pady=(10, 8))
+    btns = ttk.Frame(frm)
+    btns.grid(row=row + 1, column=0, sticky='e')
+    ttk.Button(btns, text='Exporter…', command=go, default='active', width=12).grid(row=0, column=0, padx=(0, 6))
+    ttk.Button(btns, text='Fermer', command=root.destroy, width=10).grid(row=0, column=1)
+    root.bind('<Return>', lambda e: go())
+    root.bind('<Escape>', lambda e: root.destroy())
+    status = ttk.Label(root, text='Prêt', style='Status.TLabel', anchor='w')
+    status.grid(row=1, column=0, sticky='ew')
+    return status
+
+
 def run_gui():
     import tkinter as tk
     from tkinter import ttk, filedialog, messagebox
@@ -565,6 +616,7 @@ def run_gui():
     root = tk.Tk()
     root.title('Reconstruction 3D UltraVision')
     root.withdraw()
+    _tk_style(root)
 
     src = filedialog.askopenfilename(title='Choisis le fichier de mesure',
                                      filetypes=[('Données UltraVision', '*.UVData'), ('Tous les fichiers', '*.*')])
@@ -588,14 +640,14 @@ def run_gui():
     nx, ny, ns = vol.shape
 
     root.deiconify()
+    root.title('%s - Reconstruction 3D UltraVision' % info['file'])
     root.resizable(False, False)
-    frm = ttk.Frame(root, padding=16)
-    frm.grid(sticky='nsew')
-    ttk.Label(frm, text=info['file'], font=('TkDefaultFont', 12, 'bold')).grid(row=0, column=0, sticky='w')
+    frm = ttk.Frame(root, padding=10)
+    frm.grid(row=0, column=0, sticky='nsew')
 
     # ------------------------------------------------ 1. lu dans le fichier (lecture seule)
-    box = ttk.LabelFrame(frm, text=' Lu dans le fichier ', padding=(12, 8))
-    box.grid(row=1, column=0, sticky='ew', pady=(10, 0))
+    box = ttk.LabelFrame(frm, text='Lu dans le fichier', padding=6)
+    box.grid(row=1, column=0, sticky='ew')
     rows = []
 
     def section(title):
@@ -637,29 +689,22 @@ def run_gui():
     item('Profondeur couverte', '%s à %s mm (zéro au centre de l\'écho de surface)'
          % (_fr(R0['zmin'], '%.1f'), _fr(R0['zmax'], '%.1f')))
 
-    r = 0
-    for label, value in rows:
-        if value is None:
-            ttk.Label(box, text=label, font=('TkDefaultFont', 10, 'bold')).grid(
-                row=r, column=0, columnspan=2, sticky='w', pady=(6 if r else 0, 2))
-        else:
-            ttk.Label(box, text=label, foreground='#555').grid(row=r, column=0, sticky='nw', padx=(0, 14))
-            ttk.Label(box, text=value, wraplength=400).grid(row=r, column=1, sticky='w')
-        r += 1
+    _props(box, rows)
 
     # ------------------------------------------------ 2. a entrer (ce que le fichier ne sait pas)
-    ask = ttk.LabelFrame(frm, text=' À entrer ', padding=(12, 8))
-    ask.grid(row=2, column=0, sticky='ew', pady=(12, 0))
+    ask = ttk.LabelFrame(frm, text='À entrer', padding=8)
+    ask.grid(row=2, column=0, sticky='ew', pady=(8, 0))
+    ask.columnconfigure(3, weight=1)
     a = 0
 
     def field(label, var, unit, hint):
         nonlocal a
-        ttk.Label(ask, text=label).grid(row=a, column=0, sticky='w', padx=(0, 10), pady=2)
-        ttk.Entry(ask, textvariable=var, width=9, justify='right').grid(row=a, column=1, sticky='w', pady=2)
-        ttk.Label(ask, text=unit).grid(row=a, column=2, sticky='w', padx=(6, 0))
+        ttk.Label(ask, text=label + ' :').grid(row=a, column=0, sticky='w', padx=(0, 8), pady=(2, 0))
+        ttk.Entry(ask, textvariable=var, width=10, justify='right').grid(row=a, column=1, sticky='w', pady=(2, 0))
+        ttk.Label(ask, text=unit).grid(row=a, column=2, sticky='w', padx=(4, 0), pady=(2, 0))
         a += 1
-        ttk.Label(ask, text=hint, foreground='#555', wraplength=520).grid(row=a, column=0, columnspan=3,
-                                                                          sticky='w', pady=(0, 6))
+        ttk.Label(ask, text=hint, style='Hint.TLabel', wraplength=520).grid(row=a, column=0, columnspan=4,
+                                                                            sticky='w', pady=(0, 6))
         a += 1
 
     v_speed = tk.StringVar(value=_fr(meta['scan_res_mm'] * info['rate_hz']) if info['rate_hz'] else '')
@@ -674,8 +719,8 @@ def run_gui():
     if not D['thickness'] and not info['cal_applied']:
         field('Épaisseur connue de la pièce (optionnel)', v_thick, 'mm',
               "Absente du fichier. Si tu la connais, la vitesse du son sera recalée sur l'écho de fond.")
-    lbl_len = ttk.Label(ask, foreground='#2F5D7C')
-    lbl_len.grid(row=a, column=0, columnspan=3, sticky='w', pady=(0, 6))
+    lbl_len = ttk.Label(ask)
+    lbl_len.grid(row=a, column=0, columnspan=4, sticky='w', pady=(0, 6))
     a += 1
     v_rev = tk.BooleanVar(value=False)
     ttk.Checkbutton(ask, text="Balayage fait dans le sens inverse (le fichier ne connaît pas le sens de ta main)",
@@ -694,11 +739,6 @@ def run_gui():
     upd()
 
     # ------------------------------------------------ 3. export
-    status = ttk.Label(frm, text='', foreground='#2F5D7C')
-    status.grid(row=3, column=0, sticky='w', pady=(10, 0))
-    btns = ttk.Frame(frm)
-    btns.grid(row=4, column=0, sticky='e', pady=(8, 0))
-
     def go():
         try:
             params = dict(speed=_num(v_speed.get()), rate=_num(v_rate.get()), velocity=meta['velocity_m_s'],
@@ -725,7 +765,7 @@ def run_gui():
             export(out, R, info)
         except Exception as e:
             root.config(cursor='')
-            status.config(text='')
+            status.config(text="Échec de l'export.")
             messagebox.showerror('Export impossible', str(e))
             return
         root.config(cursor='')
@@ -738,8 +778,8 @@ def run_gui():
         else:
             messagebox.showinfo('Terminé', msg)
 
-    ttk.Button(btns, text='Fermer', command=root.destroy).grid(row=0, column=0, padx=(0, 8))
-    ttk.Button(btns, text='Choisir où enregistrer…', command=go).grid(row=0, column=1)
+    status = _barre_boutons(root, frm, 3, go)
+    status.config(text='Balayage à l\'horloge interne : vérifier la vitesse de déplacement avant d\'exporter.')
     root.mainloop()
 
 
@@ -753,14 +793,13 @@ def run_gui_encoder(root, src, info, vol, meta):
     nx, ny, ns = vol.shape
 
     root.deiconify()
+    root.title('%s - Reconstruction 3D UltraVision' % info['file'])
     root.resizable(False, False)
-    frm = ttk.Frame(root, padding=16)
-    frm.grid(sticky='nsew')
-    ttk.Label(frm, text=info['file'], font=('TkDefaultFont', 12, 'bold')).grid(row=0, column=0, sticky='w')
-    ttk.Label(frm, text="Balayage avec encodeur détecté", foreground='#2F5D7C').grid(row=1, column=0, sticky='w')
+    frm = ttk.Frame(root, padding=10)
+    frm.grid(row=0, column=0, sticky='nsew')
 
-    box = ttk.LabelFrame(frm, text=' Lu dans le fichier ', padding=(12, 8))
-    box.grid(row=2, column=0, sticky='ew', pady=(8, 0))
+    box = ttk.LabelFrame(frm, text='Lu dans le fichier', padding=6)
+    box.grid(row=2, column=0, sticky='ew')
     rows = []
     section = lambda t: rows.append((t, None))
     item = lambda a, b: rows.append((a, b))
@@ -811,20 +850,10 @@ def run_gui_encoder(root, src, info, vol, meta):
     item('Profondeur couverte', "%s à %s mm (zéro au centre de l'écho de surface)"
          % (_fr(R0['zmin'], '%.1f'), _fr(R0['zmax'], '%.1f')))
 
-    r = 0
-    for label, value in rows:
-        if value is None:
-            ttk.Label(box, text=label, font=('TkDefaultFont', 10, 'bold')).grid(
-                row=r, column=0, columnspan=2, sticky='w', pady=(6 if r else 0, 2))
-        else:
-            ttk.Label(box, text=label, foreground='#555').grid(row=r, column=0, sticky='nw', padx=(0, 14))
-            ttk.Label(box, text=value, wraplength=420).grid(row=r, column=1, sticky='w')
-        r += 1
+    _props(box, rows)
 
-    ask = ttk.LabelFrame(frm, text=' Options ', padding=(12, 8))
-    ask.grid(row=3, column=0, sticky='ew', pady=(12, 0))
-    ttk.Label(ask, text="Rien à entrer : les distances viennent de l'encodeur.", foreground='#555').grid(
-        row=0, column=0, sticky='w', pady=(0, 6))
+    ask = ttk.LabelFrame(frm, text='Options', padding=8)
+    ask.grid(row=3, column=0, sticky='ew', pady=(8, 0))
     v_interp = tk.BooleanVar(value=True)
     cb = ttk.Checkbutton(ask, text="Combler les trous par interpolation linéaire (sinon ils restent vides)",
                          variable=v_interp)
@@ -834,11 +863,6 @@ def run_gui_encoder(root, src, info, vol, meta):
     v_rev = tk.BooleanVar(value=False)
     ttk.Checkbutton(ask, text="Inverser le sens du scan (si la vue est à l'envers par rapport au bloc)",
                     variable=v_rev).grid(row=2, column=0, sticky='w')
-
-    status = ttk.Label(frm, text='', foreground='#2F5D7C')
-    status.grid(row=4, column=0, sticky='w', pady=(10, 0))
-    btns = ttk.Frame(frm)
-    btns.grid(row=5, column=0, sticky='e', pady=(8, 0))
 
     def go():
         base = os.path.splitext(os.path.basename(src))[0]
@@ -856,7 +880,7 @@ def run_gui_encoder(root, src, info, vol, meta):
             export(out, B['R'], info, encoder_texts(B))
         except Exception as e:
             root.config(cursor='')
-            status.config(text='')
+            status.config(text="Échec de l'export.")
             messagebox.showerror('Export impossible', str(e))
             return
         root.config(cursor='')
@@ -869,8 +893,8 @@ def run_gui_encoder(root, src, info, vol, meta):
         else:
             messagebox.showinfo('Terminé', msg)
 
-    ttk.Button(btns, text='Fermer', command=root.destroy).grid(row=0, column=0, padx=(0, 8))
-    ttk.Button(btns, text='Choisir où enregistrer…', command=go).grid(row=0, column=1)
+    status = _barre_boutons(root, frm, 4, go)
+    status.config(text="Balayage avec encodeur : rien à entrer, les distances viennent de l'encodeur.")
     root.mainloop()
 
 
@@ -911,106 +935,110 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>__TITLE__</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap" rel="stylesheet">
 <style>
-:root { --paper:#EDF1F4; --panel:#F8FAFB; --ink:#17222E; --ink-soft:#4A5A69; --steel:#2F5D7C; --rule:#C9D3DC;
-  --signal:#C98A00; --signal-bg:#FFF4D6; --amber:#d97706; --teal:#0d9488; --rose:#e11d48; --blue:#2563eb;
-  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper:#121A22; --panel:#19232D;
-  --ink:#E3E9EF; --ink-soft:#9DAEBD; --steel:#86B5D4; --rule:#2C3A47; --signal:#F2C14E; --signal-bg:#2E2714;
-  --amber:#f59e0b; --teal:#2dd4bf; --rose:#fb7185; --blue:#60a5fa; } }
-:root[data-theme="dark"] { --paper:#121A22; --panel:#19232D; --ink:#E3E9EF; --ink-soft:#9DAEBD; --steel:#86B5D4;
-  --rule:#2C3A47; --signal:#F2C14E; --signal-bg:#2E2714; --amber:#f59e0b; --teal:#2dd4bf; --rose:#fb7185; --blue:#60a5fa; }
-*,*::before,*::after { box-sizing:inherit; }
-html { scroll-padding-top:env(safe-area-inset-top,0px); }
-body { margin:0; background:var(--paper); color:var(--ink); font-family:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
-  font-size:16px; line-height:1.5; }
-.wrap { max-width:1500px; margin:0 auto; padding:24px 20px 48px; }
-header { max-width:78ch; margin-bottom:18px; }
-.file { font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:500; font-size:15px; color:var(--ink-soft); margin:0 0 6px; }
-h1 { font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:600; font-size:clamp(28px,4.2vw,46px); line-height:1.04; margin:0 0 10px; }
-.lede { margin:0; color:var(--ink-soft); max-width:72ch; }
-h2 { font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:600; font-size:19px; margin:0; }
-.panel { background:var(--panel); border:1px solid var(--rule); border-radius:6px; }
-.stage { display:grid; grid-template-columns:minmax(0,1fr) 350px; gap:16px; align-items:start; }
-.card-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; padding:9px 14px; border-bottom:1px solid var(--rule); }
+:root { --paper:#e2e2de; --panel:#fbfbf9; --head:#ecece8; --ink:#1c1c1c; --ink-soft:#5c5c58; --rule:#a6a6a1;
+  --rule-soft:#d2d2cd; --steel:#3c3c3a; --signal:#1c1c1c; --signal-bg:#f1f1ee; --btn:#8e8e89;
+  --mono:Consolas,"Lucida Console","Courier New",monospace; }
+*,*::before,*::after { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:13px/1.45 "Segoe UI",Tahoma,"Helvetica Neue",Arial,sans-serif; }
+.wrap { padding:0 0 28px; }
+header.top { background:var(--panel); border-bottom:1px solid var(--rule); padding:9px 16px 8px; margin-bottom:12px; }
+header.top .title { display:flex; align-items:baseline; flex-wrap:wrap; gap:2px 14px; }
+h1 { font-size:16px; font-weight:600; margin:0; }
+.file { font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); margin:0; }
+.lede { margin:3px 0 0; color:var(--ink-soft); max-width:120ch; }
+h2 { font-size:12.5px; font-weight:600; margin:0; }
+.panel { background:var(--panel); border:1px solid var(--rule); }
+.stage { display:grid; grid-template-columns:minmax(0,1fr) 318px; gap:10px; align-items:start; margin:0 16px; }
+.card-head { display:flex; align-items:center; flex-wrap:wrap; gap:4px 10px; padding:4px 8px; background:var(--head);
+  border-bottom:1px solid var(--rule); min-height:30px; }
 .card-head .sp { flex:1; }
-.hint { font-size:13.5px; color:var(--ink-soft); margin:4px 0 0; }
+.hint { font-size:11.5px; color:var(--ink-soft); margin:2px 10px 0; }
+.card-head .hint { margin:0; }
 button, select, input { font:inherit; color:inherit; }
-.btn { border:1px solid var(--rule); background:transparent; border-radius:5px; padding:4px 10px; font-size:14px; cursor:pointer; color:var(--ink); }
-.btn:hover { border-color:var(--steel); }
-.btn.pri { background:var(--steel); color:var(--panel); border-color:var(--steel); font-weight:600; }
-.btn:disabled { opacity:.45; cursor:default; }
-button:focus-visible, input:focus-visible, select:focus-visible, .th:focus-visible { outline:2px solid var(--signal); outline-offset:2px; }
-.seg { display:flex; border:1px solid var(--rule); border-radius:5px; overflow:hidden; }
-.seg button { flex:1; padding:5px 8px; border:0; background:transparent; font-size:14px; cursor:pointer; white-space:nowrap; }
-.seg button + button { border-left:1px solid var(--rule); }
-.seg button[aria-pressed="true"] { background:var(--steel); color:var(--panel); font-weight:600; }
-#view3d { height:min(68vh,660px); min-height:400px; }
+.btn { border:1px solid var(--btn); background:linear-gradient(#fefefd,#e5e5e1); border-radius:2px; padding:2px 9px;
+  font-size:12px; cursor:pointer; color:var(--ink); }
+.btn:hover { background:linear-gradient(#ffffff,#ecece8); border-color:#6c6c68; }
+.btn:active { background:#d8d8d3; }
+.btn.pri { font-weight:600; border-color:#5c5c58; }
+.btn:disabled { opacity:.5; cursor:default; }
+button:focus-visible, input:focus-visible, select:focus-visible, .th:focus-visible { outline:1px dotted var(--ink); outline-offset:1px; }
+.seg { display:flex; border:1px solid var(--btn); border-radius:2px; overflow:hidden; }
+.seg button { flex:1; padding:2px 8px; border:0; background:linear-gradient(#fefefd,#e5e5e1); font-size:12px; cursor:pointer; white-space:nowrap; }
+.seg button + button { border-left:1px solid var(--btn); }
+.seg button[aria-pressed="true"] { background:#d2d2cd; box-shadow:inset 0 1px 3px rgba(0,0,0,.28); }
+#view3d { height:min(70vh,640px); min-height:380px; background:#ffffff; }
 .loading { display:flex; align-items:center; justify-content:center; height:100%; color:var(--ink-soft); padding:20px; text-align:center; }
-aside { padding:6px 16px 10px; max-height:calc(68vh + 52px); overflow-y:auto; }
-details.grp { border-top:1px solid var(--rule); padding:8px 0; }
+aside { padding:0; max-height:calc(70vh + 32px); overflow-y:auto; }
+details.grp { border-top:1px solid var(--rule); padding-bottom:6px; }
 details.grp:first-child { border-top:0; }
-details.grp > summary { cursor:pointer; font-weight:600; font-size:15.5px; padding:2px 0; }
-.row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:7px 0; font-size:14.5px; }
+details.grp:not([open]) { padding-bottom:0; }
+details.grp > summary { list-style:none; cursor:pointer; font-weight:600; font-size:12px; padding:3px 8px; background:var(--head);
+  border-bottom:1px solid var(--rule-soft); user-select:none; }
+details.grp > summary::-webkit-details-marker { display:none; }
+details.grp > summary::before { content:"\25B8"; display:inline-block; width:13px; color:var(--ink-soft); }
+details.grp[open] > summary::before { content:"\25BE"; }
+details.grp:not([open]) > summary { border-bottom:0; }
+details.grp > .seg { margin:7px 10px 4px; }
+.row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:5px 10px; font-size:12.5px; }
 .row > label, .row > .lbl { flex:0 0 auto; }
-.row input[type=range] { flex:1; min-width:70px; accent-color:var(--steel); }
-.row select, .row input.num, .row input[type=color] { border:1px solid var(--rule); background:var(--paper); border-radius:5px; padding:3px 6px; }
-.row input.num { width:84px; text-align:right; }
-.pair { display:flex; align-items:center; gap:6px; } .pair input.num { width:66px; }
-.rb { position:absolute; border:1.5px dashed var(--steel); background:rgba(47,93,124,.16); pointer-events:none; z-index:5; }
+.row input[type=range] { flex:1; min-width:60px; accent-color:#5a5a57; }
+.row select, .row input.num, .row input[type=color] { border:1px solid #9b9b96; background:#ffffff; border-radius:0; padding:1px 4px; font-size:12.5px; }
+.row input.num { width:76px; text-align:right; font-family:var(--mono); font-size:12px; }
+.pair { display:flex; align-items:center; gap:5px; } .pair input.num { width:64px; }
+.rb { position:absolute; border:1px dashed #000000; background:rgba(0,0,0,.07); pointer-events:none; z-index:5; }
 #plans.crop .cell, #plans.crop .nsewdrag { cursor:crosshair !important; }
-.row input[type=color] { padding:0; width:40px; height:26px; }
-.row output { font-variant-numeric:tabular-nums; color:var(--steel); font-weight:600; min-width:44px; text-align:right; }
-.row.chk label { display:flex; align-items:center; gap:8px; cursor:pointer; }
-.btns { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; }
+.row input[type=color] { padding:0 1px; width:38px; height:22px; }
+.row output { font-family:var(--mono); font-size:12px; color:var(--ink); min-width:42px; text-align:right; }
+.row.chk { justify-content:flex-start; }
+.row.chk label { display:flex; align-items:center; gap:6px; cursor:pointer; }
+.btns { display:flex; flex-wrap:wrap; gap:4px; margin:6px 10px; }
 .btns .btn { flex:1 1 auto; }
-.reading { border-top:1px solid var(--rule); padding-top:12px; margin-top:6px; }
-.reading dl { margin:8px 0 0; display:grid; grid-template-columns:70px 1fr; gap:6px 10px; font-size:14px; }
-.reading dt { font-variant-numeric:tabular-nums; font-weight:600; color:var(--steel); text-align:right; }
+.reading { border-top:1px solid var(--rule-soft); padding-top:8px; margin:6px 10px 0; }
+.reading dl { margin:6px 0 0; display:grid; grid-template-columns:62px 1fr; gap:4px 10px; font-size:12.5px; }
+.reading dt { font-family:var(--mono); font-size:12px; color:var(--ink); text-align:right; }
 .reading dd { margin:0; }
-.reading dd.key { background:var(--signal-bg); border-left:3px solid var(--signal); padding:2px 6px; margin-left:-9px; }
-.plans { margin-top:16px; }
-#plans { padding:8px 10px 12px; overflow-x:auto; }
+.reading dd.key { border-left:2px solid var(--ink-soft); padding-left:6px; margin-left:-8px; }
+.rd-main { font-family:var(--mono); font-size:15px; color:var(--ink); }
+.plans { margin:10px 16px 0; }
+#plans { padding:6px 8px 10px; overflow-x:auto; background:#ffffff; }
 .pgrid { display:grid; margin:0 auto; width:max-content; }
 .cell { position:relative; min-width:0; min-height:0; }
-.cell .cap { position:absolute; left:58px; top:4px; font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:600; font-size:15px; pointer-events:none; }
-.cell .cap i { font-style:normal; font-weight:500; color:var(--ink-soft); margin-left:8px; font-size:13px; }
+.cell .cap { position:absolute; left:58px; top:4px; font-weight:600; font-size:12px; pointer-events:none; }
+.cell .cap i { font-style:normal; font-weight:400; color:var(--ink-soft); margin-left:8px; font-size:11.5px; }
 .cell.top .cap { color:var(--ink); }
-.slbl { position:absolute; font-size:11.5px; line-height:1.15; color:var(--ink-soft); text-align:center; font-variant-numeric:tabular-nums; pointer-events:none; }
-.slbl b { display:block; color:var(--ink); font-weight:600; }
-.corner { padding:8px 10px; font-size:14px; }
-.corner .big { font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:600; font-size:30px; line-height:1.1; color:var(--steel); }
-.corner .sub { color:var(--ink-soft); font-size:13px; }
-.legend { margin-top:10px; font-size:12.5px; color:var(--ink-soft); }
-.legend .bar { height:10px; border-radius:3px; margin:4px 0 2px; border:1px solid var(--rule); }
-.legend .ends { display:flex; justify-content:space-between; font-variant-numeric:tabular-nums; }
+.slbl { position:absolute; font-size:11px; line-height:1.15; color:var(--ink-soft); text-align:center; font-family:var(--mono); pointer-events:none; }
+.slbl b { display:block; color:var(--ink); font-weight:600; font-family:"Segoe UI",Tahoma,Arial,sans-serif; }
+.corner { padding:6px 10px; font-size:12.5px; }
+.corner .big { font-family:var(--mono); font-size:20px; line-height:1.2; color:var(--ink); }
+.corner .sub { color:var(--ink-soft); font-size:11.5px; }
+.legend { margin-top:10px; font-size:11.5px; color:var(--ink-soft); }
+.legend .bar { height:10px; border-radius:0; margin:4px 0 2px; border:1px solid var(--rule); }
+.legend .ends { display:flex; justify-content:space-between; font-family:var(--mono); }
 .sl { position:absolute; touch-action:none; user-select:none; -webkit-user-select:none; cursor:pointer; }
 .sl.h { height:26px; } .sl.v { width:26px; }
-.sl .tr { position:absolute; background:var(--rule); border-radius:3px; }
-.sl.h .tr { left:0; right:0; top:11px; height:4px; }
-.sl.v .tr { top:0; bottom:0; left:11px; width:4px; }
-.sl .fill { position:absolute; background:var(--c); opacity:.55; border-radius:3px; }
-.sl .th { position:absolute; width:16px; height:16px; border-radius:50%; background:var(--c); border:2px solid var(--panel);
-  box-shadow:0 0 0 1px var(--c); transform:translate(-50%,-50%); cursor:grab; }
-.mrow { display:grid; grid-template-columns:22px 1fr; gap:2px 8px; font-size:14px; margin:3px 0; font-variant-numeric:tabular-nums; }
-.dotA, .dotB { font-weight:600; } .dotA { color:var(--rose); } .dotB { color:var(--blue); }
-.caveats { margin-top:24px; max-width:78ch; color:var(--ink-soft); font-size:14.5px; }
-.caveats p { margin:0 0 8px; }
-.toast { position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:8px 14px;
-  border-radius:6px; font-size:14px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:50; }
-.toast.on { opacity:.94; }
+.sl .tr { position:absolute; background:#c6c6c1; border:1px solid #a6a6a1; }
+.sl.h .tr { left:0; right:0; top:11px; height:5px; }
+.sl.v .tr { top:0; bottom:0; left:11px; width:5px; }
+.sl .fill { position:absolute; background:var(--c); opacity:.5; }
+.sl .th { position:absolute; width:11px; height:18px; border-radius:1px; background:linear-gradient(#fefefd,#dcdcd7);
+  border:1px solid #545451; box-shadow:inset 0 -4px 0 var(--c); transform:translate(-50%,-50%); cursor:grab; }
+.sl.v .th { width:18px; height:11px; box-shadow:inset 4px 0 0 var(--c); }
+.mrow { display:grid; grid-template-columns:18px 1fr; gap:2px 8px; font-size:12.5px; margin:3px 10px; font-family:var(--mono); }
+.dotA, .dotB { font-weight:600; } .dotA { color:#d62728; } .dotB { color:#1f77b4; }
+.caveats { margin:14px 16px 0; padding-top:8px; border-top:1px solid var(--rule); max-width:120ch; color:var(--ink-soft); font-size:12px; }
+.caveats p { margin:0 0 6px; }
+.toast { position:fixed; left:50%; bottom:16px; transform:translateX(-50%); background:#2e2e2c; color:#f4f4f2; padding:5px 12px;
+  font-size:12.5px; opacity:0; transition:opacity .15s; pointer-events:none; z-index:50; border:1px solid #000000; }
+.toast.on { opacity:.95; }
 @media (max-width:1100px) { .stage { grid-template-columns:1fr; } aside { max-height:none; } }
-@media (max-width:680px) { .wrap { padding:18px 12px 36px; } #view3d { height:440px; min-height:0; } }
+@media (max-width:680px) { header.top { padding:8px 12px; } .stage, .plans, .caveats { margin-left:8px; margin-right:8px; } #view3d { height:420px; min-height:0; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <p class="file">__FILELINE__</p>
-    <h1>__H1__</h1>
+  <header class="top">
+    <div class="title"><h1>__H1__</h1><p class="file">__FILELINE__</p></div>
     <p class="lede">__LEDE__</p>
   </header>
 
@@ -1018,7 +1046,7 @@ details.grp > summary { cursor:pointer; font-weight:600; font-size:15.5px; paddi
     <div class="panel">
       <div class="card-head">
         <h2>Vue 3D</h2>
-        <span class="hint" style="margin:0">Glisser pour tourner, molette pour zoomer, clic pour placer les coupes ou un point de mesure.</span>
+        <span class="hint">Glisser pour tourner, molette pour zoomer, clic pour placer les coupes ou un point de mesure.</span>
         <span class="sp"></span>
         <button type="button" class="btn" data-save="three">Enregistrer l'image</button>
       </div>
@@ -1058,7 +1086,7 @@ details.grp > summary { cursor:pointer; font-weight:600; font-size:15.5px; paddi
         <div class="row"><label for="colorMode">Couleur</label>
           <select id="colorMode"><option value="depth">Selon la profondeur</option><option value="solid">Couleur unie</option></select></div>
         <div class="row" id="rowPal"><label for="palette">Palette</label><select id="palette"></select></div>
-        <div class="row" id="rowSolid"><label for="solid">Couleur de la surface</label><input type="color" id="solid" value="#c2410c"></div>
+        <div class="row" id="rowSolid"><label for="solid">Couleur de la surface</label><input type="color" id="solid" value="#a7adb3"></div>
         <div class="row"><label for="opacity">Opacité</label><input type="range" id="opacity" min="0.1" max="1" step="0.05"><output id="opacity-out"></output></div>
         <div class="row"><label for="light">Éclairage</label>
           <select id="light"><option value="mat">Mat</option><option value="brillant">Brillant</option><option value="plat">Plat (sans relief)</option></select></div>
@@ -1069,7 +1097,7 @@ details.grp > summary { cursor:pointer; font-weight:600; font-size:15.5px; paddi
       <details class="grp" open>
         <summary>Cadre et axes de la vue 3D</summary>
         <div class="row"><label for="bg">Fond</label>
-          <select id="bg"><option value="theme">Selon le thème</option><option value="blanc">Blanc</option><option value="gris">Gris clair</option><option value="noir">Noir</option></select></div>
+          <select id="bg"><option value="theme">Blanc (page)</option><option value="blanc">Blanc</option><option value="gris">Gris clair</option><option value="noir">Noir</option></select></div>
         <div class="row chk"><label><input type="checkbox" id="axes"> Axes et grille</label></div>
         <div class="row chk"><label><input type="checkbox" id="box"> Cadre du volume</label></div>
         <div class="row chk"><label><input type="checkbox" id="cuts3d"> Plans de coupe dans la vue 3D</label></div>
@@ -1099,7 +1127,7 @@ details.grp > summary { cursor:pointer; font-weight:600; font-size:15.5px; paddi
         <p class="hint">En mode Mesurer, clique deux points dans n'importe quelle vue. Un troisième clic recommence. En mode Rogner, trace un rectangle dans une coupe.</p>
         <div class="mrow"><span class="dotA">A</span><span class="rd-a">pas encore placé</span></div>
         <div class="mrow"><span class="dotB">B</span><span class="rd-b">pas encore placé</span></div>
-        <div class="reading" style="margin-top:6px;padding-top:8px"><div class="rd-main" style="font-weight:600;font-size:17px;color:var(--steel)"></div><div class="rd-sub hint"></div></div>
+        <div class="reading"><div class="rd-main"></div><div class="rd-sub hint" style="margin-left:0"></div></div>
         <div class="btns"><button type="button" class="btn" id="mClear">Effacer</button><button type="button" class="btn" id="mCopy">Copier le résultat</button></div>
       </details>
 
@@ -1126,16 +1154,16 @@ details.grp > summary { cursor:pointer; font-weight:600; font-size:15.5px; paddi
 
       <details class="grp">
         <summary>Lire l'image</summary>
-        <div class="reading" style="border-top:0;margin-top:0;padding-top:0"><dl>__NOTES__</dl></div>
+        <div class="reading" style="border-top:0;padding-top:0"><dl>__NOTES__</dl></div>
       </details>
-      <div class="btns" style="margin-top:8px"><button type="button" class="btn" id="reset">Réinitialiser les réglages</button></div>
+      <div class="btns" style="margin:8px 10px 10px"><button type="button" class="btn" id="reset">Réinitialiser les réglages</button></div>
     </aside>
   </section>
 
   <section class="panel plans">
     <div class="card-head">
       <h2>Plans de coupe</h2>
-      <span class="hint" style="margin:0">Dépliés comme un dessin technique : dessus en haut, coupes longitudinale et transversale en dessous.</span>
+      <span class="hint">Dépliés comme un dessin technique : dessus en haut, coupes longitudinale et transversale en dessous.</span>
       <span class="sp"></span>
       <div class="seg" role="group" aria-label="Action du clic" id="modeSeg2">
         <button type="button" data-mode="cursor" aria-pressed="true">Placer les coupes</button>
@@ -1198,7 +1226,7 @@ details.grp > summary { cursor:pointer; font-weight:600; font-size:15.5px; paddi
       [0.1765, '#f8fa08'], [0.2627, '#bffa21'], [0.3922, '#63f15d'], [0.4941, '#26dc8d'], [0.5843, '#05c3b1'], [0.651, '#00adc6'],
       [0.8314, '#006cf1'], [0.9529, '#0036fd'], [0.9843, '#0019ff'], [1, '#0000ff']]          // EVDNT_Corrosion_5.pal (Omniscan)
   };
-  const PAL_NAMES = { defaut: 'Défaut (bleu à violet)', viridis: 'Viridis', plasma: 'Plasma', cividis: 'Cividis', chaud: 'Chaud', arc: 'Arc-en-ciel', gris: 'Gris', corrosion: 'Corrosion EVDNT (Omniscan)' };
+  const PAL_NAMES = { viridis: 'Viridis', defaut: 'Ambre (bleu, jaune, violet)', plasma: 'Plasma', cividis: 'Cividis', chaud: 'Chaud', arc: 'Arc-en-ciel', gris: 'Gris', corrosion: 'Corrosion EVDNT (Omniscan)' };
   const AMP = {
     Jet: PAL.arc,
     Viridis: PAL.viridis,
@@ -1221,14 +1249,14 @@ details.grp > summary { cursor:pointer; font-weight:600; font-size:15.5px; paddi
     front: { eye: { x: 0, y: -1.7, z: 0.0001 }, up: { x: 0, y: 0, z: 1 } },
     side: { eye: { x: 1.7, y: 0, z: 0.0001 }, up: { x: 0, y: 0, z: 1 } }
   };
-  const C_SIDE = '#d97706', C_END = '#0d9488', C_A = '#e11d48', C_B = '#2563eb', C_WIN = '#8b5cf6';
-  const FONT = 'Barlow, Segoe UI, sans-serif';
+  const C_SIDE = '#ff7f0e', C_END = '#2ca02c', C_A = '#d62728', C_B = '#1f77b4', C_WIN = '#9467bd';   // cycle matplotlib
+  const FONT = 'Arial, Helvetica, sans-serif';
 
   // ---------------------------------------------------------------- état
   const first = ['30', '15', '50'].find(k => meshes[k]) || levelKeys[0];
   const DEF = {
     thr: first, zlo: M.zlo, zhi: M.zhi, cx: M.cx, cy: M.cy, flipX: false, flipY: false, mode: 'cursor',
-    colorMode: 'depth', palette: 'defaut', solid: '#c2410c', opacity: 1, light: 'mat', flat: false, colorbar: true,
+    colorMode: 'depth', palette: 'viridis', solid: '#a7adb3', opacity: 1, light: 'mat', flat: false, colorbar: true,
     bg: 'theme', axes: true, box: true, cuts3d: true, zstretch: 1, projection: 'perspective',
     ampPalette: 'Jet', ampMin: 0, ampMax: 100, smooth: false, grid: true, cursors: true, trueScale: true,
     fmt: 'png', scale: 2, exBg: 'white', exCursors: false, exMeasure: true, cropPlans: true,
@@ -1352,14 +1380,14 @@ details.grp > summary { cursor:pointer; font-weight:600; font-size:15.5px; paddi
   }
 
   // ---------------------------------------------------------------- figures (données + mise en page)
-  function palette3(name) { return PAL[name] || PAL.defaut; }
+  function palette3(name) { return PAL[name] || PAL.viridis; }
   function bgSpec(o, is3d) {
-    if (o.light) return st.exBg === 'transparent' ? { bg: 'rgba(0,0,0,0)', ink: '#111111', rule: '#cfd6dd', soft: '#555555' }
-                                                   : { bg: '#ffffff', ink: '#111111', rule: '#cfd6dd', soft: '#555555' };
+    if (o.light) return st.exBg === 'transparent' ? { bg: 'rgba(0,0,0,0)', ink: '#111111', rule: '#c8c8c4', soft: '#555555' }
+                                                   : { bg: '#ffffff', ink: '#111111', rule: '#c8c8c4', soft: '#555555' };
     if (is3d) {
-      const t = { blanc: { bg: '#ffffff', ink: '#111111', rule: '#cfd6dd', soft: '#555555' },
-                  gris: { bg: '#e6ebf0', ink: '#111111', rule: '#c3ccd5', soft: '#555555' },
-                  noir: { bg: '#0b0f14', ink: '#e8edf2', rule: '#2b3641', soft: '#9aa8b5' } }[st.bg];
+      const t = { blanc: { bg: '#ffffff', ink: '#111111', rule: '#c8c8c4', soft: '#555555' },
+                  gris: { bg: '#e8e8e5', ink: '#111111', rule: '#bdbdb8', soft: '#555555' },
+                  noir: { bg: '#000000', ink: '#e6e6e6', rule: '#3a3a3a', soft: '#9a9a9a' } }[st.bg];
       if (t) return t;
     }
     return { bg: 'rgba(0,0,0,0)', ink: css('--ink'), rule: css('--rule'), soft: css('--ink-soft') };
