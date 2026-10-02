@@ -22,38 +22,32 @@
 \usepackage{amsmath, amssymb}
 \usepackage{hyperref}
 \hypersetup{
-    pdftitle={Contrôle non destructif des matériaux -- 3. Utilisation du Topaz (ultrasons phased array)},
+    pdftitle={Contrôle non destructif des matériaux: 3. Utilisation du Topaz (ultrasons phased array)},
     pdfauthor={Louis-Félix Brodeur, Simon Larouche-Tremblay}
 }
 
 % Marges, police de caractère et pied de page
 \usepackage{geometry}
-% Marge de droite élargie pour les commentaires \todo (à remettre à 20mm avec marginparwidth par défaut une fois les points vérifiés)
-\geometry{top=23mm, bottom=23mm, left=20mm, right=55mm, marginparwidth=48mm, marginparsep=3mm}
-\usepackage[colorinlistoftodos]{todonotes}
-\setuptodonotes{size=\scriptsize}
+\geometry{top=23mm, bottom=23mm, left=20mm, right=20mm}
 \usepackage{cochineal}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
 \setlength{\headheight}{13.6pt}
-\cfoot{\small VERSION A26 \qquad GPH-3000 TRAVAUX PRATIQUES AVANC\'ES \qquad Page \thepage}
+\cfoot{\small GPH-3000 TRAVAUX PRATIQUES AVANC\'ES \qquad Page \thepage}
 
 \parindent=0mm % pas d'indentation
 
-% Encadré pointillé décrivant une photo à insérer plus tard
-\newcommand{\placeholderx}[4]{%
+% Encadré pour une mise en garde
+\newcommand{\attention}[1]{%
   \begin{center}
-  \begin{tikzpicture}
-    \node[draw, dashed, thick, minimum width=#1, minimum height=#2,
-          align=center, text width=#1-1cm, font=\itshape\small, inner sep=8pt]
-          {#3 \`a ins\'erer: #4};
-  \end{tikzpicture}
+  \fbox{\begin{minipage}{0.92\linewidth}
+  \textbf{Attention}\\[1mm]
+  #1
+  \end{minipage}}
   \end{center}
 }
-\newcommand{\placeholder}[3]{\placeholderx{#1}{#2}{Photo}{#3}}
-\newcommand{\captureholder}[3]{\placeholderx{#1}{#2}{Capture}{#3}}
 
 \begin{document}
 \shorthandoff{;:!?}
@@ -143,7 +137,24 @@ Le sabot disponible pour ce laboratoire est un sabot droit, adapt\'e \`a une ond
 
 \subsection{Pr\'esentation de l'appareil}
 
-Le Topaz est un appareil portable qui int\`egre le pulseur-r\'ecepteur, l'\'electronique de traitement et un \'ecran tactile permettant de faire fonctionner UltraVision Touch directement sur l'appareil, sans ordinateur externe (Figure~\ref{fig:interface}). Il peut \^etre aliment\'e par une batterie amovible ou directement au \hl{secteur}. % what?
+Le Topaz est un appareil portable qui int\`egre le pulseur-r\'ecepteur, l'\'electronique de traitement et un \'ecran tactile permettant de faire fonctionner UltraVision Touch directement sur l'appareil, sans ordinateur externe (Figure~\ref{fig:interface}). Il peut \^etre aliment\'e par une batterie amovible ou directement au secteur. Le matériel utilisé pour ce guide est donné au Tableau~\ref{tab:materiel}.
+
+\begin{table}[H]
+\centering
+\caption{Mat\'eriel utilis\'e pour ce guide.}
+\label{tab:materiel}
+\small
+\begin{tabular}{p{5.6cm}llp{1.7cm}}
+\toprule
+\'El\'ement & Num\'ero de pi\`ece & Mod\`ele & N\textsuperscript{o} de s\'erie \\
+\midrule
+Topaz16 (configuration 16/128) & 10053725 & ZPA-IUT-TOPAZ-16/128P-KIT & 705745 \\
+Sonde lin\'eaire LM 5~MHz, 64 \'el\'ements & 10039141 & ZPA-PB1D-LM-5MHZ-REX-5M-ZPAC & B1234003 \\
+Sabot droit LM-0LW & 10038863 & ZPA-ACC-W-LM-OLW-IH-FL & non indiqu\'e \\
+Mini-encodeur (c\^able 5~m, \'etanche, connecteur DE15, avec support pour sabot) & 10040557 & ZGN-ACC-ZPAC-ENC-5M-DE15 & 706440 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 Le panneau lat\'eral droit regroupe les connecteurs: un connecteur d\'edi\'e \`a la sonde phased array, verrouill\'e par un loquet, ainsi que des connecteurs conventionnels non utilis\'es dans ce document.
 
@@ -161,11 +172,18 @@ Avant de mettre le Topaz sous tension, v\'erifier qu'une batterie charg\'ee est 
 \subsection{D\'epannage au d\'emarrage}
 \label{sec:depannage}
 
-Les points suivants sont des constats faits au laboratoire. Ils ne sont pas tous expliqu\'es de fa\c con confirm\'ee.
+Le Topaz passe par le BIOS au d\'emarrage. La proc\'edure suivante est \`a suivre \`a chaque mise sous tension, avec un clavier USB branch\'e au Topaz. Les \'ecrans sont montr\'es \`a la Figure~\ref{fig:bios}.
 
 \begin{enumerate}
-  \item Si l'\'ecran reste bloqu\'e sur le BIOS, brancher un clavier USB dans le Topaz et red\'emarrer l'appareil. Appuyer sur Suppr \`a r\'ep\'etition pendant le d\'emarrage. Une fen\^etre Enter Password appara\^it: appuyer simplement sur Enter, il n'y a pas de mot de passe. Dans le BIOS, corriger la date et l'heure, puis choisir Save and Exit et confirmer avec Enter. UltraVision Touch d\'emarre alors et propose de choisir la sonde: prendre la LM de 5~MHz et le sabot LM-0LW. Charger ensuite la configuration du laboratoire (menu File, Load Setup, fichier LFB\_ET\_SIMlT\_...) si elle est pr\'esente. Sinon, refaire la configuration compl\`ete de la Section~\ref{sec:configuration}. Les \'ecrans du BIOS sont montr\'es \`a la Figure~\ref{fig:bios}.
-  \item V\'erifier la date du BIOS \`a chaque d\'emarrage. Au laboratoire, elle \'etait revenue en 2012. L'appareil d\'emarrait, mais aucune mesure ne s'affichait tant que la date n'avait pas \'et\'e corrig\'ee. La cause probable est \hl{une pile interne déchargée}.\todo{Cause non confirm\'ee: demander \`a Eddyfi, dossier 00053839.} \hl{Le lien entre la date et l'absence de mesure} n'est pas expliqu\'e non plus.\todo{Pourquoi la date bloque-t-elle la mesure? Non expliqu\'e.}
+  \item \`A l'allumage, un \'ecran de d\'emarrage appara\^it pendant environ 1~seconde (Figure~\ref{fig:bios-demarrage}). Pendant cet \'ecran, appuyer sur Suppr (Del) ou \'Echap (Esc) sur le clavier pour entrer dans le BIOS.
+  \item Une fen\^etre Enter Password appara\^it (Figure~\ref{fig:bios-mdp}). Il n'y a pas de mot de passe: appuyer simplement sur Enter.
+  \item Dans le BIOS (Figure~\ref{fig:bios-page}), choisir Save and Exit et confirmer avec Enter. Le Topaz d\'emarre alors normalement dans UltraVision Touch.
+  \item UltraVision Touch propose de choisir la sonde: prendre la LM de 5~MHz et le sabot LM-0LW, puis charger la configuration (Section~\ref{sec:configuration}).
+\end{enumerate}
+
+Les probl\`emes suivants sont connus pour la version 3.8R11 du logiciel.
+
+\begin{enumerate}
   \item Ne pas brancher de splitter pendant le d\'emarrage. Si une fen\^etre propose une mise \`a jour FPGA, la refuser. L'accepter emp\^eche la connexion \`a UltraVision et oblige \`a r\'einstaller le logiciel (anomalie B1833 du document \og Limitations and Remaining Anomalies \fg{} de la version 3.8R11).
   \item Si les vues n'affichent rien et que la vue sectorielle est enti\`erement grise apr\`es un passage en mode remote, r\'einstaller le logiciel (anomalie B2072, TOPAZ16).
   \item Les boutons F1 et F2 du TOPAZ16 ne fonctionnent pas en version 3.8R11 (anomalie B2060).
@@ -177,20 +195,23 @@ Les points suivants sont des constats faits au laboratoire. Ils ne sont pas tous
   \centering
   \includegraphics[width=\textwidth]{../../figures/Photos_Lab/EnterBios1.jpg}
   \caption{}
+  \label{fig:bios-demarrage}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.32\textwidth}
   \centering
   \includegraphics[width=\textwidth]{../../figures/Photos_Lab/Bios2.jpg}
   \caption{}
+  \label{fig:bios-mdp}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.32\textwidth}
   \centering
   \includegraphics[width=\textwidth]{../../figures/Photos_Lab/Bios3.jpg}
   \caption{}
+  \label{fig:bios-page}
 \end{subfigure}
-\caption{Message de d\'emarrage avec Suppr pour entrer dans le BIOS (a), demande de mot de passe (b) et page principale du BIOS avec la date et l'heure (c).}
+\caption{\'Ecran de d\'emarrage, appuyer sur Suppr ou \'Echap (a). Fen\^etre Enter Password, appuyer sur Enter (b). Page du BIOS, choisir Save and Exit (c).}
 \label{fig:bios}
 \end{figure}
 
@@ -365,19 +386,19 @@ Digitizer & Recurrence & 2500~Hz & fr\'equence de r\'ep\'etition des tirs \\
 \end{tabular}
 \end{table}
 
-Le mode de rectification RF affiche le signal sans rectification. Il sert \`a voir la forme d'onde et la phase de l'\'echo.
+Le mode de rectification RF affiche le signal sans rectification. Il sert \`a voir la forme d'onde et la phase de l'\'echo. Ce mode n'a pas \'et\'e test\'e dans le cadre de ce guide.
 
 \subsubsection*{\'Etape 5: s\'equence d'acquisition}
 
-Au laboratoire, la sonde est d\'eplac\'ee \`a la main, sans encodeur de position. Dans le menu Mechanical, r\'egler Sequence Type \`a One Line, puis, dans le sous-menu Encoder, r\'egler Encoder ID \`a Clock: la position de balayage avance alors avec l'horloge interne de l'appareil. Si l'affichage d\'efile trop vite, diminuer Acquisition Rate dans UT Settings, sous-menu Digitizer.
+Sans encodeur, la sonde est d\'eplac\'ee \`a la main et sa position n'est pas mesur\'ee. Dans le menu Mechanical, r\'egler Sequence Type \`a One Line, puis, dans le sous-menu Encoder, r\'egler Encoder ID \`a Clock: la position de balayage avance alors avec l'horloge interne de l'appareil. Si l'affichage d\'efile trop vite, diminuer Acquisition Rate dans UT Settings, sous-menu Digitizer.
 
 Scan Start, Scan Stop et la r\'esolution de scan d\'efinissent un tampon de positions. Par exemple, de 0 \`a 100~mm avec une r\'esolution de 0,25~mm, on obtient 401 positions. \`A une fr\'equence d'acquisition de 20~Hz, ce tampon est rempli en 20~s.
 
-Le tampon est circulaire. Si l'acquisition dure plus longtemps que ce qu'il peut contenir, le Topaz r\'e\'ecrit le d\'ebut par la fin. Dans une acquisition du laboratoire, les 3 derni\`eres secondes avaient remplac\'e le d\'ebut du fichier. Il faut donc un Scan Stop assez grand pour tout le passage (par exemple 150~mm, soit 30~s \`a 20~Hz), et appuyer sur Stop d\`es la fin du d\'eplacement. Le fichier contient un r\'eglage StopAtEndOfScanMode qui \'etait d\'esactiv\'e. L'option d'arr\^et automatique en fin de scan est \hl{probablement dans le menu Mechanical}.\todo{Trouver le libell\'e exact dans Mechanical > Sequence.}
+Le tampon est circulaire. Si l'acquisition dure plus longtemps que ce qu'il peut contenir, le Topaz r\'e\'ecrit le d\'ebut du fichier avec les derni\`eres positions. Il faut donc un Scan Stop assez grand pour tout le passage (par exemple 150~mm, soit 30~s \`a 20~Hz), et appuyer sur Stop (le gros bouton rouge \`a c\^ot\'e de Start) d\`es la fin du d\'eplacement.
 
 Fixer Acquisition Rate \`a une valeur pr\'ecise, par exemple 20~Hz, plut\^ot qu'\`a Max. La vitesse de d\'eplacement \`a viser est alors la r\'esolution multipli\'ee par la fr\'equence, soit $0{,}25~\text{mm} \times 20~\text{Hz} = 5$~mm/s. En pratique, des rep\`eres au ruban adh\'esif plac\'es tous les 10~mm, \`a franchir toutes les 2~s, aident \`a garder une vitesse constante.
 
-Pour pouvoir analyser les donn\'ees plus tard (vues de coupe, 3D), il faut enregistrer les A-scans complets et pas seulement le C-scan. Ce r\'eglage s'appelle \hl{Record Condition et se trouve dans le sous-menu Digitizer}.\todo{V\'erifier le nom et l'emplacement sur l'appareil.}
+Pour pouvoir analyser les donn\'ees plus tard (vues de coupe, 3D), il faut enregistrer les A-scans complets et pas seulement le C-scan. Dans UT Settings, sous-menu Digitizer, Record Condition doit \^etre \`a No condition, qui enregistre les A-scans complets (ne pas choisir C-Scan).
 
 \subsubsection*{Variante avec encodeur}
 
@@ -393,10 +414,13 @@ Si un encodeur de position est utilis\'e, la position de balayage ne vient plus 
 \begin{enumerate}
   \item Brancher l'encodeur. Le Topaz affiche la fen\^etre New Scanner Detected (Figure~\ref{fig:scanner-detecte}), avec le nom Scanner Mini-Wheel et la s\'equence One Line Scan. Appuyer sur Accept.
   \item Dans le menu Mechanical, sous-menu Scan Encoder, v\'erifier que Encoder ID est \`a~1, Type \`a Quadrature et Invert \`a Normal. La r\'esolution affich\'ee par d\'efaut est de 20~pas/mm.
-  \item Calibrer l'encodeur avec le bouton Calibrate (Figure~\ref{fig:calibration-encodeur}). Dans la fen\^etre Calibrate Encoder, appuyer sur Reset, puis sur Set Start, d\'eplacer l'encodeur sur une distance mesur\'ee \`a la r\`egle (Figure~\ref{fig:methode-calibration-encodeur}), appuyer sur Set Stop, entrer cette distance avec Set Distance, puis v\'erifier Computed Resolution et appuyer sur Accept. Au laboratoire, la r\'esolution calcul\'ee \'etait de 18,68~pas/mm, soit environ $5{,}35\times10^{-2}$~mm par pas.\todo{V\'erifier l'ordre exact des boutons Set Start, Set Stop et Set Distance sur l'appareil.}
-  \item Garder Scan Stop assez grand pour tout le passage (150~mm dans les fichiers de la session avec encodeur).
-  \item Dans UT Settings, sous-menu Digitizer, r\'egler Record Condition \`a No condition au lieu d'enregistrer les A-scans complets.
-  \item Dans UT Settings, sous-menu General, r\'eduire le Range \`a $e + 5$~mm, au lieu de $2e + 5$~mm, pour ne voir que le premier \'echo de fond et garder des fichiers plus l\'egers.
+  \item Calibrer l'encodeur avec le bouton Calibrate (Figure~\ref{fig:calibration-encodeur}). Dans la fen\^etre Calibrate Encoder, appuyer sur Reset, puis sur Set Start, d\'eplacer l'encodeur sur une distance mesur\'ee \`a la r\`egle (Figure~\ref{fig:methode-calibration-encodeur}), appuyer sur Set Stop, entrer cette distance avec Set Distance, puis v\'erifier Computed Resolution et appuyer sur Accept.
+  \item Garder Scan Stop assez grand pour tout le passage.
+  \item Dans UT Settings, sous-menu Digitizer, r\'egler Record Condition \`a No condition, qui enregistre les A-scans complets, comme pour le balayage \`a l'horloge.
+  \item Dans UT Settings, sous-menu Digitizer, r\'egler Acquisition Rate \`a Max. Avec une fr\'equence fixe plus basse, il faudrait bouger tr\`es lentement: tout mouvement un peu trop rapide pendant le balayage fait sauter des positions, ce qui laisse des trous dans la mesure.
+  \item Dans le menu Inspection, la valeur Max Scanning Speed est importante \`a consid\'erer: la sonde doit rester bien en dessous de cette vitesse pendant tout le balayage.
+  \item Dans le menu Inspection, r\'egler Action On Start \`a Reset Encoder, pour que la position reparte de 0 \`a chaque Start.
+  \item Dans UT Settings, sous-menu General, r\'eduire le Time Base Range \`a $e + 5$~mm, au lieu de $2e + 5$~mm, pour ne voir que le premier \'echo de fond et garder des fichiers plus l\'egers. Cette r\'eduction se fait seulement apr\`es la calibration (Section~\ref{sec:calibration}), qui demande de voir l'\'echo \`a $2e$. Apr\`es cette r\'eduction, les indicateurs de calibration restent verts.
 \end{enumerate}
 
 \begin{figure}[H]
@@ -424,8 +448,6 @@ Si un encodeur de position est utilis\'e, la position de balayage ne vient plus 
 \caption{Calibration de l'encodeur.}
 \label{fig:methode-calibration-encodeur}
 \end{figure}
-
-Avec un encodeur, il ne faut pas d\'eplacer la sonde trop rapidement.
 
 \subsubsection*{\'Etape 6: sauvegarder la configuration}
 
@@ -465,6 +487,8 @@ Range & 10~mm & largeur de la zone de recherche \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\attention{Quand on calibre sur un bloc d'une autre \'epaisseur que celle de la configuration charg\'ee, il faut mettre \`a jour la cible (Target) et la zone de recherche (Start et Range) de chaque r\'eflecteur pour la nouvelle \'epaisseur $e$: Reflector~1 \`a $e$ et Reflector~2 \`a $2e$. Sinon, la zone de recherche peut attraper le mauvais \'echo, par exemple le deuxi\`eme \'echo de fond, et le d\'elai de sabot calcul\'e est faux. Si la pi\`ece est d'un autre alliage, il faut aussi refaire les trois calibrations sur ce bloc.}
 
 \begin{figure}[H]
 \centering
@@ -512,13 +536,20 @@ Cette calibration ajuste le gain de chaque faisceau pour qu'un m\^eme r\'eflecte
   \item Pour v\'erifier le r\'esultat, appuyer de nouveau sur Clear Envelope et attendre une ou deux secondes. La courbe rouge doit alors \^etre plate \`a 80~\% pour tous les faisceaux, \`a l'int\'erieur de la tol\'erance. Appuyer sur Accept.
 \end{enumerate}
 
-Une fois les trois calibrations accept\'ees, les indicateurs V (vitesse), \textmu s (d\'elai de sabot) et dB (sensibilit\'e) de la zone d'\'etat doivent \^etre verts. Un indicateur jaune signifie qu'au moins un faisceau n'a pas \'et\'e calibr\'e.
+Une fois les trois calibrations accept\'ees, les indicateurs V (vitesse), \textmu s (d\'elai de sabot) et dB (sensibilit\'e) de la zone d'\'etat doivent \^etre verts (Figure~\ref{fig:indicateurs}). Un indicateur gris signifie que la calibration n'a pas \'et\'e faite, et un indicateur jaune qu'au moins un faisceau n'a pas \'et\'e calibr\'e.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=4.5cm]{../../figures/Photos_Lab/IndicateurCalibration.png}
+\caption{Indicateurs de calibration V, \textmu s et dB dans la zone d'\'etat.}
+\label{fig:indicateurs}
+\end{figure}
 
 La correction de gain en fonction du temps (TCG) permet en plus de compenser l'att\'enuation avec la profondeur, pour qu'un m\^eme r\'eflecteur donne la m\^eme amplitude peu importe sa profondeur. Elle n'est pas utilis\'ee dans les manipulations propos\'ees ici.
 
 \subsubsection*{Sauvegarder la configuration calibr\'ee}
 
-V\'erifier que les indicateurs V, \textmu s et dB sont verts, puis refaire File, Save Setup avant toute acquisition. La sauvegarde de l'\'etape~6 de la Section~\ref{sec:configuration} a \'et\'e faite avant la calibration, donc elle ne contient pas les calibrations. Dans une acquisition du laboratoire, les trois calibrations \'etaient marqu\'ees termin\'ees dans le fichier, mais aucune correction n'\'etait appliqu\'ee aux donn\'ees: la vitesse \'etait rest\'ee \`a 6320~m/s et le d\'elai de sabot \'etait le m\^eme pour les 49 faisceaux.
+V\'erifier que les indicateurs V, \textmu s et dB sont verts, puis refaire File, Save Setup avant toute acquisition. La sauvegarde de l'\'etape~6 de la Section~\ref{sec:configuration} a \'et\'e faite avant la calibration, donc elle ne contient pas les calibrations.
 
 \subsection{Mesures et acquisition}
 \label{sec:mesure}
@@ -531,7 +562,7 @@ En balayage lin\'eaire, la vue principale (appel\'ee VC sectorial scan dans Ultr
 
 \begin{itemize}
   \item Zone morte: l'\'echo d'interface sabot/pi\`ece et sa tra\^ine occupent environ les 2 premiers mm sous la surface. Un d\'efaut \`a cette profondeur est difficile \`a voir.
-  \item \'Echos multiples: un r\'eflecteur plan \`a la profondeur $d$ produit aussi des \'echos \`a $2d$ et $3d$. Dans un exemple du laboratoire, un r\'eflecteur \`a 8,2~mm donnait des \'echos \`a 16,3 et 24,6~mm. Ce ne sont pas des d\'efauts suppl\'ementaires.
+  \item \'Echos multiples: un r\'eflecteur plan \`a la profondeur $d$ produit aussi des \'echos \`a $2d$ et $3d$, apr\`es un ou deux allers-retours de plus. Ce ne sont pas des d\'efauts suppl\'ementaires.
   \item Les indicateurs E (v\'erification des \'el\'ements), Ref (gain de r\'ef\'erence) et TCG peuvent rester gris. Ils ne sont pas utilis\'es dans ces manipulations.
 \end{itemize}
 
@@ -543,14 +574,12 @@ En balayage lin\'eaire, la vue principale (appel\'ee VC sectorial scan dans Ultr
   \item Appuyer dans la zone des champs d'information (en haut de l'\'ecran) et choisir les champs D(G1), qui donne la profondeur de l'\'echo dans la porte, et \%(G1), qui donne son amplitude en pourcentage de l'\'ecran. S'ils ne font pas partie du groupe affich\'e, les ajouter avec Define Custom.
 \end{enumerate}
 
-Pour lire un temps de vol plut\^ot qu'une profondeur, comme dans le document Ultrasons, r\'egler le type de base de temps \`a \hl{Time of flight} dans UT Settings, sous-menu General.\todo{V\'erifier sur l'appareil si cette option existe.}
-
 \subsubsection*{Enregistrer les donn\'ees}
 
 \begin{enumerate}
-  \item Choisir le menu Inspection et r\'egler Action On Start \`a None.
+  \item Choisir le menu Inspection et r\'egler Action On Start \`a None (\`a Reset Encoder avec un encodeur, voir l'\'etape~5 de la Section~\ref{sec:configuration}).
   \item Appuyer sur Start. L'appareil enregistre les donn\'ees.
-  \item Appuyer sur Stop. Dans la fen\^etre Save Data, entrer un nom de fichier et appuyer sur Accept. Le fichier .UVData est enregistr\'e dans le dossier Data.
+  \item Appuyer sur Stop, le gros bouton rouge \`a c\^ot\'e de Start. Dans la fen\^etre Save Data, entrer un nom de fichier et appuyer sur Accept. Le fichier .UVData est enregistr\'e dans le dossier Data.
   \item Pour garder une image de l'\'ecran (utile pour le rapport), choisir le menu Tools et appuyer sur Save Screen. L'image .PNG est enregistr\'ee dans le dossier Screens.
 \end{enumerate}
 
@@ -604,16 +633,6 @@ du centre du premier \'el\'ement, o\`u $p = 0{,}6$~mm est le pas de la sonde. Ce
 \label{fig:montage-manip}
 \end{figure}
 
-\subsubsection*{Questions}
-
-\begin{itemize}
-  \item La position du d\'efaut obtenue avec l'\'Equation~\ref{eq:position} et D(G1) correspond-elle \`a sa position r\'eelle, mesur\'ee sur le bloc?
-  \item L'\'echo du d\'efaut appara\^it sur plusieurs faisceaux voisins, alors que les faisceaux ne sont d\'ecal\'es que de 0,6~mm. Pourquoi? Comment la largeur de l'ouverture (16~\'el\'ements, soit 9,6~mm) intervient-elle?
-  \item L'\'echo de fond change-t-il pour les faisceaux situ\'es sous le d\'efaut? Pourquoi?
-  \item Quel est l'avantage pratique de ce mode de balayage par rapport au d\'eplacement d'une sonde conventionnelle sur la m\^eme distance?
-  \item Que devrait-on observer si le d\'efaut se trouvait en dehors de la longueur couverte par les 49 faisceaux?
-\end{itemize}
-
 \subsection{Balayage avec d\'eplacement de la sonde (optionnel)}
 \label{sec:manip-deplacement}
 
@@ -631,17 +650,8 @@ Cette manipulation reprend le bloc contenant le d\'efaut simul\'e, mais la sonde
   \item Analyser les donn\'ees en vue de dessus et en 3D (Section~\ref{sec:reconstruction}).
 \end{enumerate}
 
-\subsubsection*{Questions}
-
-\begin{itemize}
-  \item Quelle est la longueur du d\'efaut le long du balayage? Pourquoi cette valeur est-elle moins fiable que sa position le long de la sonde?
-  \item Si la main va 20~\% plus vite que la vitesse vis\'ee, quel est l'effet sur la longueur mesur\'ee?
-  \item Pourquoi l'\'echo de fond dispara\^it-il sous le d\'efaut, et que devient-il aux bords du d\'efaut?
-\end{itemize}
-
 \section{Reconstruction 3D \`a partir des fichiers .UVData}
 \label{sec:reconstruction}
-\todo{Section provisoire: choisir l'option A (UltraVision 3) ou B (code maison), ou garder les deux selon la r\'eponse d'Eddyfi.}
 
 \subsection{Principe}
 
@@ -649,7 +659,7 @@ Une acquisition contient un A-scan complet pour chaque position de balayage et c
 
 \subsection{Pr\'eparation des donn\'ees}
 
-Quel que soit l'outil utilis\'e, quatre corrections sont n\'ecessaires.
+Quatre corrections sont n\'ecessaires. Les deux premi\`eres ne concernent que les acquisitions \`a l'horloge.
 
 \begin{itemize}
   \item Remettre en ordre le tampon circulaire, si le d\'ebut a \'et\'e r\'e\'ecrit.
@@ -658,31 +668,28 @@ Quel que soit l'outil utilis\'e, quatre corrections sont n\'ecessaires.
   \item Placer le z\'ero de profondeur sur l'\'echo de surface.
 \end{itemize}
 
-UltraVision Touch 3.8R11 contient l'outil \hl{Scan Axis Repositioning dans le menu Analysis}, qui permet de remettre \`a l'\'echelle l'axe de balayage d'une acquisition faite sans encodeur. \hl{Ce que chaque option fait automatiquement ou non reste à préciser.}\todo{V\'erifier dans le logiciel ce que chaque option de Scan Axis Repositioning corrige automatiquement et ce qu'il faut entrer \`a la main.}
+Pour une acquisition \`a l'horloge, UltraVision Touch 3.8R11 contient l'outil Scan Axis Repositioning, dans le menu Analysis, qui permet de remettre \`a l'\'echelle l'axe de balayage. Avec un encodeur, ce n'est pas n\'ecessaire.
 
-\subsection{Option A: UltraVision 3}
-
-\begin{itemize}
-  \item Installation: \hl{téléchargement depuis le site d'Eddyfi, lien à ajouter}.
-  \item Licence: UltraVision Touch sur un ordinateur demande la cl\'e de licence USB Sentinel HL fournie avec l'appareil et le pilote Sentinel LDK Run-time de Thales (article KB0018320 du portail de support Thales). Sans le pilote, Windows affiche la cl\'e comme un p\'eriph\'erique inconnu. La page \url{http://localhost:1947} permet de v\'erifier que la cl\'e est reconnue. UltraVision 3, avec la vue 3D, demande une licence distincte.
-  \item Ouverture du fichier .UVData: \hl{étapes à décrire}.
-  \item Vue 3D: voir l'annexe D.5 du manuel TOPAZ. \hl{Étapes détaillées à décrire}.
-\end{itemize}
-
-\todo{\`A compl\'eter si la licence est obtenue. Mettre \`a jour selon la r\'eponse d'Eddyfi, dossier 00053839.}
-
-\subsection{Option B: outil maison}
+\subsection{Outil maison}
 
 Un script Python, \texttt{uvdata\_3d\_gui.py}, lit directement le fichier .UVData, remet le tampon circulaire en ordre, recale la vitesse sur l'\'epaisseur connue et exporte le volume.
 
 \begin{itemize}
   \item Lancer le script \texttt{uvdata\_3d\_gui.py}.
   \item Une fen\^etre affiche les informations lues dans le fichier. Le script d\'etecte lui-m\^eme si le balayage a \'et\'e fait \`a l'horloge ou avec un encodeur. \`A l'horloge, entrer la vitesse de d\'eplacement et le sens du balayage. Avec un encodeur, les positions sont lues dans le fichier et il n'y a pas de vitesse \`a entrer.
-  \item Choisir le format de sortie: .html (vue 3D interactive), .vtk (pour ParaView ou 3D Slicer) ou .npz (volume NumPy).
-  \item Dans 3D Slicer, ouvrir le fichier .vtk et utiliser Volume Rendering, ou Segment Editor avec un seuil de 30~\%.
+  \item Choisir le format de sortie: .html (vue 3D interactive), .vtk (format de volume standard lu par les logiciels de visualisation 3D) ou .npz (volume NumPy).
 \end{itemize}
 
-\hl{Le code sera fourni dans un dépôt ou en annexe, avec la liste des dépendances Python.}\todo{D\'ecider si on partage le code, et o\`u (annexe, d\'ep\^ot GitHub, dossier du cours).}
+\begin{itemize}
+  \item \hl{Lien du dépôt GitHub: à ajouter.}
+  \item \hl{Contenu du dépôt:}
+  \begin{itemize}
+    \item \hl{le contenu du disque,}
+    \item \hl{le code de reconstruction 3D,} \texttt{uvdata\_3d\_gui.py}\hl{, et la liste de ses dépendances Python,}
+    \item \hl{un exemple de données de balayage avec encodeur,}
+    \item \hl{un exemple de données de balayage sans encodeur.}
+  \end{itemize}
+\end{itemize}
 
 \subsection{Visualisation et interpr\'etation}
 
@@ -695,13 +702,6 @@ Quelques r\'eglages aident \`a lire le volume.
   \item La longueur d'un d\'efaut se lit le long de l'axe de balayage, et sa profondeur sur l'axe vertical.
 \end{itemize}
 
-\begin{figure}[H]
-\centering
-\captureholder{9cm}{6cm}{vue 3D de l'acquisition du bloc \`a d\'efaut simul\'e.}
-\caption{Vue 3D de l'acquisition du bloc \`a d\'efaut simul\'e.}
-\label{fig:vue-3d}
-\end{figure}
-
 \subsection{Limites}
 
 \begin{itemize}
@@ -710,22 +710,6 @@ Quelques r\'eglages aident \`a lire le volume.
   \item La r\'esolution en profondeur est d'environ 0,13~mm \`a 25~MHz d'\'echantillonnage.
   \item Un d\'efaut pr\'esent d\`es la premi\`ere position conserv\'ee d'un tampon r\'e\'ecrit a une longueur minimale seulement.
 \end{itemize}
-
-\section{Questions de compr\'ehension}
-
-\begin{itemize}
-  \item Pourquoi la calibration de la vitesse demande-t-elle deux r\'eflecteurs, alors qu'un seul suffit pour le d\'elai de sabot?
-  \item Pourquoi faut-il calibrer dans l'ordre vitesse, d\'elai de sabot, puis sensibilit\'e?
-  \item Si la vitesse utilis\'ee est trop basse de 1,6~\%, quelle erreur fait-on sur l'\'epaisseur d'un bloc de 25~mm? Dans quel sens?
-  \item Un r\'eflecteur \`a la profondeur $d$ donne des \'echos \`a $2d$ et $3d$. Quel trajet suit l'onde pour chacun? Comment les distinguer d'un vrai d\'efaut?
-  \item Pourquoi un d\'efaut situ\'e \`a moins de 2~mm de la surface est-il difficile \`a d\'etecter avec un sabot droit?
-  \item Quelle est la diff\'erence entre les rectifications Bipolar et RF? Dans quel cas l'une est-elle pr\'ef\'erable \`a l'autre?
-  \item En acquisition \`a l'horloge, comment peut-on reconna\^itre dans les donn\'ees qu'une partie du d\'ebut a \'et\'e r\'e\'ecrite?
-  \item Pourquoi un balayage lin\'eaire avec la sonde immobile ne suffit-il pas pour reconstruire un volume en 3D?
-  \item Quelles informations le fichier ne peut-il pas contenir lors d'un balayage \`a l'horloge, et comment les obtenir autrement?
-\end{itemize}
-
-\listoftodos[Points \`a v\'erifier]
 
 \section{Bibliographie}
 
