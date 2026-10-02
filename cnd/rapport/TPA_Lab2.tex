@@ -1,0 +1,377 @@
+\documentclass[11pt,letterpaper]{article}
+%graph pour image H
+\usepackage{float}
+
+% Pour Dessin
+\usepackage{tikz}
+\usepackage{amsmath}
+\usetikzlibrary{arrows.meta, positioning, patterns}
+
+% packetages pour ecrire en français
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% pour les maths, les graphiques et la navigation dans le pdf
+\usepackage{amsmath, amssymb, mathtools, bm, array}
+\usepackage{graphicx,caption,subcaption}
+\graphicspath{{./}}
+\usepackage{pdfpages}
+\usepackage{hyperref}
+\hypersetup{
+    pdftitle={Reconstruction 3D par ultrasons multiéléments d'un bloc usiné: précision en profondeur et effet de l'encodeur de position},
+    pdfauthor={L-F. Brodeur (LFBRO1), S. L-Tremblay (SILAT10)}
+}
+
+% marges, police de caractère et header
+\usepackage{geometry}
+\geometry{top=23mm, bottom=23mm, left=20mm, right=20mm}
+\usepackage{cochineal}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\parindent=0mm % pas d'indentation
+
+\lhead{L-F. Brodeur (IDUL: LFBRO1) et S. L-Tremblay (IDUL: SILAT10)}
+\rhead{Contrôle non destructif par ultrasons}
+\fancyheadoffset{0 cm}
+
+\setlength{\headheight}{13.6pt}
+
+% commandes pour ecrire des equations plus vite avec leur label
+\newcommand{\beq}[1]{\begin{equation} \label{#1}}
+\def\enq{\end{equation}}
+
+% C'est parti!
+\begin{document}
+\shorthandoff{;:!?}
+\thispagestyle{empty} % pas de header sur la première page
+\begin{center}
+
+\noindent
+\begin{minipage}[t]{0.5\textwidth}
+\raggedright
+{\large GPH-3000 \textit{Travaux pratiques avancés}}\\
+{\large Automne 2026 $\vert$ GPH-3000 (Groupe: 85213)}
+\end{minipage}%
+\begin{minipage}[t]{0.5\textwidth}
+\raggedleft
+{\large \textsc{L-F. Brodeur (IDUL: LFBRO1)}}\\
+{\large \textsc{S. L-Tremblay (IDUL: SILAT10)}}
+\end{minipage}
+\\~\\
+\vspace{1em}
+{\Large \textbf{Reconstruction 3D par ultrasons multiéléments d'un bloc usiné:} } \\
+{\Large \textbf{précision en profondeur et effet de l'encodeur de position} } \\[0.3em]
+{\large Date du Laboratoire: 24 septembre et 1\textsuperscript{er} octobre 2026 \qquad\qquad Remis le \today}
+
+\end{center}
+
+\vspace{0.5em}
+\subsection*{Résumé}
+Avec une sonde ultrasonore, on peut lire un mot usiné sur la face cachée d'une pièce, à travers près d'un centimètre d'aluminium. Dans cette expérience, un appareil Topaz de Zetec et une sonde linéaire de 64 éléments à 5~MHz ont servi à reconstruire en 3D un bloc d'aluminium qui porte le mot LASERAX en relief, en déplaçant la sonde à la main sur sa face plane. Deux acquisitions ont été comparées au modèle CAD de la pièce: une où la position de la sonde vient de l'horloge interne de l'appareil, et une où elle est mesurée par un encodeur à roue. En profondeur, les deux acquisitions retrouvent le dessus de la plaque ($9{,}47 \pm 0{,}20$ et $9{,}60 \pm 0{,}21~\text{mm}$) et le dessus des lettres ($14{,}51 \pm 0{,}30$ et $14{,}76 \pm 0{,}31~\text{mm}$), pour des valeurs CAD de 9,50 et 14,50~mm. Le long du balayage, par contre, la différence est grande. Sans encodeur, la longueur des lettres varie de 41~\% à 141~\% de leur vraie longueur, parce que la main a avancé entre 3,5 et 12~mm/s au lieu des 5~mm/s visés. Avec l'encodeur, les centres des lettres sont placés à 0,3~mm près, mais toutes les distances sont 2,4~\% trop longues, ce qui pointe vers la calibration de l'encodeur. L'encodeur a aussi laissé 5~\% de positions vides, là où la sonde a dépassé 12,8~mm/s. Le principe de la sonde multiéléments vient d'ailleurs de la médecine: dès 1968, Somer a construit un échographe qui balayait le c\oe ur électroniquement, sans bouger la sonde \cite{somer}.
+
+\section{Introduction}
+
+Une sonde ultrasonore conventionnelle ne contient qu'un seul élément piézoélectrique. Elle mesure ce qui se trouve directement sous elle, et il faut la déplacer point par point pour inspecter une surface. Une sonde multiéléments (phased array) contient plutôt une rangée d'éléments indépendants. En jouant sur les délais entre les éléments, l'appareil peut déplacer et focaliser le faisceau électroniquement, ce qui donne une coupe complète de la pièce sans bouger la sonde \cite{drinkwater}. Pour obtenir un volume en 3D, il faut quand même déplacer la sonde dans l'autre direction, et connaître sa position à chaque tir.
+
+L'expérience portait sur la qualité de ce volume. La sonde a été déplacée à la main sur un bloc d'aluminium usiné qui porte le mot LASERAX en relief, et dont le modèle CAD donne toutes les dimensions. La question était de savoir avec quelle précision le volume reconstruit reproduit la pièce, en profondeur, le long de la sonde et le long du balayage, et ce que change l'ajout d'un encodeur de position.
+
+Comme convenu avec le professeur, ce rapport est plus court que d'habitude, parce qu'une bonne partie du travail a été la rédaction d'un protocole d'utilisation du Topaz. Ce protocole est joint à l'Annexe~\ref{ann:protocole}.
+
+Le principe des sondes multiéléments et des deux façons de positionner la sonde est présenté à la Section~\ref{sec:theorie}. La Section~\ref{sec:methodologie} décrit la pièce, les acquisitions et l'analyse. Les résultats en profondeur et dans le plan sont présentés à la Section~\ref{sec:resultats}. Ils sont discutés à la Section~\ref{sec:discussion}. La Section~\ref{sec:conclusion} conclut.
+
+\section{Théorie}
+\label{sec:theorie}
+
+\subsection{Sonde multiéléments et balayage linéaire}
+
+Chaque élément de la sonde peut être excité avec un délai qui lui est propre. Pour focaliser le faisceau en un point situé à une profondeur $F$, l'élément le plus loin du point focal est excité en premier, et chaque autre élément est retardé de
+\beq{eq:loi}
+    \tau_i = \frac{r_{\max} - r_i}{c} ,
+\enq
+où $r_i$ est la distance entre l'élément $i$ et le point focal, $r_{\max}$ la plus grande de ces distances et $c$ la vitesse du son \cite{olympus}. Les ondes de tous les éléments arrivent alors en phase au point focal. L'ensemble des délais forme une loi focale.
+
+En balayage linéaire, un groupe d'éléments voisins (l'ouverture) tire avec la même loi focale, puis le groupe se décale d'un élément le long de la sonde. Chaque position du groupe donne un faisceau, et les faisceaux sont espacés du pas $p$ entre les éléments. Le long de la sonde, la largeur du faisceau au point focal est d'environ \cite{olympus}
+\beq{eq:largeur}
+    \delta \approx \frac{\lambda F}{D} ,
+\enq
+où $\lambda$ est la longueur d'onde et $D$ la largeur de l'ouverture. Dans l'autre direction, le faisceau n'est pas focalisé: sa largeur est fixée par la longueur des éléments, qui est de 10~mm pour la sonde utilisée. On s'attend donc à une image plus floue le long du balayage que le long de la sonde.
+
+\subsection{Profondeur d'un écho}
+
+La sonde est posée sur un sabot droit en plastique, qui envoie une onde longitudinale à incidence normale dans la pièce. Un écho qui revient après un temps $t$ (mesuré à partir de l'interface sabot-pièce) vient d'une profondeur
+\beq{eq:profondeur}
+    d = \frac{v\,t}{2} ,
+\enq
+où $v$ est la vitesse du son dans la pièce (6320~m/s pour une onde longitudinale dans l'aluminium \cite{krautkramer}). La calibration du Topaz fixe $v$ avec deux échos de fond d'un bloc d'épaisseur connue, et le zéro de profondeur de chaque faisceau avec le délai dans le sabot \cite{protocole_topaz}.Un écho de fond à la profondeur $e$ est aussi suivi d'un deuxième écho à $2e$, après un aller-retour de plus dans la pièce. L'écart entre ces deux échos donne l'épaisseur sans dépendre du zéro de profondeur.
+
+\subsection{Position le long du balayage: horloge ou encodeur}
+\label{sec:theorie_position}
+
+Sans encodeur, le Topaz enregistre une nouvelle position à chaque tic de son horloge, à la fréquence d'acquisition $f$. Il suppose que chaque position est séparée d'un pas $\Delta s$ fixé par l'utilisateur. La sonde doit alors avancer à la vitesse $v_{\text{main}} = \Delta s\, f$ exactement, sinon les longueurs mesurées le long du balayage sont multipliées par le rapport entre la vitesse supposée et la vraie vitesse.
+
+Avec un encodeur, une roue fixée au sabot compte des pas à mesure que la sonde avance. La position vient de ce compte, divisé par la résolution de l'encodeur (en pas/mm) obtenue par une calibration sur une distance connue. Le Topaz range chaque tir dans la case de position qui correspond, avec un pas $\Delta s$. Si la sonde avance de plus d'un pas entre deux tirs, des cases restent vides. Les tirs ne peuvent pas se faire plus vite que la fréquence d'acquisition, donc la vitesse de déplacement maximale sans trou est
+\beq{eq:vmax}
+    v_{\max} = \Delta s\, f .
+\enq
+
+\section{Méthodologie}
+\label{sec:methodologie}
+
+\subsubsection*{Pièce}
+La pièce est une plaque d'aluminium usinée de $140 \times 24 \times 9{,}5~\text{mm}$, sur laquelle les sept lettres de LASERAX dépassent de 5~mm (Figure~\ref{fig:montage}). D'après le fichier CAD, les lettres ont une hauteur de 18~mm et une longueur de 11,2 à 14,2~mm. La sonde est posée sur la face plane, avec du gel couplant. Là où il n'y a pas de lettre, le son revient sur le dessus de la plaque, à 9,5~mm. Sous une lettre, le son continue dans la lettre et revient sur son dessus, à 14,5~mm.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+        \includegraphics[height=4.2cm]{../figures/Photos_Lab/Methode3.jpg}
+        \caption{}
+        \label{fig:photo}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.46\textwidth}
+        \centering
+        \begin{tikzpicture}[x=0.12cm, y=0.155cm]
+            % sabot et sonde
+            \fill[cyan!12] (2,0) rectangle (30,6);
+            \draw (2,0) rectangle (30,6);
+            \fill[gray!45] (9,6) rectangle (23,9.5);
+            \draw (9,6) rectangle (23,9.5);
+            \node[font=\scriptsize] at (16,7.75) {sonde};
+            \node[font=\scriptsize] at (16,3) {sabot};
+            % plaque et lettre
+            \fill[gray!20] (-4,0) rectangle (36,-9.5);
+            \fill[gray!20] (17,-9.5) rectangle (29,-14.5);
+            \draw (-4,0) -- (36,0) -- (36,-9.5) -- (29,-9.5) -- (29,-14.5) -- (17,-14.5) -- (17,-9.5) -- (-4,-9.5) -- cycle;
+            % trajets
+            \draw[-{Latex[length=1.5mm]}, blue!70!black, thick] (8,0) -- (8,-9.3);
+            \draw[-{Latex[length=1.5mm]}, blue!70!black, thick] (9.5,-9.3) -- (9.5,0);
+            \draw[-{Latex[length=1.5mm]}, orange!85!black, thick] (21.5,0) -- (21.5,-14.3);
+            \draw[-{Latex[length=1.5mm]}, orange!85!black, thick] (23,-14.3) -- (23,0);
+            % cotes
+            \draw[|-|, thin] (-7,0) -- (-7,-9.5) node[midway, left, font=\scriptsize] {9,5 mm};
+            \draw[|-|, thin] (39,0) -- (39,-14.5) node[midway, right, font=\scriptsize] {14,5 mm};
+            \node[font=\scriptsize, align=center] at (23,-17) {lettre};
+            \node[font=\scriptsize] at (6,-12) {plaque};
+            \draw[-{Latex[length=1.5mm]}] (-4,-19) -- (8,-19) node[right, font=\scriptsize] {$x$, balayage};
+        \end{tikzpicture}
+        \caption{}
+        \label{fig:schema}
+    \end{subfigure}
+    \caption{Sonde et sabot posés sur la face plane du bloc, avec le gel couplant (a). Coupe du bloc le long du balayage (b): la flèche bleue revient du dessus de la plaque, la flèche orange du dessus d'une lettre.}
+    \label{fig:montage}
+\end{figure}
+
+\subsubsection*{Acquisitions}
+Les mesures ont été faites avec un Topaz16 et le logiciel UltraVision Touch 3.8R11, une sonde linéaire LM de 5~MHz à 64 éléments (pas de 0,6~mm, éléments de 10~mm de long) et le sabot droit LM-0LW, selon le protocole de l'Annexe~\ref{ann:protocole} \cite{protocole_topaz} et le protocole du cours \cite{protocole}. La loi focale utilise une ouverture de 16 éléments focalisée à 20~mm, ce qui donne 49 faisceaux répartis sur 28,8~mm le long de la sonde. Chaque A-scan contient 156 échantillons de 40~ns, soit 0,129~mm en profondeur. La sonde (38,4~mm de long) est placée en travers du bloc et déplacée à la main sur sa longueur. Les trois calibrations (vitesse, délai de sabot, sensibilité) ont été faites sur un bloc d'aluminium de 25,16~mm, et la calibration de vitesse a donné $v = 6451~\text{m/s}$. Plusieurs balayages ont été faits avec et sans encodeur, et le meilleur de chaque type est analysé ici (Tableau~\ref{tab:acquisitions}). Sans encodeur, des repères de ruban adhésif placés tous les 10~mm aidaient à garder la vitesse visée de 5~mm/s.
+
+\begin{table}[htbp]
+\centering
+\caption{Paramètres des deux acquisitions analysées. Les 49 faisceaux, l'échantillonnage et la vitesse du son sont les mêmes pour les deux.}
+\label{tab:acquisitions}
+\small
+\begin{tabular}{lcc}
+\hline
+ & Horloge (Scan\_Bloc\_Laser\_3) & Encodeur (Encodeur\_Bloc\_Laser\_6) \\
+\hline
+Source de la position & horloge interne & encodeur à roue (18,68 pas/mm) \\
+Fréquence d'acquisition & 20~Hz & 51~Hz \\
+Pas de balayage $\Delta s$ & 0,25~mm (supposé) & 0,25~mm \\
+Positions enregistrées & 462 & 578, dont 29 vides \\
+Longueur balayée (pas nominal) & 115,2~mm & 144,2~mm \\
+Amplitude médiane de l'écho de fond & 85~\% & 100~\% (saturé) \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection*{Analyse}
+Les fichiers .UVData ont été lus en Python avec l'outil \texttt{uvdata\_3d\_gui.py} décrit dans le protocole, puis analysés avec \texttt{analyse\_scans.py}. Les positions vides de l'encodeur sont comblées par interpolation entre les positions voisines. Dans chaque A-scan, on cherche l'écho du dessus de la plaque entre 7,5 et 12~mm, et celui du dessus des lettres entre 12,5 et 17~mm. La profondeur d'un écho est le centre de la partie de l'écho qui dépasse la moitié de son maximum.
+
+Pour l'image dans le plan, on utilise la chute de l'écho de fond, $q = 1 - A/A_{\text{ref}}$, où $A$ est l'amplitude de l'écho du dessus de la plaque et $A_{\text{ref}}$ sa valeur sur la plaque pour le même faisceau. On a $q = 0$ sur la plaque et $q = 1$ sous une lettre. Le seuil $q = 0{,}5$ correspond à la méthode de la chute de 6~dB utilisée en contrôle par ultrasons pour trouver le bord d'un réflecteur \cite{krautkramer}. La carte de $q$ est placée sur le CAD par le décalage qui la superpose le mieux aux lettres, avec le pas nominal de 0,25~mm. Pour mesurer chaque lettre, son contour CAD est flouté par un faisceau gaussien (largeur ajustée sur l'acquisition avec encodeur), puis étiré et déplacé le long des deux axes jusqu'à ce qu'il se superpose le mieux à la carte mesurée (curve fit). L'étirement donne la longueur et la hauteur mesurées de la lettre, et le déplacement donne la position de son centre.
+
+\subsubsection*{Incertitudes}
+L'incertitude sur une profondeur (éq.~\ref{eq:profondeur}) vient de la vitesse du son et du temps d'arrivée:
+\beq{eq:dd}
+    \Delta d = \sqrt{\left(\frac{\partial d}{\partial v}\Delta v\right)^2 + \left(\frac{\partial d}{\partial t}\Delta t\right)^2} = \frac{1}{2}\sqrt{\left(t\,\Delta v\right)^2 + \left(v\,\Delta t\right)^2} .
+\enq
+On prend $\Delta v = 131~\text{m/s}$, l'écart entre la vitesse calibrée et la vitesse nominale de l'aluminium, et $\Delta t = 20~\text{ns}$, la moitié de la période d'échantillonnage. Pour une hauteur de lettre ou un écart entre deux échos, les deux temps d'arrivée comptent chacun. La dispersion des profondeurs d'un A-scan à l'autre (0,02 à 0,10~mm) est plus petite que $\Delta d$. Une longueur dans le plan est la différence entre deux bords, $L = x_2 - x_1$, donc $\Delta L = \sqrt{2}\,\Delta x$, où $\Delta x$ est le pas d'échantillonnage: $\Delta L = 0{,}35~\text{mm}$ le long du balayage et $0{,}85~\text{mm}$ le long de la sonde.
+
+\section{Résultats}
+\label{sec:resultats}
+
+\subsection{Profondeur}
+\label{sec:res_profondeur}
+
+La Figure~\ref{fig:ascans} montre les A-scans moyens sur la plaque et sous les lettres. Sur la plaque, l'écho de fond sort près de 9,5~mm, suivi de son deuxième écho près de 19~mm. Sous une lettre, cet écho disparaît presque complètement et un écho plus faible sort près de 14,5~mm. Les profondeurs mesurées sont données au Tableau~\ref{tab:profondeur}. Toutes les valeurs correspondent au CAD à l'intérieur de leur incertitude. L'écart entre les deux échos de fond est le même dans les deux acquisitions (9,68~mm), même si les lectures directes diffèrent de 0,13~mm pour la plaque et de 0,25~mm pour les lettres.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.66\textwidth]{../figures/02_ascans_profondeur.png}
+    \caption{A-scans moyens sur la plaque (traits pleins) et sous les lettres (tirets), sans encodeur (orange) et avec encodeur (bleu). Les lignes pointillées grises marquent les profondeurs du CAD.}
+    \label{fig:ascans}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption{Profondeurs mesurées comparées au CAD. Les incertitudes viennent de l'équation~\ref{eq:dd}.}
+\label{tab:profondeur}
+\small
+\begin{tabular}{lccc}
+\hline
+Grandeur (mm) & CAD & Horloge & Encodeur \\
+\hline
+Dessus de la plaque & 9,50 & $9{,}47 \pm 0{,}20$ & $9{,}60 \pm 0{,}21$ \\
+Dessus des lettres & 14,50 & $14{,}51 \pm 0{,}30$ & $14{,}76 \pm 0{,}31$ \\
+Hauteur des lettres (différence) & 5,00 & $5{,}03 \pm 0{,}14$ & $5{,}17 \pm 0{,}14$ \\
+Écart entre le 1\textsuperscript{er} et le 2\textsuperscript{e} écho de fond & 9,50 & $9{,}68 \pm 0{,}22$ & $9{,}68 \pm 0{,}22$ \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Forme des lettres dans le plan}
+
+La Figure~\ref{fig:cscans} compare la chute de l'écho de fond au CAD. Avec l'encodeur, les sept lettres se lisent et suivent bien leur contour CAD. La Figure~\ref{fig:3d} montre la surface 3D reconstruite à partir de cette acquisition. Sans encodeur, les lettres sont étirées ou écrasées selon l'endroit, et la fin du mot sort du cadre parce que le balayage paraît plus court qu'il ne l'est. Le côté gauche du L manque aussi, car l'acquisition a commencé après. Au seuil $q = 0{,}5$, la surface des lettres mesurée recouvre 53~\% de celle du CAD avec l'encodeur, contre 27~\% sans encodeur. Le flou gaussien qui rend le mieux la carte avec encodeur a une largeur à mi-hauteur de 3,5~mm le long du balayage et de 2,4~mm le long de la sonde.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.84\textwidth]{../figures/01_cscans_cad.png}
+    \caption{Lettres du CAD (a) et chute de l'écho de fond $q$ sans encodeur (b) et avec encodeur (c), avec le contour CAD en blanc. Les traits orange en haut de (c) marquent les positions laissées vides par l'encodeur.}
+    \label{fig:cscans}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.62\textwidth]{../figures/04_surface_3d_encodeur.png}
+    \caption{Surface reconstruite à partir de l'acquisition avec encodeur. L'axe vertical est la profondeur de l'écho le plus profond, exagérée trois fois.}
+    \label{fig:3d}
+\end{figure}
+
+\subsection{Longueurs, hauteurs et distorsion}
+\label{sec:res_plan}
+
+Le Tableau~\ref{tab:lettres} donne la longueur (le long du balayage) et la hauteur (le long de la sonde) de chaque lettre. Le long de la sonde, les deux acquisitions donnent des hauteurs proches de 18~mm, à environ 1~mm près pour la plupart des lettres. Le long du balayage, les longueurs avec encodeur sont un peu plus courtes que le CAD, de 0,2 à 0,8~mm, sauf pour le deuxième A qui est 2,3~mm trop long. Sans encodeur, les longueurs vont de 41~\% (X) à 141~\% (R) de la longueur CAD (Figure~\ref{fig:positions}). En divisant la vitesse supposée de 5~mm/s par cet étirement, on obtient la vitesse de la main sur chaque lettre: elle a varié entre 3,5~mm/s (R) et 12,1~mm/s (X), sur un balayage de 23~s.
+
+\begin{table}[htbp]
+\centering
+\caption{Longueur et hauteur de chaque lettre (mm). L'incertitude est de 0,35~mm sur les longueurs et de 0,85~mm sur les hauteurs.}
+\label{tab:lettres}
+\small
+\begin{tabular}{lcccccc}
+\hline
+ & \multicolumn{3}{c}{Longueur (le long du balayage)} & \multicolumn{3}{c}{Hauteur (le long de la sonde)} \\
+Lettre & CAD & Horloge & Encodeur & CAD & Horloge & Encodeur \\
+\hline
+L & 11,2 & coupée\textsuperscript{a} & 10,8 & 18,0 & coupée\textsuperscript{a} & 20,4 \\
+A & 14,1 & 17,7 & 13,9 & 18,0 & 16,9 & 18,0 \\
+S & 12,7 & 7,2  & 11,9 & 18,5 & 18,1 & 18,8 \\
+E & 12,2 & 10,1 & 11,4 & 18,0 & 18,5 & 18,5 \\
+R & 14,0 & 19,7 & 13,2 & 18,0 & 16,5 & 18,7 \\
+A & 14,1 & 6,8  & 16,3 & 18,0 & 17,8 & 17,9 \\
+X & 14,2 & 5,9  & 13,7 & 18,0 & 15,3 & 19,1 \\
+\hline
+\end{tabular}
+\\[0.3em]
+{\footnotesize \textsuperscript{a} L'acquisition sans encodeur commence au milieu du L.}
+\end{table}
+
+La position des centres (Figure~\ref{fig:positions}) montre la même chose à plus grande échelle. Avec l'encodeur, les centres mesurés suivent une droite de pente $1{,}024 \pm 0{,}003$ par rapport aux centres CAD (incertitude tirée de la matrice de covariance du curve fit), avec un écart RMS de 0,28~mm autour de cette droite. Sans encodeur, l'écart RMS autour de la meilleure droite est de 3,5~mm, et le X est mesuré 18~mm trop tôt.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.82\textwidth]{../figures/03_positions_lettres.png}
+    \caption{Écart entre le centre mesuré et le centre CAD de chaque lettre (a) et rapport entre la longueur mesurée et la longueur CAD (b), sans encodeur (cercles orange) et avec encodeur (carrés bleus). Le L sans encodeur n'est pas montré.}
+    \label{fig:positions}
+\end{figure}
+
+L'encodeur a laissé 29 positions vides sur 578 (5~\%), en 13 trous d'au plus 5 positions (1,25~mm). Parmi elles, 26 sont entre $x = 23{,}8$ et $37{,}2~\text{mm}$, sur la fin du R et sur le deuxième A (traits orange de la Figure~\ref{fig:cscans}). Dans cette zone, la sonde a avancé en moyenne de 1,9 position entre deux tirs.
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsubsection*{Profondeur et vitesse du son}
+En profondeur, la reconstruction est bonne: les quatre grandeurs du Tableau~\ref{tab:profondeur} correspondent au CAD à l'intérieur de leur incertitude, qui est dominée par la vitesse du son. L'écart entre les deux échos de fond permet de vérifier cette vitesse, parce qu'il ne dépend pas du zéro de profondeur. Il vaut 9,68~mm dans les deux acquisitions, alors que la plaque fait 9,50~mm. Pour que cet écart donne 9,50~mm, il faudrait une vitesse de $6330 \pm 60~\text{m/s}$ (même calcul que l'éq.~\ref{eq:dd}, avec seulement l'incertitude sur les temps), proche de la valeur nominale de 6320~m/s et loin des 6451~m/s de la calibration. La calibration de vitesse a donc probablement surestimé la vitesse d'environ 2~\%, par exemple à cause d'une erreur sur l'épaisseur du bloc de calibration ou sur la position d'un des deux échos. Les lectures directes restent proches du CAD parce qu'elles dépendent aussi du zéro de profondeur fixé par le délai de sabot.
+
+La différence de 0,13 à 0,25~mm entre les lectures directes des deux acquisitions vient probablement du gain. Avec l'encodeur, l'écho de fond était saturé à 100~\% (Tableau~\ref{tab:acquisitions}). Le sommet de l'écho est alors coupé, et le centre de la partie au-dessus de la moitié du maximum se déplace vers la fin de l'écho. L'écart entre deux échos est beaucoup moins sensible à cet effet, ce qui explique qu'il soit le même dans les deux acquisitions.
+
+\subsubsection*{Le long de la sonde}
+Le long de la sonde, les positions viennent de l'électronique: chaque faisceau est décalé de 0,6~mm, peu importe comment la main bouge. C'est pourquoi les hauteurs des lettres sont semblables dans les deux acquisitions. Le flou mesuré dans cette direction (2,4~mm à mi-hauteur) est proche de la largeur prévue par l'équation~\ref{eq:largeur}, $\delta \approx 1{,}26~\text{mm} \times 20~\text{mm} / 9{,}6~\text{mm} = 2{,}6~\text{mm}$, avec $\lambda = v/f = 1{,}26~\text{mm}$. Les hauteurs les plus éloignées du CAD sont celles du L (+2,4~mm) et du X (+1,1~mm) avec l'encodeur. Leur bas est proche du bord du bloc, où l'écho de fond baisse déjà parce qu'une partie de l'ouverture n'est plus sur la pièce (la sonde est plus longue que le bloc n'est large). Cette baisse est vue comme un bout de lettre.
+
+\subsubsection*{Le long du balayage}
+Sans encodeur, la reconstruction suppose une vitesse constante de 5~mm/s. Une erreur constante sur la vitesse ne ferait que changer l'échelle, mais la main a changé de vitesse d'une lettre à l'autre, d'un facteur 3,5 entre la plus lente et la plus rapide. Chaque lettre a donc sa propre échelle, et aucune correction globale ne peut rattraper cette distorsion: même avec la meilleure droite, les centres restent à 3,5~mm RMS de leur position. Les repères au ruban adhésif n'ont pas suffi.
+
+Avec l'encodeur, cette distorsion disparaît: l'écart RMS des centres (0,28~mm) est de l'ordre du pas de balayage. Il reste une erreur d'échelle de $2{,}4 \pm 0{,}3~\%$ qui touche toutes les distances. Elle vient très probablement de la calibration de l'encodeur: la résolution entrée était de 18,68~pas/mm, alors que les données indiquent plutôt $18{,}68 \times 1{,}024 = 19{,}13~\text{pas/mm}$. Une erreur de 2,4~mm sur une distance de calibration de 100~mm suffit pour l'expliquer. Avec la résolution par défaut de 20~pas/mm, l'erreur aurait été de $-4{,}3~\%$, donc la calibration a quand même aidé. Les longueurs des lettres avec encodeur sont un peu plus courtes que le CAD même si l'échelle est trop grande. C'est encore la saturation de l'écho de fond: sur le bord d'une lettre, l'écho doit baisser sous 100~\% avant que la chute soit visible, donc la lettre paraît plus petite que son contour.
+
+\subsubsection*{Trous de l'encodeur}
+Les trous sont presque tous dans une même zone, où la sonde avançait en moyenne de 1,9 position par tir, soit environ $1{,}9 \times 0{,}25~\text{mm} \times 51~\text{Hz} \approx 24~\text{mm/s}$. C'est le double de la vitesse maximale de l'équation~\ref{eq:vmax}, $v_{\max} = 0{,}25~\text{mm} \times 51~\text{Hz} = 12{,}8~\text{mm/s}$. Les 51~Hz viennent de la fréquence de répétition des tirs (2500~Hz) partagée entre les 49 faisceaux. Le deuxième A, qui est au milieu de cette zone, est la seule lettre dont la longueur avec encodeur s'écarte de plus de 1~mm du CAD (+16~\%). Les A-scans interpolés dans les trous ne sont pas des mesures, et les mouvements brusques de la main dans cette zone ont aussi pu faire glisser la roue de l'encodeur.
+
+\subsubsection*{Améliorations}
+Un gain plus bas, qui garde l'écho de fond sous 80~\% de l'écran, éviterait la saturation. Calibrer l'encodeur sur toute la longueur du bloc (140~mm) réduirait l'erreur d'échelle, et moins de faisceaux augmenteraient $v_{\max}$.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+Le Topaz et sa sonde de 64 éléments ont permis de reconstruire en 3D le mot LASERAX, lu à travers 9,5~mm d'aluminium. En profondeur, les deux acquisitions donnent le dessus de la plaque et le dessus des lettres à environ 0,3~mm près, ce qui correspond au CAD à l'intérieur de l'incertitude. L'écart entre les deux échos de fond indique toutefois que la vitesse calibrée était environ 2~\% trop haute. Le long de la sonde, la position est fixée par l'électronique et les hauteurs des lettres sont bonnes dans les deux cas. Le long du balayage, l'encodeur fait toute la différence: sans lui, la vitesse irrégulière de la main déforme les lettres de $-59$ à $+41~\%$, et avec lui il ne reste qu'une erreur d'échelle de 2,4~\%, qui vient de sa calibration. Il faut quand même déplacer la sonde sous 12,8~mm/s pour éviter les trous. Une prochaine expérience pourrait utiliser un gain plus bas et calibrer l'encodeur sur toute la longueur du bloc. Aussi, le même montage pourrait servir à mesurer la taille d'un vrai défaut caché, par exemple un trou percé dans un bloc, et à vérifier la précision obtenue ici.
+
+\renewcommand{\refname}{Bibliographie}
+\begin{thebibliography}{9}
+
+\bibitem{drinkwater}
+Drinkwater, B.W. et Wilcox, P.D. « Ultrasonic arrays for non-destructive evaluation: A review ». \textit{NDT \& E International}, vol.~39, n\textsuperscript{o}~7, p.~525-541, 2006.
+
+\bibitem{olympus}
+Olympus NDT (R/D Tech). \textit{Introduction to Phased Array Ultrasonic Technology Applications: R/D Tech Guideline}. Waltham (MA), Olympus NDT, 2004.
+
+\bibitem{krautkramer}
+Krautkrämer, J. et Krautkrämer, H. \textit{Ultrasonic Testing of Materials}, 4\textsuperscript{e} édition. Springer-Verlag, Berlin, 1990.
+
+\bibitem{protocole}
+Département de physique, de génie physique et d'optique, Université Laval. \textit{GPH-3000, Contrôle non destructif des matériaux: 1. Ultrasons}, version A26, 2026.
+
+\bibitem{protocole_topaz}
+Brodeur, L-F. et Larouche-Tremblay, S. \textit{GPH-3000, Contrôle non destructif des matériaux: 3. Utilisation du Topaz (ultrasons phased array)}, version A26, 2026 (Annexe~\ref{ann:protocole}).
+
+\bibitem{zetec}
+Zetec, Inc. \textit{TOPAZ User Manual}, révision 10046055-R08.
+
+\bibitem{somer}
+Somer, J.C. « Electronic sector scanning for ultrasonic diagnosis ». \textit{Ultrasonics}, vol.~6, n\textsuperscript{o}~3, p.~153-159, 1968.
+
+\end{thebibliography}
+
+% ------------------------------------------------------------------ annexes
+\clearpage
+\appendix
+\makeatletter
+\renewcommand{\@seccntformat}[1]{Annexe~\csname the#1\endcsname:\ }
+\makeatother
+
+\section{Reconstruction 3D sans encodeur}
+\label{ann:3d_horloge}
+
+La Figure~\ref{fig:3d_horloge} montre la surface reconstruite à partir de l'acquisition sans encodeur, avec le pas nominal de 0,25~mm, à comparer avec la Figure~\ref{fig:3d}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{../figures/05_surface_3d_horloge.png}
+    \caption{Surface reconstruite à partir de l'acquisition sans encodeur. L'axe vertical est la profondeur de l'écho le plus profond, exagérée trois fois.}
+    \label{fig:3d_horloge}
+\end{figure}
+
+\clearpage
+\thispagestyle{empty}
+\vspace*{\fill}
+\begin{center}
+\refstepcounter{section}
+\label{ann:protocole}
+\addcontentsline{toc}{section}{Annexe~\thesection: Protocole d'utilisation du Topaz}
+{\Huge \textbf{Annexe~\thesection}}\\[1.2em]
+{\LARGE Protocole d'utilisation du Topaz}\\[0.6em]
+{\large (ultrasons phased array)}
+\end{center}
+\vspace*{\fill}
+
+\includepdf[pages=-]{protocole_topaz/Guide_Topaz_PhasedArray_A26.pdf}
+
+\end{document}
