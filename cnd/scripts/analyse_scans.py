@@ -397,7 +397,7 @@ def _carte(ax, S, C, LC, lettre):
         for l in g:
             ax.plot(L['centre'] + (m['centre'] - L['centre']) + m['ax'] * (l[:, 0] - L['centre']),
                     m['zc'] + m['az'] * (l[:, 1] - L['zc']), color='white', lw=0.7, ls=(0, (2.5, 1.5)))
-    ax.text(0.006, 0.93, lettre, transform=ax.transAxes, color='white', va='top', fontsize=9)
+    ax.text(0.0, 1.03, lettre, transform=ax.transAxes, va='bottom', ha='left', fontsize=9)   # au-dessus du cadre
     return im
 
 
@@ -409,15 +409,13 @@ def _axes_bloc(ax):
 
 
 def fig_cscans(SH, SE, C, LC, path):
-    fig, axs = plt.subplots(3, 1, figsize=(7.0, 4.1), sharex=True, gridspec_kw=dict(hspace=0.08))
+    fig, axs = plt.subplots(3, 1, figsize=(7.0, 4.5), sharex=True, gridspec_kw=dict(hspace=0.24))
     ext = [C['xs'][0], C['xs'][-1], C['zs'][0], C['zs'][-1]]
     axs[0].imshow(C['M'].T, origin='lower', extent=ext, aspect='equal', cmap='Greys', vmin=0, vmax=1.6)
     axs[0].add_patch(plt.Rectangle((-70, -12), 140, 24, fill=False, color='0.4', lw=0.8))
-    axs[0].text(0.006, 0.93, '(a)', transform=axs[0].transAxes, va='top', fontsize=9)
+    axs[0].text(0.0, 1.03, '(a)', transform=axs[0].transAxes, va='bottom', ha='left', fontsize=9)
     _carte(axs[1], SH, C, LC, '(b)')
     im = _carte(axs[2], SE, C, LC, '(c)')
-    vides = SE['x_cad'][~SE['filled']]
-    axs[2].plot(vides, np.full(vides.size, -12.4), '|', color='#F28E2B', ms=5, mew=1.0)
     for a in axs:
         _axes_bloc(a)
     axs[2].set_xlabel('$x$ (mm)')
@@ -429,21 +427,35 @@ def fig_cscans(SH, SE, C, LC, path):
 
 def fig_ascan(SH, SE, path):
     fig, ax = plt.subplots(figsize=(6.4, 3.0))
+    courbes = {'plaque': [], 'lettre': []}
     for S, c, lab in ((SH, C_HORLOGE, 'horloge'), (SE, C_ENCODEUR, 'encodeur')):
         q = S['q']
         plaque = (q < 0.05) & S['filled'][:, None]
         lettre = (q > 0.8) & (S['a_l'] > SEUIL_SIGNAL) & S['filled'][:, None]
-        ax.plot(S['d'], S['vol'][plaque].mean(0), '-', color=c, lw=1.2, label='Plaque, %s' % lab)
-        ax.plot(S['d'], S['vol'][lettre].mean(0), '--', color=c, lw=1.2, label='Lettre, %s' % lab)
-    for y, t in ((Y_BASE - Y_FACE, 'plaque'), (Y_HAUT - Y_FACE, 'lettre'),
-                 (2 * (Y_BASE - Y_FACE), r'$2\times$ plaque')):
+        courbes['plaque'].append((S['d'], S['vol'][plaque].mean(0)))
+        courbes['lettre'].append((S['d'], S['vol'][lettre].mean(0)))
+        ax.plot(*courbes['plaque'][-1], '-', color=c, lw=1.2, label='Plaque, %s' % lab)
+        ax.plot(*courbes['lettre'][-1], '--', color=c, lw=1.2, label='Lettre, %s' % lab)
+
+    def sommet(nom, lo, hi):
+        """Position moyenne du sommet des deux courbes dans [lo, hi] (sommet affine par une parabole)."""
+        pos = []
+        for d, a in courbes[nom]:
+            k = np.nonzero((d >= lo) & (d <= hi))[0]
+            i = k[np.argmax(a[k])]
+            y0, y1, y2 = a[i - 1], a[i], a[i + 1]
+            pos.append(d[i] + 0.5 * (y0 - y2) / (y0 - 2 * y1 + y2) * (d[1] - d[0]))
+        return np.mean(pos)
+    # lignes sur les echos mesures (moyenne des deux acquisitions), pas sur les profondeurs du CAD
+    for y, t in ((sommet('plaque', *FENETRE_FOND), 'écho plaque'), (sommet('lettre', *FENETRE_LETTRE), 'écho lettre'),
+                 (sommet('plaque', 17.5, SH['d'][-2]), '2e écho plaque')):
         ax.axvline(y, color='0.45', ls=':', lw=0.9)
-        ax.text(y - 0.25, 97, t, fontsize=8, color='0.3', rotation=90, va='top', ha='right')
+        ax.text(y - 0.4, 98, t, fontsize=8, color='0.3', rotation=90, va='top', ha='right')
     ax.set_xlabel('Profondeur (mm)')
     ax.set_ylabel('Amplitude moyenne (% écran)')
     ax.set_xlim(0, SH['d'][-1])
     ax.set_ylim(0, 100)
-    ax.legend(frameon=False, fontsize=8, loc='upper center', bbox_to_anchor=(0.62, 0.86))
+    ax.legend(frameon=False, fontsize=8, loc='upper left', bbox_to_anchor=(0.14, 0.98))   # zone vide entre 2 et 8 mm
     fig.savefig(path)
     plt.close(fig)
 
@@ -466,7 +478,7 @@ def fig_positions(SH, SE, LC, path):
     a2.set_xticks(range(7))
     a2.set_xticklabels(LETTRES)
     a2.set_ylabel('Longueur mesurée / CAD')
-    a2.set_ylim(0, 1.6)
+    a2.set_ylim(0, 2.0)
     a1.text(-0.2, 1.03, '(a)', transform=a1.transAxes, fontsize=9)
     a2.text(-0.2, 1.03, '(b)', transform=a2.transAxes, fontsize=9)
     fig.savefig(path)
@@ -476,9 +488,24 @@ def fig_positions(SH, SE, LC, path):
 X3D, Z3D = (-66, 66), (-9.95, 10.65)                      # zone montree en 3D : sans les bouts ni les bords du bloc
 
 
-def _surface3d(X, Z, H, path, elev=50, azim=-80):
-    """Une surface vue en 3D, meme cadre pour toutes les surfaces (le blanc autour est rogne)."""
-    fig = plt.figure(figsize=(9.0, 4.0))
+def _rogner(images, marge=15):
+    """Rogne le blanc autour, avec le meme cadre pour toutes les images (les boites 3D restent alignees)."""
+    boites = []
+    for im in images:
+        a = np.asarray(im).min(2) < 245
+        r, c = np.nonzero(a.any(1))[0], np.nonzero(a.any(0))[0]
+        boites.append((c[0], r[0], c[-1], r[-1]))
+    b = np.array(boites)
+    x0, y0, x1, y1 = b[:, 0].min() - marge, b[:, 1].min() - marge, b[:, 2].max() + marge, b[:, 3].max() + marge
+    return [im.crop((max(x0, 0), max(y0, 0), x1, y1)) for im in images]
+
+
+def _surface3d(X, Z, H, path, elev=40, azim=-75):
+    """Une surface vue en 3D, meme cadre pour toutes les surfaces. Les trois axes sont nommes a la main
+    (position projetee de chaque axe), parce que matplotlib entasse l'axe vertical et l'axe z dans le meme coin
+    pour une boite aussi longue et etroite."""
+    from mpl_toolkits.mplot3d import proj3d
+    fig = plt.figure(figsize=(10.0, 4.6))
     ax = fig.add_subplot(111, projection='3d')
     ax.plot_surface(X, Z, np.clip(H, 9, 15), cmap='viridis', vmin=9, vmax=15.5, rstride=1, cstride=1, linewidth=0,
                     antialiased=False, shade=True)
@@ -486,21 +513,34 @@ def _surface3d(X, Z, H, path, elev=50, azim=-80):
     ax.set_xlim(*X3D)
     ax.set_ylim(Z3D[1], Z3D[0])
     ax.set_zlim(9, 15)                                        # profondeur vue de la sonde : lettres en relief
-    ax.set_xlabel('$x$ (mm)', labelpad=14)
+    ax.zaxis._axinfo['juggled'] = (1, 2, 0)                  # axe vertical du cote gauche, axe z a droite
+    ax.set_xlabel('')
     ax.set_ylabel('')
     ax.set_zlabel('')
+    ax.set_xticks([-60, -40, -20, 0, 20, 40, 60])
+    ax.set_yticks([-10, 0, 10])
     ax.set_zticks([9.5, 14.5])
-    ax.set_yticks([])
-    ax.tick_params(axis='z', pad=1)
+    ax.tick_params(axis='y', pad=2)
     ax.view_init(elev=elev, azim=azim)
-    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    fig.canvas.draw()
+
+    def ecran(x, y, z):
+        u, v, _ = proj3d.proj_transform(x, y, z, ax.get_proj())
+        return ax.transData.transform((u, v))
+    pix = lambda p: ax.transData.inverted().transform(p)
+    # x : sous le milieu de l'arete avant, sous les etiquettes des graduations
+    avant = min(Z3D, key=lambda y: ecran(0, y, 9)[1])     # arete la plus basse a l'ecran
+    ax.annotate('$x$ (mm)', xy=pix(ecran(30, avant, 9)), xytext=(0, -34), textcoords='offset points',
+                ha='center', va='top', fontsize=11, annotation_clip=False)
+    # z : a droite de l'arete de droite (le long de la sonde)
+    ax.annotate('$z$ (mm)', xy=pix(ecran(X3D[1], 0.35, 9)), xytext=(34, -6), textcoords='offset points',
+                ha='left', va='center', fontsize=11, annotation_clip=False)
+    # profondeur : a gauche de l'axe vertical
+    gauche = min(Z3D, key=lambda y: ecran(X3D[0], y, 12)[0])
+    ax.annotate('Profondeur (mm)', xy=pix(ecran(X3D[0], gauche, 12)), xytext=(-46, 0), textcoords='offset points',
+                ha='right', va='center', fontsize=11, rotation=0, annotation_clip=False)
     fig.savefig(path)
     plt.close(fig)
-    from PIL import Image
-    im = Image.open(path).convert('RGB')
-    a = np.asarray(im).min(2) < 245
-    r, c = np.nonzero(a.any(1))[0], np.nonzero(a.any(0))[0]
-    im.crop((max(c[0] - 15, 0), max(r[0] - 15, 0), c[-1] + 15, r[-1] + 15)).save(path)
 
 
 def surface_mesuree(S):
@@ -522,12 +562,9 @@ def surface_cad(C, ds=0.25, di=0.3):
     return X, Z, np.where(C['M'][np.ix_(ix, iz)], Y_HAUT - Y_FACE, Y_BASE - Y_FACE)
 
 
-def fig_3d(S, path):
-    _surface3d(*surface_mesuree(S), path)
-
-
 def fig_3d_triple(C, SE, SH, path):
-    """CAD en haut, encodeur au milieu, horloge en bas, empiles dans une seule image avec (a), (b), (c)."""
+    """CAD en haut, encodeur au milieu, horloge en bas, empiles dans une seule image. Les lettres (a), (b), (c)
+    sont dans une marge a gauche, hors des boites."""
     from PIL import Image, ImageDraw, ImageFont
     parts = []
     for i, (X, Z, H) in enumerate((surface_cad(C), surface_mesuree(SE), surface_mesuree(SH))):
@@ -535,17 +572,18 @@ def fig_3d_triple(C, SE, SH, path):
         _surface3d(X, Z, H, p)
         parts.append(Image.open(p).convert('RGB'))
         os.remove(p)
-    w = max(im.width for im in parts)
-    out = Image.new('RGB', (w, sum(im.height for im in parts)), 'white')
+    parts = _rogner(parts)
     try:
-        font = ImageFont.truetype('arial.ttf', 30)
+        font = ImageFont.truetype('arial.ttf', 34)
     except OSError:
         font = ImageFont.load_default()
-    y = 0
-    for im, lab in zip(parts, ('(a)', '(b)', '(c)')):
-        out.paste(im, ((w - im.width) // 2, y))
-        ImageDraw.Draw(out).text((12, y + 10), lab, fill='black', font=font)
-        y += im.height
+    gauche, espace = 70, 20
+    w, h = parts[0].size
+    out = Image.new('RGB', (w + gauche, len(parts) * h + (len(parts) - 1) * espace), 'white')
+    for i, (im, lab) in enumerate(zip(parts, ('(a)', '(b)', '(c)'))):
+        y = i * (h + espace)
+        out.paste(im, (gauche, y))
+        ImageDraw.Draw(out).text((6, y + 4), lab, fill='black', font=font)
     out.save(path)
 
 

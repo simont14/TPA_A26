@@ -19,7 +19,7 @@
 \usepackage{pdfpages}
 \usepackage{hyperref}
 \hypersetup{
-    pdftitle={Reconstruction 3D par ultrasons multiéléments d'un bloc usiné: précision en profondeur, en longueur et en hauteur, avec et sans encodeur},
+    pdftitle={Reconstruction 3D par ultrasons phased array: analyse de la précision spatiale},
     pdfauthor={L-F. Brodeur (LFBRO1), S. L-Tremblay (SILAT10)}
 }
 
@@ -61,15 +61,15 @@
 \end{minipage}
 \\~\\
 \vspace{1em}
-{\Large \textbf{Reconstruction 3D par ultrasons multiéléments d'un bloc usiné:} } \\
-{\Large \textbf{précision en profondeur, en longueur et en hauteur, avec et sans encodeur} } \\[0.3em]
+{\Large \textbf{Reconstruction 3D par ultrasons phased array:} } \\
+{\Large \textbf{analyse de la précision spatiale} } \\[0.3em]
 {\large Date du Laboratoire: 24 septembre et 1\textsuperscript{er} octobre 2026 \qquad\qquad Remis le \today}
 
 \end{center}
 
 \vspace{0.5em}
 \subsection*{Résumé}
-Avec une sonde ultrasonore, on peut lire un mot usiné sur la face cachée d'une pièce, à travers près d'un centimètre d'aluminium. Dans cette expérience, un appareil Topaz de Zetec et une sonde linéaire de 64 éléments à 5~MHz ont servi à reconstruire en 3D un bloc d'aluminium qui porte le mot LASERAX en relief, en déplaçant la sonde à la main sur sa face plane. Deux balayages faits à la main ont été comparés au modèle CAD de la pièce: un où la position de la sonde est déduite de l'horloge interne de l'appareil, et un où elle est mesurée par un encodeur à roue. En profondeur, les deux acquisitions retrouvent le dessus de la plaque ($9{,}47 \pm 0{,}20$ et $9{,}60 \pm 0{,}21~\text{mm}$) et le dessus des lettres ($14{,}51 \pm 0{,}30$ et $14{,}76 \pm 0{,}31~\text{mm}$), pour des valeurs CAD de 9,50 et 14,50~mm. Le long du balayage, par contre, la différence est grande. Sans encodeur, la longueur des lettres varie de 41~\% à 141~\% de leur vraie longueur, parce que la main a avancé entre 3,5 et 12~mm/s au lieu des 5~mm/s visés. Avec l'encodeur, les centres des lettres sont placés à 0,3~mm près, mais toutes les distances sont 2,4~\% trop longues, ce qui pointe vers la calibration de l'encodeur. L'encodeur a aussi laissé 5~\% de positions vides, là où la sonde a dépassé 12,8~mm/s. Le principe de la sonde multiéléments vient d'ailleurs de la médecine: dès 1968, Somer a construit un échographe qui balayait le c\oe ur électroniquement, sans bouger la sonde \cite{somer}.
+Avec une sonde ultrasonore, on peut lire un mot usiné sur la face cachée d'une pièce, à travers près d'un centimètre d'aluminium. Dans cette expérience, un appareil Topaz de Zetec et une sonde linéaire de 64 éléments à 5~MHz ont servi à reconstruire en 3D un bloc d'aluminium qui porte le mot LASERAX en relief, en déplaçant la sonde à la main sur sa face plane. Deux balayages faits à la main ont été comparés au modèle CAD de la pièce: un où la position de la sonde est déduite de l'horloge interne de l'appareil, et un où elle est mesurée par un encodeur à roue. En profondeur, les deux acquisitions retrouvent le dessus de la plaque ($9{,}47 \pm 0{,}20$ et $9{,}60 \pm 0{,}21~\text{mm}$) et le dessus des lettres ($14{,}51 \pm 0{,}30$ et $14{,}76 \pm 0{,}31~\text{mm}$), pour des valeurs CAD de 9,50 et 14,50~mm. Le long du balayage, par contre, la différence est grande. Sans encodeur, la longueur des lettres varie de 41~\% à 180~\% de leur vraie longueur, parce que la main a avancé entre 2,8 et 12~mm/s au lieu des 5~mm/s visés. Avec l'encodeur, les centres des lettres sont placés à 0,3~mm près, mais toutes les distances sont 2,4~\% trop longues, ce qui pointe vers la calibration de l'encodeur. L'encodeur a aussi laissé 5~\% de positions vides, là où la sonde a dépassé 12,8~mm/s. Le principe de la sonde multiéléments vient d'ailleurs de la médecine: dès 1968, Somer a construit un échographe qui balayait le c\oe ur électroniquement, sans bouger la sonde \cite{somer}.
 
 \section{Introduction}
 
@@ -197,7 +197,7 @@ Amplitude médiane de l'écho de fond & 85~\% & 100~\% (saturé) \\
 \subsubsection*{Analyse}
 Les données brutes ont été lues et analysées en Python. Les positions vides de l'encodeur sont comblées par interpolation entre les positions voisines. Dans chaque A-scan, on cherche l'écho du dessus de la plaque entre 7,5 et 12~mm, et celui du dessus des lettres entre 12,5 et 17~mm. La profondeur d'un écho est le centre de la partie de l'écho qui dépasse la moitié de son maximum.
 
-Pour l'image dans le plan, on utilise la chute de l'écho de fond, $q = 1 - A/A_{\text{ref}}$, où $A$ est l'amplitude de l'écho du dessus de la plaque et $A_{\text{ref}}$ sa valeur sur la plaque pour le même faisceau. On a $q = 0$ sur la plaque et $q = 1$ sous une lettre. Le seuil $q = 0{,}5$ correspond à la méthode de la chute de 6~dB utilisée en contrôle par ultrasons pour trouver le bord d'un réflecteur \cite{krautkramer}. La carte de $q$ est placée sur le CAD par le décalage qui la superpose le mieux aux lettres, avec le pas nominal de 0,25~mm. Pour mesurer chaque lettre, son contour CAD est flouté par un faisceau gaussien (largeur ajustée sur l'acquisition avec encodeur), puis étiré et déplacé le long des deux axes jusqu'à ce qu'il se superpose le mieux à la carte mesurée (curve fit). L'étirement donne la longueur et la hauteur mesurées de la lettre, et le déplacement donne la position de son centre.
+Pour l'image dans le plan, on utilise la chute de l'écho de fond, $q = 1 - A/A_{\text{ref}}$, où $A$ est l'amplitude de l'écho du dessus de la plaque et $A_{\text{ref}}$ sa valeur sur la plaque pour le même faisceau. On a $q = 0$ sur la plaque et $q = 1$ sous une lettre. Le seuil $q = 0{,}5$ correspond à la méthode de la chute de 6~dB utilisée en contrôle par ultrasons pour trouver le bord d'un réflecteur \cite{krautkramer}. La carte de $q$ est placée sur le CAD par le décalage qui la superpose le mieux aux lettres, avec le pas nominal de 0,25~mm. Pour mesurer chaque lettre, son contour CAD est flouté par un faisceau gaussien (largeur ajustée sur l'acquisition avec encodeur), puis étiré et déplacé le long des deux axes jusqu'à ce qu'il se superpose le mieux à la carte mesurée (curve fit). Chaque lettre a son propre étirement et son propre déplacement, parce que la distorsion change le long du balayage. Ce placement a ensuite été vérifié à l'œil et corrigé à la main, lettre par lettre, là où le contour ne suivait pas la carte. L'étirement donne la longueur et la hauteur mesurées de la lettre, et le déplacement donne la position de son centre.
 
 \subsubsection*{Incertitudes}
 L'incertitude sur une profondeur (éq.~\ref{eq:profondeur}) vient de la vitesse du son et du temps d'arrivée:
@@ -217,7 +217,7 @@ La Figure~\ref{fig:ascans} montre les A-scans moyens sur la plaque et sous les l
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.66\textwidth]{../figures/02_ascans_profondeur.png}
-    \caption{A-scans moyens sur la plaque (traits pleins) et sous les lettres (tirets), sans encodeur (orange) et avec encodeur (bleu). Les lignes pointillées grises marquent les profondeurs du CAD.}
+    \caption{A-scans moyens sur la plaque (traits pleins) et sous les lettres (tirets), sans encodeur (orange) et avec encodeur (bleu). Les lignes pointillées grises marquent la position moyenne de chaque écho dans les deux acquisitions.}
     \label{fig:ascans}
 \end{figure}
 
@@ -240,12 +240,12 @@ Hauteur des lettres (différence) & 5,00 & $5{,}03 \pm 0{,}14$ & $5{,}17 \pm 0{,
 
 \subsection{Forme des lettres dans le plan}
 
-La Figure~\ref{fig:cscans} compare la chute de l'écho de fond au CAD, et la Figure~\ref{fig:3d} montre les surfaces 3D reconstruites sous la surface du CAD. Avec l'encodeur, les sept lettres se lisent et leur contour CAD se place avec un étirement proche de 1. Sans encodeur, les lettres sont étirées ou écrasées selon l'endroit, et la fin du mot arrive vers $x = 40~\text{mm}$ au lieu de $60~\text{mm}$ parce que le balayage paraît plus court qu'il ne l'est. Le côté gauche du L manque aussi, car l'acquisition a commencé après. Au seuil $q = 0{,}5$, la surface des lettres mesurée recouvre 53~\% de celle du CAD avec l'encodeur, contre 27~\% sans encodeur. Le flou gaussien qui rend le mieux la carte avec encodeur a une largeur à mi-hauteur de 3,5~mm le long du balayage et de 2,4~mm le long de la sonde.
+La Figure~\ref{fig:cscans} compare la chute de l'écho de fond au CAD, et la Figure~\ref{fig:3d} montre les surfaces 3D reconstruites sous la surface du CAD. Avec l'encodeur, les sept lettres se lisent et leur contour CAD se place avec un étirement proche de 1. Sans encodeur, les lettres sont étirées ou écrasées selon l'endroit, et la fin du mot arrive vers $x = 40~\text{mm}$ au lieu de $60~\text{mm}$ parce que le balayage paraît plus court qu'il ne l'est. Le L, au tout début du balayage, paraît presque deux fois trop long, parce que la main avançait lentement au départ. Au seuil $q = 0{,}5$, la surface des lettres mesurée recouvre 53~\% de celle du CAD avec l'encodeur, contre 27~\% sans encodeur. Le flou gaussien qui rend le mieux la carte avec encodeur a une largeur à mi-hauteur de 3,5~mm le long du balayage et de 2,4~mm le long de la sonde.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.84\textwidth]{../figures/01_cscans_cad.png}
-    \caption{Lettres du CAD (a) et chute de l'écho de fond $q$ sans encodeur (b) et avec encodeur (c). Le pointillé blanc est le contour CAD de chaque lettre, placé sur la mesure avec son propre décalage et son propre étirement. Les traits orange en haut de (c) marquent les positions laissées vides par l'encodeur.}
+    \caption{Lettres du CAD (a) et chute de l'écho de fond $q$ sans encodeur (b) et avec encodeur (c). Le pointillé blanc est le contour CAD de chaque lettre, placé sur la mesure avec son propre décalage et son propre étirement.}
     \label{fig:cscans}
 \end{figure}
 
@@ -259,7 +259,7 @@ La Figure~\ref{fig:cscans} compare la chute de l'écho de fond au CAD, et la Fig
 \subsection{Longueurs, hauteurs et distorsion}
 \label{sec:res_plan}
 
-Le Tableau~\ref{tab:lettres} donne la longueur (le long du balayage) et la hauteur (le long de la sonde) de chaque lettre. Le long de la sonde, les deux acquisitions donnent des hauteurs proches de 18~mm, à environ 1~mm près pour la plupart des lettres. Le long du balayage, les longueurs avec encodeur sont un peu plus courtes que le CAD, de 0,2 à 0,8~mm, sauf pour le deuxième A qui est 2,3~mm trop long. Sans encodeur, les longueurs vont de 41~\% (X) à 141~\% (R) de la longueur CAD (Figure~\ref{fig:positions}). En divisant la vitesse supposée de 5~mm/s par cet étirement, on obtient la vitesse de la main sur chaque lettre: elle a varié entre 3,5~mm/s (R) et 12,1~mm/s (X), sur un balayage de 23~s.
+Le Tableau~\ref{tab:lettres} donne la longueur (le long du balayage) et la hauteur (le long de la sonde) de chaque lettre. Le long de la sonde, les deux acquisitions donnent des hauteurs proches de 18~mm, à environ 1~mm près pour la plupart des lettres. Le long du balayage, les longueurs avec encodeur sont un peu plus courtes que le CAD, de 0,2 à 0,8~mm, sauf pour le deuxième A qui est 2,3~mm trop long. Sans encodeur, les longueurs vont de 41~\% (X) à 180~\% (L) de la longueur CAD (Figure~\ref{fig:positions}). En divisant la vitesse supposée de 5~mm/s par cet étirement, on obtient la vitesse de la main sur chaque lettre: elle a varié entre 2,8~mm/s (L) et 12,1~mm/s (X), sur un balayage de 23~s. Le R n'est pas mesuré sans encodeur, parce que la vitesse de la main a changé pendant son passage: il est étiré d'un côté et écrasé de l'autre, et aucun étirement unique ne rend son contour.
 
 \begin{table}[htbp]
 \centering
@@ -271,29 +271,29 @@ Le Tableau~\ref{tab:lettres} donne la longueur (le long du balayage) et la haute
  & \multicolumn{3}{c}{Longueur (le long du balayage)} & \multicolumn{3}{c}{Hauteur (le long de la sonde)} \\
 Lettre & CAD & Horloge & Encodeur & CAD & Horloge & Encodeur \\
 \hline
-L & 11,2 & coupée\textsuperscript{a} & 10,8 & 18,0 & coupée\textsuperscript{a} & 20,4 \\
-A & 14,1 & 17,7 & 13,9 & 18,0 & 16,9 & 18,0 \\
+L & 11,2 & 20,2 & 10,8 & 18,0 & 18,0 & 20,4 \\
+A & 14,1 & 19,8 & 13,9 & 18,0 & 16,9 & 18,0 \\
 S & 12,7 & 7,2  & 11,9 & 18,5 & 18,1 & 18,8 \\
-E & 12,2 & 10,1 & 11,4 & 18,0 & 18,5 & 18,5 \\
-R & 14,0 & 19,7 & 13,2 & 18,0 & 16,5 & 18,7 \\
+E & 12,2 & 11,9 & 11,4 & 18,0 & 18,5 & 18,5 \\
+R & 14,0 & n.m.\textsuperscript{a} & 13,2 & 18,0 & n.m.\textsuperscript{a} & 18,7 \\
 A & 14,1 & 6,8  & 16,3 & 18,0 & 17,8 & 17,9 \\
 X & 14,2 & 5,9  & 13,7 & 18,0 & 15,3 & 19,1 \\
 \hline
 \end{tabular}
 \\[0.3em]
-{\footnotesize \textsuperscript{a} L'acquisition sans encodeur commence au milieu du L.}
+{\footnotesize \textsuperscript{a} Non mesuré: le R est trop déformé à l'intérieur de la lettre sans encodeur.}
 \end{table}
 
-La position des centres (Figure~\ref{fig:positions}) montre la même chose à plus grande échelle. Avec l'encodeur, les centres mesurés suivent une droite de pente $1{,}024 \pm 0{,}003$ par rapport aux centres CAD (incertitude tirée de la matrice de covariance du curve fit), avec un écart RMS de 0,28~mm autour de cette droite. Sans encodeur, l'écart RMS autour de la meilleure droite est de 3,5~mm, et le X est mesuré 18~mm trop tôt.
+La position des centres (Figure~\ref{fig:positions}) montre la même chose à plus grande échelle. Avec l'encodeur, les centres mesurés suivent une droite de pente $1{,}024 \pm 0{,}003$ par rapport aux centres CAD (incertitude tirée de la matrice de covariance du curve fit), avec un écart RMS de 0,28~mm autour de cette droite. Sans encodeur, l'écart RMS autour de la meilleure droite est de 6,5~mm, et le X est mesuré 18~mm trop tôt.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.82\textwidth]{../figures/03_positions_lettres.png}
-    \caption{Écart entre le centre mesuré et le centre CAD de chaque lettre (a) et rapport entre la longueur mesurée et la longueur CAD (b), sans encodeur (cercles orange) et avec encodeur (carrés bleus). Le L sans encodeur n'est pas montré.}
+    \caption{Écart entre le centre mesuré et le centre CAD de chaque lettre (a) et rapport entre la longueur mesurée et la longueur CAD (b), sans encodeur (cercles orange) et avec encodeur (carrés bleus). Le R sans encodeur n'est pas montré.}
     \label{fig:positions}
 \end{figure}
 
-L'encodeur a laissé 29 positions vides sur 578 (5~\%), en 13 trous d'au plus 5 positions (1,25~mm). Parmi elles, 26 sont entre $x = 23{,}8$ et $37{,}2~\text{mm}$, sur la fin du R et sur le deuxième A (traits orange de la Figure~\ref{fig:cscans}). Dans cette zone, la sonde a avancé en moyenne de 1,9 position entre deux tirs.
+L'encodeur a laissé 29 positions vides sur 578 (5~\%), en 13 trous d'au plus 5 positions (1,25~mm). Parmi elles, 26 sont entre $x = 23{,}8$ et $37{,}2~\text{mm}$, sur la fin du R et sur le deuxième A. Dans cette zone, la sonde a avancé en moyenne de 1,9 position entre deux tirs.
 
 \section{Discussion}
 \label{sec:discussion}
@@ -307,7 +307,7 @@ La différence de 0,13 à 0,25~mm entre les lectures directes des deux acquisiti
 Le long de la sonde, les positions viennent de l'électronique: chaque faisceau est décalé de 0,6~mm, peu importe comment la main bouge. C'est pourquoi les hauteurs des lettres sont semblables dans les deux acquisitions. Le flou mesuré dans cette direction (2,4~mm à mi-hauteur) est proche de la largeur prévue par l'équation~\ref{eq:largeur}, $\delta \approx 1{,}26~\text{mm} \times 20~\text{mm} / 9{,}6~\text{mm} = 2{,}6~\text{mm}$, avec $\lambda = v/f = 1{,}26~\text{mm}$. Les hauteurs les plus éloignées du CAD sont celles du L (+2,4~mm) et du X (+1,1~mm) avec l'encodeur. Leur bas est proche du bord du bloc, où l'écho de fond baisse déjà parce qu'une partie de l'ouverture n'est plus sur la pièce (la sonde est plus longue que le bloc n'est large). Cette baisse est vue comme un bout de lettre.
 
 \subsubsection*{Le long du balayage}
-Sans encodeur, la reconstruction suppose une vitesse constante de 5~mm/s. Une erreur constante sur la vitesse ne ferait que changer l'échelle, mais la main a changé de vitesse d'une lettre à l'autre, d'un facteur 3,5 entre la plus lente et la plus rapide. Chaque lettre a donc sa propre échelle, et aucune correction globale ne peut rattraper cette distorsion: même avec la meilleure droite, les centres restent à 3,5~mm RMS de leur position. Les repères au ruban adhésif n'ont pas suffi.
+Sans encodeur, la reconstruction suppose une vitesse constante de 5~mm/s. Une erreur constante sur la vitesse ne ferait que changer l'échelle, mais la main a changé de vitesse d'une lettre à l'autre, d'un facteur 4,3 entre la plus lente et la plus rapide, et parfois même à l'intérieur d'une lettre, comme pour le R. Chaque lettre a donc sa propre échelle, et aucune correction globale ne peut rattraper cette distorsion: même avec la meilleure droite, les centres restent à 6,5~mm RMS de leur position. Les repères au ruban adhésif n'ont pas suffi.
 
 Avec l'encodeur, cette distorsion disparaît: l'écart RMS des centres (0,28~mm) est de l'ordre du pas de balayage. Il reste une erreur d'échelle de $2{,}4 \pm 0{,}3~\%$ qui touche toutes les distances. Elle vient très probablement de la calibration de l'encodeur: la résolution entrée était de 18,68~pas/mm, alors que les données indiquent plutôt $18{,}68 \times 1{,}024 = 19{,}13~\text{pas/mm}$. Une erreur de 2,4~mm sur une distance de calibration de 100~mm suffit pour l'expliquer. Avec la résolution par défaut de 20~pas/mm, l'erreur aurait été de $-4{,}3~\%$, donc la calibration a quand même aidé. Les longueurs des lettres avec encodeur sont un peu plus courtes que le CAD même si l'échelle est trop grande. C'est encore la saturation de l'écho de fond: sur le bord d'une lettre, l'écho doit baisser sous 100~\% avant que la chute soit visible, donc la lettre paraît plus petite que son contour.
 
@@ -320,7 +320,7 @@ Un gain plus bas, qui garde l'écho de fond sous 80~\% de l'écran, éviterait l
 \section{Conclusion}
 \label{sec:conclusion}
 
-Le Topaz et sa sonde de 64 éléments ont permis de reconstruire en 3D le mot LASERAX, lu à travers 9,5~mm d'aluminium. En profondeur, les deux acquisitions donnent le dessus de la plaque et le dessus des lettres à environ 0,3~mm près, ce qui correspond au CAD à l'intérieur de l'incertitude. L'écart entre les deux échos de fond indique toutefois que la vitesse calibrée était environ 2~\% trop haute. Le long de la sonde, la position est fixée par l'électronique et les hauteurs des lettres sont bonnes dans les deux cas. Le long du balayage, l'encodeur fait toute la différence: sans lui, la vitesse irrégulière de la main déforme les lettres de $-59$ à $+41~\%$, et avec lui il ne reste qu'une erreur d'échelle de 2,4~\%, qui vient de sa calibration. Il faut quand même déplacer la sonde sous 12,8~mm/s pour éviter les trous. Une prochaine expérience pourrait utiliser un gain plus bas et calibrer l'encodeur sur toute la longueur du bloc. Aussi, le même montage pourrait servir à mesurer la taille d'un vrai défaut caché, par exemple un trou percé dans un bloc, et à vérifier la précision obtenue ici.
+Le Topaz et sa sonde de 64 éléments ont permis de reconstruire en 3D le mot LASERAX, lu à travers 9,5~mm d'aluminium. En profondeur, les deux acquisitions donnent le dessus de la plaque et le dessus des lettres à environ 0,3~mm près, ce qui correspond au CAD à l'intérieur de l'incertitude. L'écart entre les deux échos de fond indique toutefois que la vitesse calibrée était environ 2~\% trop haute. Le long de la sonde, la position est fixée par l'électronique et les hauteurs des lettres sont bonnes dans les deux cas. Le long du balayage, l'encodeur fait toute la différence: sans lui, la vitesse irrégulière de la main déforme les lettres de $-59$ à $+80~\%$, et avec lui il ne reste qu'une erreur d'échelle de 2,4~\%, qui vient de sa calibration. Il faut quand même déplacer la sonde sous 12,8~mm/s pour éviter les trous. Une prochaine expérience pourrait utiliser un gain plus bas et calibrer l'encodeur sur toute la longueur du bloc. Aussi, le même montage pourrait servir à mesurer la taille d'un vrai défaut caché, par exemple un trou percé dans un bloc, et à vérifier la précision obtenue ici.
 
 \renewcommand{\refname}{Bibliographie}
 \begin{thebibliography}{9}

@@ -33,12 +33,11 @@ import os
 import datetime
 
 import numpy as np
-import matplotlib
-matplotlib.use('TkAgg')
+import analyse_scans as A                # impose le mode Agg (figures sans fenetre) a son import
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RadioButtons, Slider, Button, CheckButtons
 
-import analyse_scans as A
+plt.switch_backend('TkAgg')              # cet outil a besoin d'une vraie fenetre
 
 SORTIE = os.path.join(A.DATA, 'placement_lettres.json')
 SIGMA_X, SIGMA_Z = 1.5, 1.0          # flou du faisceau trouve par analyse_scans.flou() sur l'acquisition encodeur
