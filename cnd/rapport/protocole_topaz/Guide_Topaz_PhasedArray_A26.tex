@@ -15,7 +15,6 @@
 \setlist[itemize]{label=\textbullet}
 \usepackage{booktabs, array}
 \usepackage{xcolor}
-\usepackage{soul}
 
 % Packages pour écrire en français
 \usepackage[french]{babel}
@@ -27,7 +26,7 @@
 \usepackage{amsmath, amssymb}
 \usepackage{hyperref}
 \hypersetup{
-    pdftitle={Contrôle non destructif des matériaux: 3. Utilisation du Topaz (ultrasons phased array)},
+    pdftitle={Contrôle non destructif des matériaux: Utilisation du Topaz (ultrasons phase array)},
     pdfauthor={Louis-Félix Brodeur, Simon Larouche-Tremblay}
 }
 
@@ -59,7 +58,7 @@
 
 \begin{center}
 {\Large Contr\^ole non destructif des mat\'eriaux}\\[2mm]
-{\huge 3. Utilisation du Topaz (ultrasons phased array)}\\[6mm]
+{\huge Utilisation du Topaz (ultrasons phase array)}\\[6mm]
 {\sc GPH-3000}\\
 {\sc Louis-F\'elix Brodeur, Simon Larouche-Tremblay}\\
 {\sc Septembre 2026}
@@ -71,18 +70,12 @@
 
 \vspace{4mm}
 
-\section{Introduction}
-
-Le document Ultrasons de ce cours pr\'esente la th\'eorie de base de la propagation des ondes ultrasonores, soit l'imp\'edance acoustique, la r\'eflexion, la r\'efraction et l'att\'enuation, ainsi que leur g\'en\'eration et leur d\'etection par effet pi\'ezo\'electrique. Il propose aussi une s\'erie de manipulations r\'ealis\'ees avec une sonde \`a un seul \'el\'ement branch\'ee \`a un oscilloscope.
-
-Ce document compl\`ete le pr\'ec\'edent en pr\'esentant un second appareil disponible au laboratoire, le Topaz de Zetec, utilis\'e avec son logiciel UltraVision Touch. Le Topaz pilote une sonde \`a r\'eseau phas\'e (phased array), c'est-\`a-dire une sonde compos\'ee de plusieurs \'el\'ements pi\'ezo\'electriques ind\'ependants plut\^ot que d'un seul. La th\'eorie de base des ultrasons n'est pas reprise ici. Ce document couvre plut\^ot le principe de fonctionnement d'une sonde phased array, la mise en marche et la calibration du Topaz, puis propose deux manipulations: une reprise des manipulations du document Ultrasons avec le Topaz, et une manipulation propre au phased array. Une troisième manipulation, optionnelle, demande de déplacer la sonde pour reconstruire un volume en 3D.
-
-\section{Principe du phased array}
+\section{Principe du phase array}
 \label{sec:theorie}
 
 Une sonde \`a ultrasons conventionnelle, comme celle utilis\'ee dans le document Ultrasons, contient un seul \'el\'ement pi\'ezo\'electrique. Cet \'el\'ement \'emet un faisceau dont la direction est fix\'ee par la g\'eom\'etrie de la sonde et ne peut \^etre chang\'ee qu'en la d\'epla\c cant physiquement.
 
-Une sonde phased array contient plusieurs \'el\'ements pi\'ezo\'electriques ind\'ependants, align\'es en r\'eseau. Chaque \'el\'ement peut \^etre excit\'e s\'epar\'ement, avec un d\'elai qui lui est propre. Si tous les \'el\'ements sont excit\'es en m\^eme temps, leurs ondes s'additionnent comme si un seul \'el\'ement avait \'et\'e utilis\'e. Mais si l'excitation de chaque \'el\'ement est retard\'ee d'une quantit\'e pr\'ecise par rapport \`a ses voisins, les fronts d'onde \'emis par chaque \'el\'ement ne sont plus en phase au moment de leur \'emission. Ils peuvent alors interf\'erer de fa\c con constructive dans une direction diff\'erente de la normale \`a la sonde, ou converger vers un point de focalisation \`a une profondeur donn\'ee. L'ensemble de ces d\'elais s'appelle une loi focale. C'est ce principe qui permet de diriger et de focaliser \'electroniquement le faisceau, sans d\'eplacer la sonde.
+Une sonde phase array contient plusieurs \'el\'ements pi\'ezo\'electriques ind\'ependants, align\'es en r\'eseau. Chaque \'el\'ement peut \^etre excit\'e s\'epar\'ement, avec un d\'elai qui lui est propre. Si tous les \'el\'ements sont excit\'es en m\^eme temps, leurs ondes s'additionnent comme si un seul \'el\'ement avait \'et\'e utilis\'e. Mais si l'excitation de chaque \'el\'ement est retard\'ee d'une quantit\'e pr\'ecise par rapport \`a ses voisins, les fronts d'onde \'emis par chaque \'el\'ement ne sont plus en phase au moment de leur \'emission. Ils peuvent alors interf\'erer de fa\c con constructive dans une direction diff\'erente de la normale \`a la sonde, ou converger vers un point de focalisation \`a une profondeur donn\'ee. L'ensemble de ces d\'elais s'appelle une loi focale. C'est ce principe qui permet de diriger et de focaliser \'electroniquement le faisceau, sans d\'eplacer la sonde.
 
 \begin{figure}[H]
 \centering
@@ -142,7 +135,7 @@ Le sabot disponible pour ce laboratoire est un sabot droit, adapt\'e \`a une ond
 
 \subsection{Pr\'esentation de l'appareil}
 
-Le Topaz est un appareil portable qui int\`egre le pulseur-r\'ecepteur, l'\'electronique de traitement et un \'ecran tactile permettant de faire fonctionner UltraVision Touch directement sur l'appareil, sans ordinateur externe (Figure~\ref{fig:interface}). Il peut \^etre aliment\'e par une batterie amovible ou directement au secteur. Le matériel utilisé pour ce guide est donné au Tableau~\ref{tab:materiel}.
+Le Topaz est un appareil portable qui int\`egre le pulseur-r\'ecepteur, l'\'electronique de traitement et un \'ecran tactile permettant de faire fonctionner UltraVision Touch directement sur l'appareil, sans ordinateur externe (Figure~\ref{fig:interface}). Il peut \^etre aliment\'e par une batterie amovible ou directement au 120~V. Le matériel utilisé pour ce guide est donné au Tableau~\ref{tab:materiel}.
 
 \begin{table}[H]
 \centering
@@ -156,12 +149,12 @@ Le Topaz est un appareil portable qui int\`egre le pulseur-r\'ecepteur, l'\'elec
 Topaz16 (configuration 16/128) & 10053725 & ZPA-IUT-TOPAZ-16/128P-KIT & 705745 \\
 Sonde lin\'eaire LM 5~MHz, 64 \'el\'ements & 10039141 & ZPA-PB1D-LM-5MHZ-REX-5M-ZPAC & B1234003 \\
 Sabot droit LM-0LW & 10038863 & ZPA-ACC-W-LM-OLW-IH-FL & non indiqu\'e \\
-Mini-encodeur (c\^able 5~m, \'etanche, connecteur DE15, avec support pour sabot) & 10040557 & ZGN-ACC-ZPAC-ENC-5M-DE15 & 706440 \\
+Mini-encodeur & 10040557 & ZGN-ACC-ZPAC-ENC-5M-DE15 & 706440 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Le panneau lat\'eral droit regroupe les connecteurs: un connecteur d\'edi\'e \`a la sonde phased array, verrouill\'e par un loquet, ainsi que des connecteurs conventionnels non utilis\'es dans ce document.
+Le panneau lat\'eral droit regroupe les connecteurs: un connecteur d\'edi\'e \`a la sonde phase array, verrouill\'e par un loquet, ainsi que des connecteurs conventionnels non utilis\'es dans ce document.
 
 \begin{figure}[H]
 \centering
@@ -190,7 +183,6 @@ Les probl\`emes suivants sont connus pour la version 3.8R11 du logiciel.
 
 \begin{enumerate}
   \item Ne pas brancher de splitter pendant le d\'emarrage. Si une fen\^etre propose une mise \`a jour FPGA, la refuser. L'accepter emp\^eche la connexion \`a UltraVision et oblige \`a r\'einstaller le logiciel (anomalie B1833 du document \og Limitations and Remaining Anomalies \fg{} de la version 3.8R11).
-  \item Si les vues n'affichent rien et que la vue sectorielle est enti\`erement grise apr\`es un passage en mode remote, r\'einstaller le logiciel (anomalie B2072, TOPAZ16).
   \item Les boutons F1 et F2 du TOPAZ16 ne fonctionnent pas en version 3.8R11 (anomalie B2060).
 \end{enumerate}
 
@@ -222,12 +214,12 @@ Les probl\`emes suivants sont connus pour la version 3.8R11 du logiciel.
 
 \subsection{Connexion de la sonde}
 
-Pour connecter la sonde phased array, retirer d'abord le capot de protection du connecteur en faisant glisser le loquet de la position verrouill\'ee vers la position d\'everrouill\'ee. Aligner ensuite le connecteur de la sonde avec celui du panneau lat\'eral et verrouiller le loquet.
+Pour connecter la sonde phase array, retirer d'abord le capot de protection du connecteur en faisant glisser le loquet de la position verrouill\'ee vers la position d\'everrouill\'ee. Aligner ensuite le connecteur de la sonde avec celui du panneau lat\'eral et verrouiller le loquet.
 
 \begin{figure}[H]
 \centering
 \includegraphics[height=9cm]{../../figures/Photos_Lab/ConnecteurSonde.jpg}
-\caption{Connexion de la sonde phased array.}
+\caption{Connexion de la sonde phase array.}
 \label{fig:connexion-sonde}
 \end{figure}
 
@@ -281,16 +273,16 @@ Si le fichier LFB\_ET\_SIMlT\_LM5MHz\_LM0LW\_ALU.UVSetup est pr\'esent dans le d
 \centering
 \caption{Param\`etres du sp\'ecimen (menu Specimen).}
 \label{tab:specimen}
-\begin{tabular}{llp{7cm}}
+\begin{tabular}{ll}
 \toprule
-Param\`etre & Valeur & Remarque \\
+Param\`etre & Valeur \\
 \midrule
-Shape Type & Plate & bloc \`a faces planes \\
-Weld Type & None & aucune soudure \\
-Thickness & \'epaisseur mesur\'ee & au pied \`a coulisse \\
-Material & aluminium & \\
-LW Velocity & 6320~m/s & onde longitudinale, affich\'ee automatiquement \\
-SW Velocity & 3130~m/s & onde transversale, non utilis\'ee ici \\
+Shape Type & Plate \\
+Weld Type & None \\
+Thickness & \'epaisseur mesur\'ee \\
+Material & aluminium \\
+LW Velocity & 6320~m/s \\
+SW Velocity & 3130~m/s \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -412,7 +404,7 @@ Si un encodeur de position est utilis\'e, la position de balayage ne vient plus 
 \begin{figure}[H]
 \centering
 \includegraphics[width=9cm]{../../figures/Photos_Lab/SondeEncodeur1.jpg}
-\caption{Sonde phased array avec son encodeur.}
+\caption{Sonde phase array avec son encodeur.}
 \label{fig:sonde-encodeur}
 \end{figure}
 
@@ -675,45 +667,16 @@ Quatre corrections sont n\'ecessaires. Les deux premi\`eres ne concernent que le
 
 Pour une acquisition \`a l'horloge, UltraVision Touch 3.8R11 contient l'outil Scan Axis Repositioning, dans le menu Analysis, qui permet de remettre \`a l'\'echelle l'axe de balayage. Avec un encodeur, ce n'est pas n\'ecessaire.
 
-\subsection{Outil maison}
+\subsection{Conversion en CSV}
 
-Un script Python, \texttt{uvdata\_3d\_gui.py}, lit directement le fichier .UVData, remet le tampon circulaire en ordre, recale la vitesse sur l'\'epaisseur connue et exporte le volume.
+Le script Python \texttt{uvdata\_vers\_csv.py} est un outil qui permet d'utiliser les fichiers propri\'etaires .UVData d'UltraVision. Il convertit un fichier .UVData en CSV, sans aucun traitement des donn\'ees: le CSV contient les valeurs brutes enregistr\'ees par le Topaz, avec une ligne par A-scan. Sans encodeur, la position est simplement le num\'ero du coup d'horloge.
 
+Le script est disponible dans le d\'ep\^ot GitHub \url{https://github.com/LouisFelixBRODEUR/Topaz16_GPH_3000}, qui contient:
 \begin{itemize}
-  \item Lancer le script \texttt{uvdata\_3d\_gui.py}.
-  \item Une fen\^etre affiche les informations lues dans le fichier. Le script d\'etecte lui-m\^eme si le balayage a \'et\'e fait \`a l'horloge ou avec un encodeur. \`A l'horloge, entrer la vitesse de d\'eplacement et le sens du balayage. Avec un encodeur, les positions sont lues dans le fichier et il n'y a pas de vitesse \`a entrer.
-  \item Choisir le format de sortie: .html (vue 3D interactive), .vtk (format de volume standard lu par les logiciels de visualisation 3D) ou .npz (volume NumPy).
-\end{itemize}
-
-\begin{itemize}
-  \item \hl{Lien du dépôt GitHub: à ajouter.}
-  \item \hl{Contenu du dépôt:}
-  \begin{itemize}
-    \item \hl{le contenu du disque,}
-    \item \hl{le code de reconstruction 3D,} \texttt{uvdata\_3d\_gui.py}\hl{, et la liste de ses dépendances Python,}
-    \item \hl{un exemple de données de balayage avec encodeur,}
-    \item \hl{un exemple de données de balayage sans encodeur.}
-  \end{itemize}
-\end{itemize}
-
-\subsection{Visualisation et interpr\'etation}
-
-Quelques r\'eglages aident \`a lire le volume.
-
-\begin{itemize}
-  \item Le seuil d'amplitude de la surface 3D d\'etermine ce qui est affich\'e. Par exemple, 15, 30 ou 50~\% de l'\'ecran donnent des surfaces de plus en plus petites.
-  \item Masquer les 2 \`a 3 premiers mm cache l'\'echo de surface.
-  \item Les \'echos multiples ($2d$ et $3d$) apparaissent comme des copies du r\'eflecteur \`a des profondeurs multiples. Ce ne sont pas de vrais d\'efauts.
-  \item La longueur d'un d\'efaut se lit le long de l'axe de balayage, et sa profondeur sur l'axe vertical.
-\end{itemize}
-
-\subsection{Limites}
-
-\begin{itemize}
-  \item Sans encodeur, les longueurs le long du balayage d\'ependent de la r\'egularit\'e du d\'eplacement. Avec un encodeur, elles sont mesur\'ees.
-  \item Le volume ne couvre que 28,8~mm le long de la sonde. Un d\'efaut qui touche le premier ou le dernier faisceau peut continuer au-del\`a.
-  \item La r\'esolution en profondeur est d'environ 0,13~mm \`a 25~MHz d'\'echantillonnage.
-  \item Un d\'efaut pr\'esent d\`es la premi\`ere position conserv\'ee d'un tampon r\'e\'ecrit a une longueur minimale seulement.
+  \item le dossier \texttt{Docs\_ULTRAVISION}, avec les manuels d'utilisation du Topaz et d'UltraVision Touch,
+  \item l'outil de conversion en CSV, \texttt{uvdata\_vers\_csv.py},
+  \item un exemple de balayage avec encodeur, \texttt{Example\_Data\_Encodeur.UVData},
+  \item un exemple de balayage sans encodeur, \texttt{Example\_Data\_Sans\_Encodeur.UVData}.
 \end{itemize}
 
 \section{Bibliographie}
