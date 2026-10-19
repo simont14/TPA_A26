@@ -1,0 +1,21 @@
+Lab Geo
+3 Geophone planté dans le sol espacé chacun de 10cm mesuré au gallon à mesuré.
+Des aquisition on été fait avec le bord de la plaque premièrement collé sur le premier geophone. la distance entre le bord et le centre de la plaque est 13 cm donc on peut dire que le premier est a 13 cm du premier geophone et 23 cm du deuxieme et 30cm du troisième et aussi chaque distance a été aquisitionné 3 fois. 
+
+Canal 3 Geophone 1(le plus profche qui commence collé sur la plaque.
+Canal 2 Geophone 3 le plus loin qui commence a 20cm de la plaque
+Canal 1 Geophone 2 qui commence a 10cm de la plaque.
+
+Dans le png Localisation il y a en orange la localisation de l'endroit ou on a fait les tests sur le grand axe de ulaval.
+
+Pour les fichier:
+Scope 0 1 2 0m. Ca veut dire que le bord de la plaque était a 0m du Geophone 1.
+Scope 3 4 5 0.3m
+Scope 6 7 8 0.6m
+Scope 9 10 11 0.9m
+Scope 12 13 14 1.5m
+Scope 15 16 17 2.1m
+Scope 18 19 20 2.7m
+Scope 21 22 23 3.3m
+Scope 24 25 26 3.9m
+Scope 27 28 29 5m

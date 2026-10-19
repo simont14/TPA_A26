@@ -48,6 +48,12 @@ qui priment sur les consignes standard ci-dessus :**
 - Éviter le ton trop lisse/générique dans les sections rédigées : varier la
   structure des paragraphes, éviter les tournures répétitives d'un rapport
   à l'autre
+- Bibliographie : une référence qui n'est citée nulle part dans le texte ne
+  doit pas apparaître. Utiliser le mécanisme de
+  `geophysique/rapport/TPA_Lab3.tex` (redéfinition de `\citation` dans le
+  préambule et `\refsicitee{cle}{texte}` à la place de `\bibitem{cle} texte`),
+  qui masque automatiquement les entrées non citées. Dans le texte d'une
+  entrée, écrire `\%` dans les URL (le texte est un argument de macro).
 
 ### Principes tirés de la révision du rapport nucléaire (24 septembre 2026)
 
@@ -129,6 +135,40 @@ Ces principes viennent de la révision ligne par ligne faite par l'auteur sur
   peuvent se croiser visuellement même si le code semble correct. Inverser
   la position (`xytext`) des deux étiquettes concernées règle généralement
   le problème.
+
+### Schémas (TikZ ou autre)
+
+Le schéma de la Figure 1b de `geophysique/rapport/TPA_Lab3.tex` (bloc
+`tikzpicture` « couches », approuvé par l'auteur le 19 octobre 2026) est
+l'exemple de référence à suivre pour tout nouveau schéma. Partir de ce code.
+Ce qui en ressort :
+
+- Fond en aplats de couleur douce (`brown!20`, `brown!45`) pour les milieux,
+  traits noirs fins pour les interfaces, symbole de vitesse ($V_1$, $V_2$)
+  dans le coin de chaque milieu.
+- Trajets en couleur (bleu plein pour l'onde directe, rouge pointillé pour
+  l'onde réfractée), avec une étiquette de la même couleur, en `\small`, juste
+  à côté du trajet. Les trajets se terminent tous au même capteur.
+- Objets simples : rectangle gris pour la plaque, triangles noirs pour les
+  capteurs avec leur nom au-dessus, grosse flèche pour la masse avec son nom
+  au-dessus.
+- Cotes et angles selon les règles ci-dessous.
+
+- Toutes les cotes (distances) d'une même figure utilisent le même style :
+  une ligne avec une flèche aux deux bouts (`\draw[<->]`). Ne jamais mélanger
+  accolades et flèches dans une figure, c'est incohérent pour le lecteur.
+- Les cotes alignées sont à la même hauteur, au-dessus des objets, avec de
+  courtes lignes de rappel. Aucun bout de cote ni ligne de rappel ne doit être
+  caché par un autre élément (plaque, capteur, flèche, étiquette).
+- L'étiquette d'une cote est centrée au-dessus de sa ligne et ne doit pas être
+  plus large que l'intervalle coté. Le schéma n'étant pas à l'échelle, élargir
+  l'intervalle plutôt que de décaler l'étiquette.
+- L'étiquette d'un angle est centrée sur sa bissectrice, à l'extérieur de
+  l'arc, sans toucher l'arc, la normale ni le trajet. Si le même angle apparaît
+  plusieurs fois (ex. angle critique à l'entrée et à la sortie), le dessiner et
+  l'étiqueter à chaque endroit, de la même façon.
+- Toujours regarder le rendu (`pdftoppm`) après chaque modification d'un
+  schéma, en zoomant sur les zones serrées.
 
 ## Ne jamais référencer le chemin du dépôt local dans le texte du rapport
 
