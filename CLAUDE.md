@@ -8,10 +8,46 @@ cnd, geophysique, laser-co2, nucleaire, rayons-x), structuré ainsi :
 - `data/` — données brutes
 - `figures/` — figures générées (scripts Python)
 - `protocole/` — protocole spécifique à l'expérience
+- `preparation/` — fiche de préparation du labo (`.docx`), voir plus bas
+- `cahier_de_lab/` — notes et manipulations faites pendant la session de labo
+
+Les labs déjà complétés (nucleaire, cnd, geophysique) n'ont ni
+`preparation/` ni `cahier_de_lab/`. Ne pas les y ajouter.
 - `Rapport/` — le rapport LaTeX (`.tex` + `.pdf` compilé), avec un
   sous-dossier `Rapport/scripts/` pour le code d'analyse
 
 Compilation LaTeX via MikTeX.
+
+## Préparation d'un laboratoire
+
+Quand l'auteur demande de « faire la préparation » d'un labo, il veut une
+fiche à coller dans OneNote (page « Préparation » de la section du labo dans
+le cahier TPA_Cahier_de_Lab). Référence approuvée:
+`acoustique/preparation/Preparation_Acoustique.docx` (3 novembre 2026).
+
+- Sources: tout ce qui se trouve dans `<labo>/protocole/` (protocole(s),
+  page du site de cours, articles).
+- Livrable: un seul fichier `<labo>/preparation/Preparation_<Labo>.docx`.
+  Pas de HTML ni de texte brut à côté: le collage navigateur → OneNote rend
+  mal, seul le collage depuis Word garde les puces.
+- Génération: écrire le contenu en HTML simple (titres de section en `<p>`,
+  listes `<ul>` imbriquées, Calibri 11, aucune couleur) dans le scratchpad,
+  puis le convertir avec Word par COM (`Documents.Open(html)` puis
+  `SaveAs2(docx, 16)`). Ne pas faire de script qui copie dans le
+  presse-papier avec un Word caché (il reste bloqué à la fermeture).
+- Sections, dans l'ordre, chacune en liste à puces:
+  1. Explications: la physique et le but de chaque partie du labo
+  2. Formules: en texte simple (`Lp = 20·log₁₀(p/p_réf)`), chaque paramètre
+     en sous-puce avec sa signification et son unité entre crochets
+  3. Équipement: avec les réglages des logiciels s'ils sont donnés
+  4. Manipulations: étapes par partie, en sous-puces
+  5. Définitions importantes: termes moins communs
+  6. Points importants: à ne pas oublier pendant le labo
+  7. Questions: celles du protocole, chacune avec une piste de réponse
+  8. Pistes d'exemples intéressants: applications concrètes et historiques
+     de la matière (pas une liste générique), incluant les articles fournis
+- Les règles de style des rapports (pas de `;`, etc.) ne s'appliquent pas
+  strictement à cette fiche, qui est un document de travail personnel.
 
 ## Rédaction des rapports LaTeX
 

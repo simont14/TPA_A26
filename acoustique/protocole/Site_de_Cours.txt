@@ -1,0 +1,171 @@
+https://github.com/FELED1/roomacoustics
+
+
+Passer au contenu principal
+Expériences
+A1+A2 : Acoustique
+Expériences en acoustique
+Simulation (A2020)
+Inspiration
+
+Expériences en acoustique
+Dans cette page
+Description
+(2)
+Cliquer pour afficher le contenu
+Complément
+Téléchargement logiciel sonomètre Générateurs de sons (et de bruits) Pink Noise White Noise
+Description
+Vous aurez l'occasion de réaliser cette semaine des manipulations expérimentales dans le domaine de l'acoustique. Nous travaillerons ensemble à explorer quelques facettes de cette discipline fascinante et très pertinente en pratique.
+
+Les documents ci-dessous contiennent des informations générales et des protocoles proposés. 
+
+Protocole_Acoustique_2022.pdf est la version "officielle"
+Protocole_Acoustique_2022_v2.pdf est une version "améliorée" qui inclue des modifications par des équipes précédentes.
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+Protocole_Acoustique_2022.pdf
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+665.5 ko
+
+| Source : Simon Rainville, 2022
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+Protocole_Acoustique_Addaptation_2022_v2.pdf
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+2.92 Mo
+
+Complément
+Pour ce laboratoire, nous vous suggérons d'apporter un ordinateur portable pour prendre les mesures et tracer les graphiques. Vous devriez aussi télécharger le logiciel du sonomètre (ci-dessous).
+
+Toutefois, un ordinateur disposant du logiciel sera aussi à votre disposition dans le laboratoire.
+
+Téléchargement logiciel sonomètreCet hyperlien s'ouvrira dans un nouvel onglet.
+
+Générateurs de sons (et de bruits)Cet hyperlien s'ouvrira dans un nouvel onglet.
+
+Pink NoiseCet hyperlien s'ouvrira dans un nouvel onglet.
+
+White NoiseCet hyperlien s'ouvrira dans un nouvel onglet.
+
+
+Module précédent
+
+Appuyez sur la barre d'espacement pour commencer à déplacer l'élément. Certains lecteurs d'écran peuvent exiger que vous soyez en mode focus.
+
+Passer au contenu principal
+Expériences
+A1+A2 : Acoustique
+Expériences en acoustique
+Simulation (A2020)
+Inspiration
+
+Simulation (A2020)
+Dans cette page
+Description
+Télécharger Python
+Telecharger pyroomacoustics
+Informations
+Description
+Vous trouverez dans cet onglet des instructions pour utiliser un code de simulation numérique en acoustique (Pyroomacoustics) qui a été déjà été utilisé par le passé. Si ça vous intéresse, vous pouvez explorer cette voie dans votre laboratoire.
+
+**********
+
+Vous êtes invités à télécharger les fichiers sur GitHub. Les informations pour le laboratoire se trouvent dans le fichier README.MD sur le git. Git a été choisi au lieu de monportail parce qu'il permet de visualiser un Notebook et un .md sans logiciels complémentaire.
+
+GitHub sur lequel se trouvent les instructionsCet hyperlien s'ouvrira dans un nouvel onglet.
+
+Télécharger Python
+Pour télécharger Python 3, le plus simple est de télécharger la suite Anaconda. Python est un logiciel permettant aux utilisateurs de publier de "packages". Anaconda permet de telecharger facilement des packages en plus de permettre de télécharger Jupyter Notebook, pycharm et plusieurs autres environnements de programmation.
+
+AnacondaCet hyperlien s'ouvrira dans un nouvel onglet.
+
+Telecharger pyroomacoustics
+Il se peut que lorsque vous fassiez:
+
+pip install pyroomacoustics
+
+Un message d'erreur se présente puisque pyroomacoustics utilise des librairies en C++ pour accélérer la vitesse de calcul. Si c'est le cas, sur Windows* vous pouvez télécharger Visual studio Tools** (1.2G) et ça devrait fonctionner.
+
+* Nous cherchons toujours une solution pour Mac.
+
+** Attention il se peut que ça prenne une trentaine de minutes à télécharger. Le lien est: https://visualstudio.microsoft.com/visual-cpp-build-tools/
+
+Informations
+Instructions pour le rapport
+
+Le rapport de ce labo est en 2 parties. Dans la première répondez aux questions dans le fichier Questions-1ere-partie.md. Dans la seconde, écrivez un compte rendu d'une expérience comparant des mesures acoustiques à celles faites sur le simulateur.
+
+
+
+Appuyez sur la barre d'espacement pour commencer à déplacer l'élément. Certains lecteurs d'écran peuvent exiger que vous soyez en mode focus.
+
+Passer au contenu principal
+Expériences
+A1+A2 : Acoustique
+Expériences en acoustique
+Simulation (A2020)
+Inspiration
+
+Inspiration
+Dans cette page
+Sites internet
+Articles
+(7)
+Cliquer pour afficher le contenu
+Sites internet
+Room Acoustics SoftwareCet hyperlien s'ouvrira dans un nouvel onglet.
+
+REW is free software for room acoustic measurement, loudspeaker measurement and audio device measurement.
+
+OSHA Technical Manual (OTM): NoiseCet hyperlien s'ouvrira dans un nouvel onglet.
+
+Articles
+Slow sound.pdf (voir plus bas le fichier intitulé "10.0001023.pdf")
+The sound field around a tuning fork and the role of a resonance box.pdf (voir plus bas le fichier intitulé "A71.pdf")
+Brief Analysis of Sounds Using a Smartphone (voir plus bas le fichier intitulé "1.5095371.pdf")
+Radiation modes and acoustic field confined near acoustic sources -- The Journal of the Acoustical Society of America 146, EL299 (2019); doi: 10.1121/1.5126922
+Acoustic testing and modeling (voir plus bas le fichier intitulé "JASA-March2012.pdf")
+Line Arrays Explained.pdf (voir plus bas le fichier intitulé "Line Arrays Explained.pdf")
+Longo2018_Chapter_ANon-classicalAcousticsTeachin.pdf (voir plus bas le fichier intitulé "Longo2018_Chapter_ANon-classicalAcousticsTeachin.pdf")
+MDIwMTU1.pdf (voir plus bas le fichier intitulé "MDIwMTU1.pdf")
+
+
+
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+10.0001023.pdf
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+805.4 ko
+
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+A71.pdf
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+1.69 Mo
+
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+1.5095371.pdf
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+2.13 Mo
+
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+JASA-March2012.pdf
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+2.4 Mo
+
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+Line Arrays Explained.pdf
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+350.7 ko
+
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+Longo2018_Chapter_ANon-classicalAcousticsTeachin.pdf
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+276.28 ko
+
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+MDIwMTU1.pdf
+Cet hyperlien s'ouvrira dans un nouvel onglet.
+738.13 ko
+
+
+
+Module suivant
+Appuyez sur la barre d'espacement pour commencer à déplacer l'élément. Certains lecteurs d'écran peuvent exiger que vous soyez en mode focus.
