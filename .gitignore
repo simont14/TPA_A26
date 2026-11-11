@@ -43,3 +43,6 @@ Thumbs.db
 *.nav
 *.snm
 *.tdo
+
+# Visualisation 3D interactive generee (CND)
+cnd/figures/Encodeur_Bloc_Laser_6_3D.html
