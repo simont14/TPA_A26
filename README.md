@@ -34,10 +34,13 @@ Chaque dossier de labo suit la même structure :
 - `figures/` : graphiques générés par les scripts (idéalement reproductibles
   en relançant le script correspondant).
 - `protocole/` : protocole(s) du labo fourni(s) par le cours (PDF, etc.).
-- `rapport/` : rapport LaTeX (ou autre) du labo, incluant les fichiers générés
-  à la compilation. Les figures utilisées dans le rapport sont référencées
-  directement depuis `figures/` (chemin relatif, ex. `../figures/nom.png`),
-  sans être dupliquées dans `rapport/`.
+- `rapport/` : rapport LaTeX du labo (`.tex` + `.pdf` compilé, les fichiers
+  intermédiaires de compilation sont ignorés par Git). Les figures utilisées
+  dans le rapport sont référencées directement depuis `figures/` (chemin
+  relatif, ex. `../figures/nom.png`), sans être dupliquées dans `rapport/`.
+- `preparation/` et `cahier_de_lab/` : seulement pour les labos à venir
+  (acoustique, rayons-x, laser-co2). Fiche de préparation et notes de la
+  session de labo, en `.docx`.
 
 ## Installation
 
@@ -50,7 +53,8 @@ pip install -r requirements.txt
 ## Ajouter un nouveau labo
 
 1. Créer un dossier à la racine (ex. `mon-labo/`) avec les sous-dossiers
-   `data/`, `scripts/`, `figures/`, `protocole/`, `rapport/`.
+   `data/`, `scripts/`, `figures/`, `protocole/`, `rapport/` (et
+   `preparation/`, `cahier_de_lab/`).
 2. Ajouter un `README.md` minimal dans ce dossier décrivant le labo.
 3. Si une nouvelle dépendance Python est nécessaire, l'ajouter à
    `requirements.txt`.

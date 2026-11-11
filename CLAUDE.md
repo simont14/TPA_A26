@@ -10,11 +10,11 @@ cnd, geophysique, laser-co2, nucleaire, rayons-x), structuré ainsi :
 - `protocole/` — protocole spécifique à l'expérience
 - `preparation/` — fiche de préparation du labo (`.docx`), voir plus bas
 - `cahier_de_lab/` — notes et manipulations faites pendant la session de labo
+- `rapport/` — le rapport LaTeX (`.tex` + `.pdf` compilé)
+- `scripts/` — code d'analyse Python
 
 Les labs déjà complétés (nucleaire, cnd, geophysique) n'ont ni
 `preparation/` ni `cahier_de_lab/`. Ne pas les y ajouter.
-- `Rapport/` — le rapport LaTeX (`.tex` + `.pdf` compilé), avec un
-  sous-dossier `Rapport/scripts/` pour le code d'analyse
 
 Compilation LaTeX via MikTeX.
 
@@ -51,7 +51,7 @@ le cahier TPA_Cahier_de_Lab). Référence approuvée:
 
 ## Rédaction des rapports LaTeX
 
-Avant de rédiger ou de générer le contenu d'un rapport (`<labo>/Rapport/*.tex`),
+Avant de rédiger ou de générer le contenu d'un rapport (`<labo>/rapport/*.tex`),
 lire dans l'ordre :
 
 1. `consignes/Consignes_Rapports_1.pdf` et `consignes/Grille évaluation rapports.pdf`
@@ -94,7 +94,7 @@ qui priment sur les consignes standard ci-dessus :**
 ### Principes tirés de la révision du rapport nucléaire (24 septembre 2026)
 
 Ces principes viennent de la révision ligne par ligne faite par l'auteur sur
-`nucleaire/Rapport/TPA_Lab1.tex`. Ils s'appliquent à tous les rapports.
+`nucleaire/rapport/TPA_Lab1.tex`. Ils s'appliquent à tous les rapports.
 
 - Rapporter ce qui a été utilisé, pas ce qui a été testé. Pas de modèle
   rejeté (ex. linéaire contre quadratique), pas de critère de sélection de
@@ -255,7 +255,7 @@ qui comptent, pas le nom des fichiers.
 
 ### Écrire comme un·e étudiant·e l'expliquerait, pas comme un manuel
 
-Le `\subsection*{Résumé}` de `nucleaire/Rapport/TPA_Lab1.tex` (après
+Le `\subsection*{Résumé}` de `nucleaire/rapport/TPA_Lab1.tex` (après
 sa réécriture du 23 septembre 2026) est l'exemple de référence à suivre. Ce
 qui en ressort :
 
