@@ -324,3 +324,43 @@ qui en ressort :
   sections changent de numéro, et devient cliquable dans le PDF
   (`hyperref` est déjà chargé dans le préambule).
 
+
+## Journal des corrections de l'auteur
+
+Chaque correction que l'auteur demande (« Remplace X par Y ») est appliquée
+telle quelle dans le `.tex`, avec l'orthographe corrigée, puis notée ici avec
+ce qu'elle apprend sur son style. Relire ce journal avant de rédiger.
+
+- Guide Topaz (12 novembre 2026): « plusieurs éléments piézoélectriques
+  indépendants, alignés en réseau » → « plusieurs éléments piézoélectriques
+  alignés en réseau ». La phrase suivante dit déjà « Chaque élément peut être
+  excité séparément ». Leçon: ne pas annoncer dans un adjectif une idée que la
+  phrase suivante explique. Une phrase de présentation décrit l'objet
+  physique (combien, comment disposé), et la propriété est expliquée une seule
+  fois, à l'endroit où elle sert.
+- Guide Topaz (12 novembre 2026), demande générale: « réduire les termes
+  trop complexes, inutiles, trop longs, trop détaillés, les informations
+  triviales ». Première passe jugée encore « beaucoup trop formelle ».
+  Exemple donné par l'auteur: « Déverrouiller le loquet et retirer le capot
+  du connecteur. Aligner le connecteur de la sonde avec celui du panneau
+  latéral, puis verrouiller le loquet » → « Aligner le connecteur et le
+  verrouiller (Figure 5) ». Leçons (18 → 13 pages):
+  - Ne jamais écrire une étape évidente que tout le monde fait sans y
+    penser (retirer un capot pour brancher, appuyer sur Accept après chaque
+    fenêtre, allumer avec le bouton marche/arrêt, remettre le capot).
+  - Pas de mots techniques que personne ne dit (« loquet », « panneau
+    latéral », « séquence de démarrage s'amorce »). Utiliser les mots de
+    tous les jours: « le côté droit du Topaz », « allumer », « marcher »,
+    « mettre X à Y », « bouts de ruban adhésif ».
+  - Le moins de mots possible: un pronom plutôt que de renommer l'objet
+    (« le verrouiller »), le chemin de menu en raccourci (« Dans Channel,
+    Calculator, entrer... ») plutôt que « Choisir le menu Channel, puis
+    appuyer sur le bouton Calculator ».
+  - Regrouper en une phrase les étapes d'une liste qui ne sont que des clics
+    à la suite. Une liste numérotée seulement quand l'ordre compte vraiment.
+  - Une information dite deux fois est gardée à un seul endroit. Couper ce
+    qui n'a pas servi (« mode non testé », « pas utilisé ici ») et les
+    remarques de tableau qui redisent la valeur.
+  - Ton d'un collègue qui explique à un autre, pas d'un manuel: « En jouant
+    sur ces délais, on peut orienter le faisceau », « il suffit de ne pas
+    aller trop vite ».
