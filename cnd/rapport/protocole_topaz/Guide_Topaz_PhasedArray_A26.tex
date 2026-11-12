@@ -64,11 +64,35 @@
 {\sc Septembre 2026}
 \end{center}
 
+\vspace{8mm}
+
 \begin{center}
-\includegraphics[width=9cm]{../../figures/Photos_Lab/PageTitreProtocole3.jpg}
+\includegraphics[width=11cm]{../../figures/Photos_Lab/BlocMachine.jpg}\\[1mm]
+{\small Bloc d'aluminium usin\'e}\\[8mm]
+\includegraphics[width=\textwidth]{../../figures/guide_topaz_scan3d.png}\\[1mm]
+{\small Surface reconstruite \`a partir d'un balayage du bloc avec le Topaz et l'encodeur}
 \end{center}
 
-\vspace{4mm}
+\newpage
+
+\section*{Avant de commencer}
+\label{sec:avant}
+
+La r\'ef\'erence principale pour faire ce laboratoire est la documentation de Zetec, le fournisseur du Topaz. Ce guide est seulement une aide. Il d\'etaille ce que Louis-F\'elix Brodeur et Simon Larouche-Tremblay ont fait pendant leur laboratoire de TPA \`a l'automne 2026: les r\'eglages utilis\'es, les probl\`emes rencontr\'es et la fa\c con de les r\'egler. En cas de doute, c'est le manuel de Zetec qui a raison.
+
+Tout ce qu'il faut pour refaire le laboratoire est dans le d\'ep\^ot GitHub suivant:
+\begin{center}
+\url{https://github.com/LouisFelixBRODEUR/Topaz16_GPH_3000}
+\end{center}
+Il contient:
+\begin{itemize}
+  \item le dossier \texttt{Docs\_ULTRAVISION}, avec la documentation de Zetec: le manuel d'utilisation du Topaz, le bulletin de produit d'UltraVision Touch 3.8R11 et la liste des anomalies connues de cette version,
+  \item l'outil \texttt{uvdata\_vers\_csv.py}, qui convertit les fichiers propri\'etaires .UVData du Topaz en CSV (Section~\ref{sec:csv}),
+  \item un exemple de balayage avec encodeur, \texttt{Example\_Data\_Encodeur.UVData},
+  \item un exemple de balayage sans encodeur, \texttt{Example\_Data\_Sans\_Encodeur.UVData}.
+\end{itemize}
+
+Les exemples permettent d'essayer la conversion et l'analyse avant m\^eme d'aller au laboratoire. La surface en page couverture a \'et\'e obtenue avec un balayage du m\^eme type que l'exemple avec encodeur.
 
 \section{Principe du phase array}
 \label{sec:theorie}
@@ -668,22 +692,19 @@ Quatre corrections sont n\'ecessaires. Les deux premi\`eres ne concernent que le
 Pour une acquisition \`a l'horloge, UltraVision Touch 3.8R11 contient l'outil Scan Axis Repositioning, dans le menu Analysis, qui permet de remettre \`a l'\'echelle l'axe de balayage. Avec un encodeur, ce n'est pas n\'ecessaire.
 
 \subsection{Conversion en CSV}
+\label{sec:csv}
 
-Le script Python \texttt{uvdata\_vers\_csv.py} est un outil qui permet d'utiliser les fichiers propri\'etaires .UVData d'UltraVision. Il convertit un fichier .UVData en CSV, sans aucun traitement des donn\'ees: le CSV contient les valeurs brutes enregistr\'ees par le Topaz, avec une ligne par A-scan. Sans encodeur, la position est simplement le num\'ero du coup d'horloge.
-
-Le script est disponible dans le d\'ep\^ot GitHub \url{https://github.com/LouisFelixBRODEUR/Topaz16_GPH_3000}, qui contient:
-\begin{itemize}
-  \item le dossier \texttt{Docs\_ULTRAVISION}, avec les manuels d'utilisation du Topaz et d'UltraVision Touch,
-  \item l'outil de conversion en CSV, \texttt{uvdata\_vers\_csv.py},
-  \item un exemple de balayage avec encodeur, \texttt{Example\_Data\_Encodeur.UVData},
-  \item un exemple de balayage sans encodeur, \texttt{Example\_Data\_Sans\_Encodeur.UVData}.
-\end{itemize}
+Le script Python \texttt{uvdata\_vers\_csv.py} est un outil qui permet d'utiliser les fichiers propri\'etaires .UVData d'UltraVision. Il convertit un fichier .UVData en CSV, sans aucun traitement des donn\'ees: le CSV contient les valeurs brutes enregistr\'ees par le Topaz, avec une ligne par A-scan. Sans encodeur, la position est simplement le num\'ero du coup d'horloge. Le script et deux fichiers d'exemple sont dans le d\'ep\^ot GitHub donn\'e \hyperref[sec:avant]{au d\'ebut du guide}.
 
 \section{Bibliographie}
 
 Zetec, Inc. \emph{TOPAZ User Manual}, r\'evision 10046055-R08.
 
 Zetec, \emph{UltraVision Touch 3.8R11, Limitations and Remaining Anomalies}.
+
+Zetec, \emph{UltraVision Touch 3.8R11, Product Bulletin}.
+
+L.-F. Brodeur, S. Larouche-Tremblay, d\'ep\^ot Topaz16\_GPH\_3000, \url{https://github.com/LouisFelixBRODEUR/Topaz16_GPH_3000}.
 
 Voir aussi le document \emph{Ultrasons} de ce cours pour la th\'eorie de base de la propagation, de la r\'eflexion et de l'att\'enuation des ultrasons.
 
