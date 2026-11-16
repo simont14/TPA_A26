@@ -266,7 +266,7 @@ Si le fichier LFB\_ET\_SIMlT\_LM5MHz\_LM0LW\_ALU.UVSetup est dans le dossier Set
 
 \subsubsection*{\'Etape 1: sp\'ecimen}
 
-Dans Specimen, Geometry, entrer les param\`etres du Tableau~\ref{tab:specimen}. Dans Material, choisir l'aluminium.
+Dans Specimen, Geometry, entrer les param\`etres du Tableau~\ref{tab:specimen}. Dans Material, choisir l'aluminium (ou le mat\'eriau du bloc, les vitesses changent alors).
 
 \begin{table}[H]
 \centering
@@ -490,7 +490,7 @@ Elle fixe la vitesse du son avec le premier \'echo de fond ($e$) et le deuxi\`em
   \item Entrer les param\`etres du Tableau~\ref{tab:reflecteur} dans Reflector~1 avec Target~$= e$, et dans Reflector~2 avec Target~$= 2e$ et Start~$= 2e - 5$~mm.
   \item Dans Calibrate, choisir un faisceau du centre comme Current Beam, par exemple le 25.
   \item Appuyer sur Clear Envelope, attendre une ou deux secondes, puis Compute~1 et Compute~2.
-  \item La vitesse doit \^etre proche de 6320~m/s. Sinon, l'\'epaisseur est probablement mal mesur\'ee ou le deuxi\`eme \'echo est hors de la zone de recherche. Appuyer sur Accept.
+  \item La vitesse doit \^etre proche de celle du mat\'eriau du bloc: environ 6320~m/s pour l'aluminium, 5920~m/s pour l'acier, 4660~m/s pour le cuivre et 4430~m/s pour le laiton (ondes longitudinales). Sinon, l'\'epaisseur est probablement mal mesur\'ee ou le deuxi\`eme \'echo est hors de la zone de recherche. Appuyer sur Accept.
 \end{enumerate}
 
 \subsubsection*{D\'elai de sabot}
