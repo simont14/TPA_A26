@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ct>
+  <dso>308.3</dso>
+  <dde>90</dde>
+  <screensize>150</screensize>
+  <d>0.333333343</d>
+  <n>180</n>
+  <projectionsize>500</projectionsize>
+  <cubesize>460</cubesize>
+  <x0>0</x0>
+  <y0>0</y0>
+  <y0screen>0</y0screen>
+  <black>7.94261254E-19</black>
+  <white>0.95</white>
+  <gain>21.8950977</gain>
+  <alpha>7.79383755</alpha>
+  <colorcount>1</colorcount>
+  <whitebackcolor>false</whitebackcolor>
+  <rgbmode>true</rgbmode>
+  <min>0</min>
+  <max>255</max>
+  <ambient>0.5</ambient>
+  <diffuse>0.5</diffuse>
+  <specular>0.5</specular>
+</ct>

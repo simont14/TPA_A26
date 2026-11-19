@@ -46,3 +46,8 @@ Thumbs.db
 
 # Visualisation 3D interactive generee (CND)
 cnd/figures/Encodeur_Bloc_Laser_6_3D.html
+
+# Rayons X: volumes reconstruits (.ct3d) et projections, plusieurs Go,
+# trop gros pour GitHub (limite de 100 Mo par fichier). Gardés en local seulement.
+*.ct3d
+rayons-x/data/**/Projections/

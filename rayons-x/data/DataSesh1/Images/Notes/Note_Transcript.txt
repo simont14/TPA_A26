@@ -1,0 +1,57 @@
+Box Dimentions: 53.8mm x 53.8mm x 54.4mm
+
+Épaisseur Coquille à sa sortie flèches dans l'image:
+0.6
+0.39
+0.4
+0.36
+0.33
+0.38
+0.37
+0.4
+0.5
+0.58
+0.55
+0.65
+1
+1.7
+3mm
+
+Les autres dimontions sont inscritent directement sur les images.
+
+C'est toujours ca sauf si autrement indiqué:
+Anode CU
+Pas de Colimateur
+Pas de Reference
+Position 1
+800ms (20 frames)
+Courant 1mA
+35kV
+(Par example 3 et 9 je dis rien parceque c'est exactement ca)
+
+Test_1: 400ms (10 frames)
+Test_2: 16 000ms (40 frames)
+Test_3: 
+Test_4: 10kV
+Test_5: 15kV
+Test_6: 20kV
+Test_7: 25kV
+Test_8: 30kV
+Test_9: 
+Test_10: 0.25mA
+Test_11: 0.5mA
+Test_12: 0.75mA
+Test_13: 0.1mA
+Test_14: 0.05mA
+Test_15: 0.01mA
+Test_16: Position 2
+Test_17: Position 3 (Mais une partie de la coquille croppait donc j'ai fait une position 4)
+Test_18: Position 4
+
+dde Position 1 = environ 170mm
+dde Position 2 = environ 132.5mm
+dde Position 3 = environ 211.5mm
+dde Position 4 = environ 196.5mm
+dde difficile à mesurer précisément car il faut rentrer un règle dans la machine et mesurer entre l'écran et le centre d'un poteau
+
+dsd = environ 391.5 entre le centre de la surface qui emet du tube et l'écran.
