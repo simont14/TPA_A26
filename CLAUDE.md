@@ -153,6 +153,12 @@ Ces principes viennent de la révision ligne par ligne faite par l'auteur sur
   dessous font doublon. Le `label=` passé à `ax.step()`/`ax.plot()` pour la
   légende interne (ex. nom de la source) peut rester, seul `set_title` est à
   proscrire.
+- Toute figure doit rester lisible imprimée en noir et blanc. Ne jamais
+  distinguer des séries seulement par la couleur: marqueurs différents
+  (plein contre vide), styles de ligne, ou une case par série (grille de
+  petites figures) quand il y a plus de deux ou trois séries. Pour une
+  carte de couleur, prendre une palette à luminosité monotone (`magma`,
+  `viridis`). Vérifier en convertissant l'image en gris.
 - Avec `subcaption` (`\begin{subfigure}...\caption{}...\label{fig:xxx}`), le
   `\ref{fig:xxx}` d'une sous-figure retourne déjà le numéro complet avec sa
   lettre (ex. `2a`). Ne jamais ajouter la lettre à la main après le `\ref`
@@ -364,3 +370,115 @@ ce qu'elle apprend sur son style. Relire ce journal avant de rédiger.
   - Ton d'un collègue qui explique à un autre, pas d'un manuel: « En jouant
     sur ces délais, on peut orienter le faisceau », « il suffit de ne pas
     aller trop vite ».
+- Rapport acoustique (18 novembre 2026): passage à 55 km/h retiré partout
+  (script, figures, tableau, texte). C'était un premier passage de test, fait
+  à une seule distance. Leçon: un essai de test qui n'a pas de pendant dans
+  le plan de mesure ne va pas dans le rapport.
+- Rapport acoustique (18 novembre 2026): « mesurées au ruban » → « mesurées
+  avec un galon à mesurer ». Leçon: nommer l'instrument comme l'équipe le
+  nomme vraiment.
+- Rapport acoustique (18 novembre 2026), Tableau 1: « $d$ au ruban » →
+  « $d$ réelle », « $v$ visée » → « $v$ réelle ». Leçon: un en-tête de
+  tableau dit ce que la grandeur est, pas avec quel instrument elle a été
+  obtenue.
+- Rapport acoustique (18 novembre 2026): « sonomètre » → « microphone »
+  dans le texte et le schéma. Le sonomètre est seulement nommé une fois pour
+  dire d'où vient le microphone. Leçon: nommer la pièce qui sert vraiment
+  (le micro), pas l'appareil complet.
+- Rapport acoustique (18 novembre 2026): étiquette « trajectoire » enlevée
+  du schéma. Leçon: ne pas étiqueter ce qui est évident sur le dessin (la
+  route est la trajectoire).
+- Rapport acoustique (18 novembre 2026), légende du schéma: « Vue de haut du
+  montage (pas à l'échelle). La voiture roulait à vitesse constante sur
+  environ 10 m avant et 10 m après le point P » → « Schéma de la
+  configuration de l'expérience. La voiture roule à vitesse constante v en
+  ligne droite et passe par le point P, le plus proche du microphone, à une
+  distance d. » La zone de 10 m avant/après a aussi été retirée du schéma, du
+  résumé, de la théorie et de la méthodologie. Elle n'était pas prévue au
+  protocole et sa longueur variait: on en parle seulement dans la discussion,
+  comme cause des écarts avec la théorie. Leçons: une légende de schéma
+  décrit le modèle idéal, sans « pas à l'échelle ». Une limite de l'expérience
+  qui n'était pas planifiée ne se présente pas comme une partie du montage.
+- Rapport acoustique (19 novembre 2026): spectrogrammes de 50 km/h
+  (« un peu déformé »), puis de 60 km/h (« encore plus déformé »),
+  remplacés par ceux de 10 km/h, puis de 30 km/h, puis de nouveau de
+  50 km/h (avec une fenêtre d'analyse plus longue et l'axe centré). Leçon: pour
+  une figure d'exemple, l'auteur veut une raie propre et régulière, centrée
+  dans le cadre (pas une petite courbe dans le haut d'un grand cadre vide).
+- Rapport acoustique (19 novembre 2026), légende de la Figure 3: « Fréquence
+  reçue en fonction du temps autour du passage, à 3,53 m (en haut) et à
+  8,97 m (en bas), pour chaque vitesse visée. Les points gris sont les
+  fréquences suivies dans les trois régions et la ligne noire le modèle avec
+  la vitesse et la distance mesurées. » → « Fréquence dominante du spectre
+  en fonction du temps pour les passages à chaque vitesse et à chaque
+  distance. La ligne noire est le résultat du curve fit et les lignes
+  pointillées marquent 440 Hz. » Étiquettes des cases: « v = » et « d = »
+  devant les valeurs. Leçons: dans une légende, nommer la grandeur par ce
+  qu'elle est (fréquence dominante du spectre), pas par l'étape d'analyse
+  (« suivies dans les trois régions »). Pas de positions (en haut/en bas)
+  quand chaque case porte son étiquette, et l'étiquette nomme le symbole.
+- Rapport acoustique (19 novembre 2026), résumé: « Quand une voiture nous
+  croise, son bruit baisse d'un coup » → « ... la fréquence de son bruit
+  baisse ». Leçon: être exact sur la grandeur physique. « Le bruit baisse »
+  se lit comme le volume, alors que l'effet Doppler change la fréquence.
+- Rapport acoustique (19 novembre 2026), résumé: « devant un microphone, à
+  3,53 m ou à 8,97 m de sa trajectoire, à des vitesses visées entre 10 et
+  70 km/h » → « devant un microphone à 3,53 m et 8,97 m de sa trajectoire et
+  à des vitesses entre 10 km/h et 70 km/h ». Leçon: dans le résumé, garder
+  la phrase simple (pas de « visées », la nuance va dans la méthodologie),
+  et coordonner avec « et » plutôt qu'enchaîner des virgules.
+- Rapport acoustique (19 novembre 2026), résumé: « La fréquence reçue a été
+  suivie dans le spectrogramme de chacun des 10 passages. » → « Les
+  spectrogrammes des 10 passages ont été enregistrés pour y analyser le
+  profil des courbes Doppler. » Leçon: dans le résumé, dire le but de
+  l'analyse (le profil de la courbe Doppler) plutôt que l'opération
+  technique (suivre une fréquence).
+- Rapport acoustique (19 novembre 2026), résumé: phrase « La vitesse a été
+  mesurée sur les deux bouts de la courbe, où la fréquence se stabilise, et
+  la distance sur la partie centrale, où la fréquence chute » retirée et
+  fusionnée avec la précédente (« ...pour analyser le profil des courbes
+  Doppler et en tirer la vitesse de la voiture et la distance entre le
+  microphone et sa trajectoire »). Leçon: le résumé dit quoi on mesure, pas
+  comment. La méthode est expliquée plus loin, ne pas la dire deux fois.
+- Rapport acoustique (19 novembre 2026), résumé: trois phrases d'écarts de
+  vitesse par groupe de passages (10 km/h à part, 30 à 70 km/h, queue
+  d'approche à moins de 6 %, freinage) → « Pour les cinq passages à
+  3,53 m, la vitesse mesurée s'écarte en moyenne de 30 % de la vitesse
+  visée, et pour les cinq passages à 8,97 m, de 11 %. » Leçons: dans le
+  résumé, un seul chiffre par série, en commençant par la première série.
+  Ne pas découper en sous-groupes ni expliquer la cause, c'est le rôle de la
+  discussion. Et ne jamais omettre en silence un cas qui ne suit pas la
+  tendance (le passage à 10 km/h). Même chose pour la distance: « 6
+  passages sur 10, incertitude de 13 à 16 % à 8,97 m, les passages où la
+  vitesse changeait le plus... » → « l'écart moyen avec la distance mesurée
+  avec le galon est de 29 % à 3,53 m et de 16 % à 8,97 m ».
+- Rapport acoustique (19 novembre 2026), introduction: « Les résultats sont
+  présentés à la Section 4. Ils sont discutés à la Section 5. La Section 6
+  conclut. » → « Les résultats sont présentés à la Section 4, ils sont
+  discutés à la Section 5 et la Section 6 conclut. » Leçon: la règle des
+  phrases courtes pour le plan vise les phrases longues qui empilent des
+  clauses. Trois phrases très courtes à la suite font haché, on peut les
+  joindre en une phrase simple.
+- Rapport acoustique (19 novembre 2026): règlement n° 39 de la CEE-ONU et
+  zone grise retirés de la Figure 4 et de la discussion. Il ne s'applique
+  pas au Canada, et l'analyse des queues montre déjà la vraie cause de
+  l'écart. Leçon: une référence qui ne s'applique pas au contexte de
+  l'expérience ne sert pas d'argument, même comme ordre de grandeur.
+- Rapport acoustique (19 novembre 2026), légende des spectrogrammes:
+  « Spectrogrammes de deux passages à 60 km/h visés, à 3,53 m (gauche) et à
+  8,97 m (droite) de la trajectoire. La chute de fréquence dure environ
+  0,7 s à 3,53 m et environ 1,7 s à 8,97 m. » → « Spectrogrammes des
+  passages à 10 km/h, à d = 3,53 m et 8,97 m. » Leçon: légende minimale,
+  pas de (gauche)/(droite) quand l'étiquette est déjà dans chaque panneau,
+  pas de valeur lue sur la figure.
+- Rapport acoustique (19 novembre 2026), légende du Tableau 1: « Vitesse,
+  distance et fréquence de la source mesurées pour les 10 passages. » →
+  « Vitesse, distance et fréquence pour les 10 passages. » Leçon: une
+  légende de tableau nomme les grandeurs, les en-têtes de colonnes disent
+  déjà lesquelles sont mesurées.
+- Rapport acoustique (19 novembre 2026): le règlement n° 39 de la CEE-ONU
+  (Europe) ne s'applique pas à une voiture vendue au Québec. Au Canada, la
+  norme 101 ne fixe aucune précision pour le compteur. Leçon: vérifier
+  qu'une norme citée s'applique vraiment au Québec/Canada, sinon la
+  présenter comme un ordre de grandeur. Ne jamais nommer le modèle de la
+  voiture dans le rapport.

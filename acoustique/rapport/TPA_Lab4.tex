@@ -81,15 +81,15 @@
 
 \vspace{0.5em}
 \subsection*{Résumé}
-Quand une voiture nous croise, son bruit baisse d'un coup, et la forme de cette baisse dépend de la vitesse de la voiture et de la distance à laquelle elle passe. Dans cette expérience, le système de son d'une voiture jouait un sinus de 440~Hz pendant qu'elle passait en ligne droite devant un sonomètre, à 3,53~m ou à 8,97~m de sa trajectoire, à des vitesses visées entre 10 et 70~km/h. La fréquence reçue a été suivie dans le spectrogramme de chacun des 11 passages, puis un curve fit du modèle Doppler a donné la vitesse et la distance de la voiture. Quand la distance est connue, la vitesse est mesurée avec une incertitude de 0,3 à 6~km/h. À 8,97~m, les vitesses mesurées (de $27{,}1 \pm 0{,}8$ à $62{,}6 \pm 1{,}6~\text{km/h}$ pour 30 à 70~km/h visés) sont entre 6 et 11~\% sous la vitesse visée, ce qui correspond à l'erreur permise pour un compteur de vitesse. À 3,53~m, les passages à 50, 60 et 70~km/h sont plus lents que prévu, probablement parce que la voiture n'a pas roulé à vitesse constante devant le micro. Trouver la distance avec l'audio seulement est plus difficile: à 3,53~m, le curve fit donne des distances entre 1,5 et 5,3~m avec une incertitude d'environ 1~m, et à 8,97~m il ne converge pas pour trois passages sur cinq. La zone de 20~m où la voiture roulait à vitesse constante est trop courte pour séparer la vitesse de la distance. En 1957, deux physiciens de l'Université Johns Hopkins ont résolu le même problème avec le signal radio de Spoutnik: la courbe Doppler d'un seul passage du satellite leur a suffi pour calculer toute son orbite, ce qui a mené au premier système de navigation par satellite \cite{guier}.
+Quand une voiture nous croise, la fréquence de son bruit baisse, et la forme de cette baisse dépend de la vitesse de la voiture et de la distance à laquelle elle passe. Dans un spectrogramme, ce profil est ce qu'on appelle une courbe Doppler. Dans cette expérience, le système de son d'une voiture jouait un sinus de 440~Hz pendant qu'elle passait en ligne droite devant un microphone à 3,53~m et 8,97~m de sa trajectoire et à des vitesses entre 10~km/h et 70~km/h. Les spectrogrammes des 10 passages ont été enregistrés pour analyser le profil des courbes Doppler et en tirer la vitesse de la voiture et la distance entre le microphone et sa trajectoire. Pour les cinq passages à 3,53~m, la vitesse mesurée s'écarte en moyenne de 30~\% de la vitesse visée, et pour les cinq passages à 8,97~m, de 11~\%. Pour la distance, l'écart moyen avec la distance réelle est de 29~\% à 3,53~m et de 16~\% à 8,97~m. En 1957, deux physiciens de l'Université Johns Hopkins ont résolu le même problème avec le signal radio de Spoutnik: la courbe Doppler d'un seul passage du satellite leur a suffi pour calculer toute son orbite, ce qui a mené au premier système de navigation par satellite \cite{guier}.
 
 \section{Introduction}
 
 Christian Doppler a prédit en 1842 que la fréquence d'une onde change quand la source et l'observateur se déplacent l'un par rapport à l'autre \cite{doppler}. Trois ans plus tard, Buys Ballot a vérifié cette prédiction pour le son près d'Utrecht: des trompettistes jouaient une note fixe sur un train en marche, et des musiciens qui avaient l'oreille absolue notaient la note entendue depuis le quai \cite{buysballot}.
 
-Quand une voiture passe devant nous, la fréquence reçue ne saute pas d'une valeur à l'autre. Elle descend progressivement, et la forme de la courbe dépend de la vitesse de la voiture et de la distance à laquelle elle passe. Il y avait deux objectifs à cette expérience. Premièrement, voir comment la vitesse et la distance changent la courbe de la fréquence en fonction du temps. Deuxièmement, savoir si l'enregistrement d'un seul passage suffit pour retrouver la vitesse et la distance de la voiture.
+Quand une voiture passe devant nous, la fréquence entendue ne saute pas d'une valeur à l'autre instantanément: elle fait une descente progressive dont la forme dépend de la vitesse de la voiture et de la distance à laquelle elle passe. Il y avait deux objectifs à cette expérience. Premièrement, voir comment la vitesse et la distance changent la courbe Doppler. Deuxièmement, déterminer si, en pratique, l'enregistrement du spectrogramme d'un passage est assez pour retrouver la vitesse et la distance de la voiture, car la théorie dit que oui.
 
-La Section~\ref{sec:theorie} présente le modèle Doppler pour une source qui passe en ligne droite. La Section~\ref{sec:methodologie} décrit le montage, l'acquisition et l'analyse. Les résultats sont présentés à la Section~\ref{sec:resultats}. Ils sont discutés à la Section~\ref{sec:discussion}. La Section~\ref{sec:conclusion} conclut.
+La Section~\ref{sec:theorie} présente le modèle Doppler pour une source qui passe en ligne droite. La Section~\ref{sec:methodologie} décrit le montage, l'acquisition et l'analyse. Les résultats sont présentés à la Section~\ref{sec:resultats}, ils sont discutés à la Section~\ref{sec:discussion} et la Section~\ref{sec:conclusion} conclut.
 
 \section{Théorie}
 \label{sec:theorie}
@@ -104,11 +104,15 @@ où $c$ est la vitesse du son. Le son émis à la position $x = v\,(t_e - t_p)$,
 \enq
 où $t_p$ est le moment où la source passe au point $P$. Les équations~\ref{eq:doppler} et~\ref{eq:retard} donnent la fréquence reçue $f(t)$ en fonction des trois paramètres $v$, $d$ et $t_p$.
 
-Loin avant le point $P$, $\cos\theta \to 1$ et la fréquence tend vers $f_a = f_0/(1 - v/c)$. Loin après, elle tend vers $f_e = f_0/(1 + v/c)$. La hauteur de la chute de fréquence dépend donc seulement de $v$, et on a $v = c\,(f_a - f_e)/(f_a + f_e)$. Au passage, la fréquence reçue vaut $f_0$ et sa pente est d'environ
+Loin avant le point $P$, $\cos\theta \to 1$ et la fréquence tend vers $f_a = f_0/(1 - v/c)$. Loin après, elle tend vers $f_e = f_0/(1 + v/c)$. La hauteur de la chute de fréquence dépend donc seulement de $v$, et on a
+\beq{eq:plateaux}
+    v = c\,\frac{f_a - f_e}{f_a + f_e} , \qquad f_0 = \frac{2\,f_a\,f_e}{f_a + f_e} .
+\enq
+La vitesse ne dépend donc pas de la fréquence exacte de la source. Au passage, la fréquence reçue vaut $f_0$ et sa pente est d'environ
 \beq{eq:pente}
     \left.\frac{\mathrm{d}f}{\mathrm{d}t}\right|_{x=0} \approx -\frac{f_0\,v^2}{c\,d} .
 \enq
-La chute dure donc environ $2d/v$: plus la voiture passe loin ou lentement, plus la chute est lente. Pour séparer $v$ et $d$, il faut donc voir la hauteur de la chute et sa durée. Si la vitesse n'est constante que sur une zone $|x| \leq L$, la fréquence n'atteint jamais $f_a$ ou $f_e$: au bord de la zone, $\cos\theta = L/\sqrt{L^2 + d^2}$ seulement.
+La chute dure donc environ $2d/v$: plus la voiture passe loin ou lentement, plus la chute est lente. Pour séparer $v$ et $d$, il faut donc voir la hauteur de la chute et sa durée.
 
 Finalement, la vitesse du son dans l'air dépend de la température $T$ (en $^\circ$C) \cite{kinsler}:
 \beq{eq:c}
@@ -119,7 +123,7 @@ Finalement, la vitesse du son dans l'air dépend de la température $T$ (en $^\c
 \label{sec:methodologie}
 
 \subsubsection*{Montage et acquisition}
-Les mesures ont été faites le 12 novembre 2026 sur une route droite, à une température d'environ 1~$^\circ$C, ce qui donne $c = 331{,}9~\text{m/s}$ (équation~\ref{eq:c}). Le système de son de la voiture jouait un sinus de 440~Hz pendant tout le passage. Le micro était un sonomètre Piccolo~II placé à $d = 3{,}53~\text{m}$ de la trajectoire, puis 5,44~m plus loin, à $d = 8{,}97~\text{m}$ (Figure~\ref{fig:schema}). Ces distances sont mesurées au ruban jusqu'au côté de la voiture qui fait face au micro. Le fonctionnement d'un sonomètre est décrit dans le protocole du cours \cite{protocole}. Son signal audio brut (44\,117~échantillons par seconde, 16~bits) était lu par USB avec un programme Python écrit par l'équipe et enregistré pour chaque passage.
+Les mesures ont été faites le 12 novembre 2026 sur une route droite, à une température d'environ 1~$^\circ$C, ce qui donne $c = 331{,}9~\text{m/s}$ (équation~\ref{eq:c}). Le système de son de la voiture jouait un sinus de 440~Hz pendant tout le passage. Le microphone était celui d'un sonomètre Piccolo~II, placé à $d = 3{,}53~\text{m}$ de la trajectoire, puis 5,44~m plus loin, à $d = 8{,}97~\text{m}$ (Figure~\ref{fig:schema}). Ces distances sont mesurées avec un galon à mesurer jusqu'au côté de la voiture qui fait face au micro. Le fonctionnement d'un sonomètre est décrit dans le protocole du cours \cite{protocole}. Son signal audio brut (44\,117~échantillons par seconde, 16~bits) était lu par USB avec un programme Python écrit par l'équipe et enregistré pour chaque passage.
 
 \begin{figure}[htbp]
     \centering
@@ -129,7 +133,6 @@ Les mesures ont été faites le 12 novembre 2026 sur une route droite, à une te
         \draw (-6.5,1.0) -- (6.5,1.0);
         \draw (-6.5,-1.0) -- (6.5,-1.0);
         \draw[dashed, gray] (-6.5,0) -- (6.5,0);
-        \node[above left, gray!60!black] at (6.5,0) {\small trajectoire};
         % trajet du son (sous la voiture)
         \draw[blue!70!black, thick, ->] (-4.0,0) -- (-0.05,-2.96);
         \node[blue!70!black, below left] at (-2.0,-1.5) {\small son reçu};
@@ -142,96 +145,92 @@ Les mesures ont été faites le 12 novembre 2026 sur une route droite, à une te
         % point P
         \fill (0,0) circle (0.06);
         \node[above right] at (0,0) {$P$};
-        % sonometre
+        % microphone
         \fill (-0.15,-3.3) -- (0.15,-3.3) -- (0,-3.0) -- cycle;
-        \node[below] at (0,-3.3) {sonomètre};
+        \node[below] at (0,-3.3) {microphone};
         % angle theta (etiquette sur la bissectrice)
         \draw (-2.7,0) arc (0:-36.87:1.3);
         \node at ({-4.0+1.75*cos(-18.43)},{1.75*sin(-18.43)}) {$\theta$};
         % cote d
         \draw[gray] (0.2,-3.0) -- (1.1,-3.0);
         \draw[<->] (0.9,0) -- (0.9,-3.0) node[midway, right] {$d$};
-        % cotes x et zone a vitesse constante: lignes de rappel, puis fleches
+        % cote x: lignes de rappel, puis fleche
         \draw[gray] (-4.0,0.5) -- (-4.0,1.6);
-        \draw[gray] (0,0.15) -- (0,2.5);
-        \draw[gray] (-5.6,1.05) -- (-5.6,2.5);
-        \draw[gray] (5.6,1.05) -- (5.6,2.5);
+        \draw[gray] (0,0.15) -- (0,1.6);
         \draw[<->] (-4.0,1.4) -- (0,1.4) node[midway, above] {$x$};
-        \draw[<->] (-5.6,2.3) -- (0,2.3) node[midway, above] {\small 10~m};
-        \draw[<->] (0,2.3) -- (5.6,2.3) node[midway, above] {\small 10~m};
     \end{tikzpicture}
-    \caption{Vue de haut du montage (pas à l'échelle). La voiture roulait à vitesse constante sur environ 10~m avant et 10~m après le point $P$, le plus proche du sonomètre.}
+    \caption{Schéma de l'expérience. La voiture roule à vitesse constante $v$ en ligne droite et passe par le point $P$, le plus proche du microphone, à une distance $d$.}
     \label{fig:schema}
 \end{figure}
 
-Le conducteur visait une vitesse au compteur et la gardait constante sur environ 20~m, soit 10~m avant et 10~m après le point $P$. Avant cette zone, la voiture accélérait, et après, elle freinait. Il y a eu un passage pour chaque vitesse visée: 10, 30, 50, 55, 60 et 70~km/h à 3,53~m, et 10, 30, 50, 60 et 70~km/h à 8,97~m, pour un total de 11 passages.
+Le conducteur visait une vitesse au compteur et essayait de la garder constante pendant le passage. Il y a eu un passage pour chaque vitesse visée (10, 30, 50, 60 et 70~km/h) à chacune des deux distances, pour un total de 10 passages.
 
 \subsubsection*{Analyse}
 L'analyse a été faite en Python. Le signal est découpé en trames de 4096~échantillons (93~ms) qui avancent de 256~échantillons (5,8~ms). Pour chaque trame, la fréquence du maximum du spectre entre 400 et 485~Hz est trouvée par interpolation entre les canaux de fréquence. Cette bande évite une raie fixe du bruit de fond à 385~Hz. Les trames où le maximum ne dépasse pas le niveau médian de la bande d'au moins 15~dB sont rejetées.
 
-Le modèle des équations~\ref{eq:doppler} et~\ref{eq:retard} est ensuite ajusté à la fréquence en fonction du temps avec un curve fit, avec $f_0 = 440~\text{Hz}$. Le curve fit utilise seulement les points émis dans la zone à vitesse constante ($|x| \leq 10~\text{m}$). La zone est aussi coupée là où la fréquence remonte, parce qu'à vitesse constante la fréquence reçue ne fait que diminuer. Une fréquence qui monte avant le passage indique donc que la voiture accélère encore, et une fréquence qui remonte après le passage indique qu'elle freine. Deux curve fits sont faits pour chaque passage. Dans le premier, $d$ est fixée à la distance mesurée au ruban et le curve fit donne $v$. Dans le deuxième, $d$ est libre, et le curve fit donne $v$ et $d$ à partir de l'audio seulement.
+La vitesse et la distance viennent de parties différentes de la courbe (Section~\ref{sec:theorie}): $v$ vient des deux bouts, où la fréquence tend vers $f_a$ et $f_e$, et $d$ vient de la chute, dont la pente dépend de $v^2/d$. Trois régions sont donc placées sur chaque courbe, à partir de sa forme seulement, sans utiliser la vitesse visée ni la distance mesurée avec le galon. Une marche douce (tangente hyperbolique) ajustée à la chute donne le moment du passage $t_p$ et la durée de la chute $\tau \approx d/v$. La région centrale est $|t - t_p| < 0{,}77\,\tau$, là où la pente dépasse la moitié de sa valeur maximale. Les deux queues vont de $2\tau$ à $5\tau$ de chaque côté du passage, soit $|x|$ entre $2d$ et $5d$. Elles s'arrêtent avant si la fréquence remonte, parce qu'à vitesse constante la fréquence reçue ne fait que diminuer. Les régions ont ensuite été vérifiées sur le spectrogramme de chaque passage.
+
+Le modèle des équations~\ref{eq:doppler} et~\ref{eq:retard} est ensuite ajusté avec deux curve fits. Sur les queues, $v$ et $f_0$ sont libres et $d$ et $t_p$ sont fixés. La vitesse vient alors du rapport des deux plateaux (équation~\ref{eq:plateaux}). Sur la région centrale, $d$ et $t_p$ sont libres et $v$ et $f_0$ sont fixés. Comme les queues n'atteignent jamais tout à fait leurs plateaux, la vitesse trouvée dépend un peu de $d$. Les deux curve fits sont donc répétés l'un après l'autre jusqu'à ce que $v$ et $d$ ne changent plus. La fréquence $f_0$ trouvée sert aussi de vérification: le système de son joue exactement 440~Hz, donc un $f_0$ différent de 440~Hz montre que la vitesse n'était pas la même avant et après le passage.
 
 \subsubsection*{Incertitudes}
-Les incertitudes du curve fit viennent de sa matrice de covariance. Comme les trames se chevauchent, 16~trames successives partagent les mêmes échantillons et ne sont pas indépendantes. Les incertitudes du curve fit sont donc multipliées par $\sqrt{16} = 4$. Le curve fit donne en fait le rapport $v/c$, donc l'incertitude sur la température ($\Delta T = 1~^\circ\text{C}$, soit $\Delta c = 0{,}6~\text{m/s}$) est propagée dans la vitesse:
+Les incertitudes de chaque curve fit viennent de sa matrice de covariance. Comme les trames se chevauchent, 16~trames successives partagent les mêmes échantillons et ne sont pas indépendantes. Les incertitudes des curve fits sont donc multipliées par $\sqrt{16} = 4$. Comme $v$ dépend un peu de $d$ et l'inverse, l'incertitude de chaque grandeur inclut aussi celle de l'autre. Pour la vitesse, l'incertitude sur la température ($\Delta T = 1~^\circ\text{C}$, soit $\Delta c = 0{,}6~\text{m/s}$) est aussi propagée:
 \beq{eq:incertitude}
-    \Delta v = \sqrt{\left(\Delta v_{\text{fit}}\right)^2 + \left(\frac{\partial v}{\partial c}\,\Delta c\right)^2} = \sqrt{\left(\Delta v_{\text{fit}}\right)^2 + \left(\frac{v}{c}\,\Delta c\right)^2} .
+    \Delta v = \sqrt{\left(\Delta v_{\text{fit}}\right)^2 + \left(\frac{\partial v}{\partial d}\,\Delta d_{\text{fit}}\right)^2 + \left(\frac{v}{c}\,\Delta c\right)^2} , \qquad
+    \Delta d = \sqrt{\left(\Delta d_{\text{fit}}\right)^2 + \left(\frac{\partial d}{\partial v}\,\Delta v_{\text{fit}}\right)^2} .
 \enq
-Le deuxième terme ne vaut que 0,2~\% de $v$, donc l'incertitude vient presque entièrement du curve fit.
+Les dérivées $\partial v/\partial d$ et $\partial d/\partial v$ sont trouvées en refaisant le curve fit avec une valeur un peu plus grande et un peu plus petite de l'autre grandeur. Le terme de la température ne vaut que 0,2~\% de $v$.
 
 \section{Résultats}
 \label{sec:resultats}
 
-La Figure~\ref{fig:spectro} montre le spectrogramme de deux passages à 50~km/h. Avant le passage, la raie du sinus est autour de 457~Hz, et après le passage, elle est autour de 430~Hz. À 8,97~m, la chute est visiblement plus lente qu'à 3,53~m. On voit aussi une bande verticale de bruit large bande autour du passage (bruit du moteur et des pneus), plus forte à 3,53~m, ainsi que la raie fixe à 385~Hz.
+La Figure~\ref{fig:spectro} montre le spectrogramme de deux passages à 50~km/h. Avant le passage, la raie du sinus est autour de 457~Hz, et après le passage, elle est autour de 430~Hz. À 8,97~m, la chute est visiblement plus lente qu'à 3,53~m.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{../figures/01_spectrogrammes.png}
-    \caption{Spectrogrammes de deux passages à 50~km/h visés, à 3,53~m (gauche) et à 8,97~m (droite) de la trajectoire. La chute de fréquence dure environ 0,7~s à 3,53~m et environ 1,5~s à 8,97~m.}
+    \caption{Spectrogrammes des passages à 50~km/h, à $d = 3{,}53~\text{m}$ et 8,97~m.}
     \label{fig:spectro}
 \end{figure}
 
-La Figure~\ref{fig:courbes} montre la fréquence suivie dans la zone à vitesse constante pour les 11 passages, avec le curve fit où $d$ est fixée. Plus la vitesse est grande, plus la chute est haute. À la même vitesse, la chute est plus lente à 8,97~m, comme le prévoit l'équation~\ref{eq:pente}. L'écart quadratique moyen entre les points et le curve fit est de 1,0 à 1,6~Hz à 8,97~m et de 0,7 à 3,0~Hz à 3,53~m.
+La Figure~\ref{fig:courbes} montre la fréquence suivie dans les trois régions pour les 10 passages, avec le modèle calculé avec $v$, $d$ et $f_0$ mesurés. Plus la vitesse est grande, plus la chute est haute. À la même vitesse, la chute est plus lente à 8,97~m, comme le prévoit l'équation~\ref{eq:pente}. L'écart quadratique moyen entre les points et le modèle est de 0,8 à 2,8~Hz sur les queues et de 0,2 à 2,7~Hz sur la région centrale.
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.95\textwidth]{../figures/02_courbes_doppler.png}
-    \caption{Fréquence reçue en fonction du temps autour du passage, dans la zone à vitesse constante, à 3,53~m (gauche) et à 8,97~m (droite). Les points sont les fréquences suivies dans le spectrogramme et les lignes le curve fit avec $d$ fixée. La ligne pointillée grise marque la fréquence émise de 440~Hz.}
+    \includegraphics[width=\textwidth]{../figures/02_courbes_doppler.png}
+    \caption{Fréquence dominante du spectre en fonction du temps pour les passages à chaque vitesse et à chaque distance. La ligne noire est le résultat du curve fit et la ligne pointillée marque 440~Hz.}
     \label{fig:courbes}
 \end{figure}
 
-Le Tableau~\ref{tab:resultats} donne la vitesse mesurée avec $d$ fixée et la distance trouvée par le curve fit où $d$ est libre. Les vitesses mesurées sont aussi comparées aux vitesses visées à la Figure~\ref{fig:vitesses}. À 10~km/h, la voiture allait un peu plus vite que la vitesse visée. Pour tous les autres passages, elle allait moins vite, de 6 à 11~\% à 8,97~m et de 8 à 30~\% à 3,53~m.
+Le Tableau~\ref{tab:resultats} donne la vitesse et la distance mesurées. Les vitesses mesurées sont aussi comparées aux vitesses visées à la Figure~\ref{fig:vitesses}. À 10~km/h, la voiture allait à la vitesse visée ou un peu plus vite. Pour tous les autres passages, elle allait moins vite, de 12 à 16~\% à 8,97~m et de 27 à 34~\% à 3,53~m. La fréquence de la source trouvée par le curve fit des queues va de 438,9 à 443,6~Hz.
 
 \begin{table}[htbp]
 \centering
-\caption{Vitesse mesurée (curve fit avec $d$ fixée) et distance mesurée (curve fit avec $d$ libre) pour les 11 passages.}
+\caption{Vitesse et distance pour les 10 passages.}
 \label{tab:resultats}
 \small
 \begin{tabular}{cccc}
 \hline
-$d$ au ruban (m) & $v$ visée (km/h) & $v$ mesurée (km/h) & $d$ mesurée (m) \\
+$d$ réelle (m) & $v$ réelle (km/h) & $v$ mesurée (km/h) & $d$ mesurée (m) \\
 \hline
-3,53 & 10 & $11{,}3 \pm 0{,}3$ & $5{,}3 \pm 1{,}1$ \\
-3,53 & 30 & $25{,}0 \pm 1{,}6$ & $2{,}5 \pm 1{,}4$ \\
-3,53 & 50 & $35{,}2 \pm 3{,}4$ & $2{,}3 \pm 1{,}5$ \\
-3,53 & 55 & $50{,}5 \pm 1{,}8$ & $3{,}2 \pm 1{,}0$ \\
-3,53 & 60 & $44{,}8 \pm 6{,}4$ & $1{,}5 \pm 0{,}9$ \\
-3,53 & 70 & $55{,}8 \pm 4{,}9$ & $1{,}8 \pm 1{,}1$ \\
+3,53 & 10 & $12{,}2 \pm 0{,}3$ & $5{,}1 \pm 0{,}4$ \\
+3,53 & 30 & $21{,}9 \pm 1{,}3$ & $3{,}0 \pm 1{,}0$ \\
+3,53 & 50 & $33{,}8 \pm 2{,}1$ & $4{,}1 \pm 1{,}5$ \\
+3,53 & 60 & $39{,}9 \pm 4{,}6$ & $2{,}8 \pm 1{,}8$ \\
+3,53 & 70 & $45{,}9 \pm 5{,}4$ & $1{,}9 \pm 0{,}7$ \\
 \hline
-8,97 & 10 & $12{,}4 \pm 0{,}7$ & n.d.$^a$ \\
-8,97 & 30 & $27{,}1 \pm 0{,}8$ & $9{,}5 \pm 6{,}9$ \\
-8,97 & 50 & $45{,}0 \pm 1{,}9$ & n.d.$^a$ \\
-8,97 & 60 & $56{,}3 \pm 2{,}0$ & n.d.$^a$ \\
-8,97 & 70 & $62{,}6 \pm 1{,}6$ & $7{,}1 \pm 2{,}7$ \\
+8,97 & 10 & $10{,}2 \pm 0{,}8$ & $5{,}6 \pm 1{,}5$ \\
+8,97 & 30 & $25{,}2 \pm 0{,}8$ & $8{,}0 \pm 1{,}0$ \\
+8,97 & 50 & $44{,}2 \pm 1{,}2$ & $9{,}4 \pm 1{,}4$ \\
+8,97 & 60 & $52{,}1 \pm 1{,}8$ & $9{,}3 \pm 1{,}5$ \\
+8,97 & 70 & $60{,}6 \pm 1{,}9$ & $7{,}0 \pm 0{,}7$ \\
 \hline
 \end{tabular}
-\\[0.3em]
-{\footnotesize $^a$ non déterminée: le curve fit ne converge pas et $d$ part vers la limite permise de 30~m.}
 \end{table}
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{../figures/03_vitesses.png}
-    \caption{Vitesse mesurée par effet Doppler en fonction de la vitesse visée au compteur. La zone grise est la plage de vitesses réelles permise pour un compteur par le règlement n\textsuperscript{o}~39 de la CEE-ONU. À 8,97~m, les passages de 30 à 70~km/h tombent tous dans cette zone.}
+    \caption{Vitesse mesurée par effet Doppler en fonction de la vitesse visée au compteur.}
     \label{fig:vitesses}
 \end{figure}
 
@@ -239,25 +238,27 @@ $d$ au ruban (m) & $v$ visée (km/h) & $v$ mesurée (km/h) & $d$ mesurée (m) \\
 \label{sec:discussion}
 
 \subsubsection*{Vitesse}
-Un compteur de vitesse n'est pas exact. Le règlement n\textsuperscript{o}~39 de la CEE-ONU exige que la vitesse affichée ne soit jamais plus petite que la vitesse réelle, et qu'elle la dépasse d'au plus 10~\% plus 4~km/h \cite{ece39}. À 70~km/h affichés, la voiture peut donc rouler entre 60 et 70~km/h. À 8,97~m, les quatre passages de 30 à 70~km/h tombent dans cette plage (Figure~\ref{fig:vitesses}). L'écart entre la vitesse visée et la vitesse mesurée correspond donc à l'erreur normale d'un compteur, si celui de la voiture suit une règle semblable. À 10~km/h, la voiture allait plus vite que la vitesse affichée, ce qui est impossible selon cette règle. Par contre, l'aiguille est difficile à garder exactement à 10~km/h, et une petite variation de vitesse est déjà 10~\% de la vitesse visée.
+À 8,97~m, les passages de 30 à 70~km/h donnent une vitesse de 12 à 16~\% plus petite que la vitesse visée (Figure~\ref{fig:vitesses}). Une partie de cet écart pourrait venir du compteur, qui n'est pas exact. Au Canada, la norme 101 du Règlement sur la sécurité des véhicules automobiles exige seulement que le compteur affiche la vitesse en km/h et qu'il soit éclairé, sans limite sur sa précision \cite{cmvss101}. Par contre, la fréquence de la source trouvée pour ces passages va de 441,5 à 443,6~Hz, alors que le système de son joue 440~Hz. Selon l'équation~\ref{eq:plateaux}, $f_0$ dépasse 440~Hz quand la fréquence après le passage est plus haute que prévu, donc quand la voiture roule moins vite en s'éloignant qu'en s'approchant. En fixant $f_0 = 440~\text{Hz}$, chaque queue donne sa propre vitesse. Pour 30, 50, 60 et 70~km/h visés, la queue d'approche donne 29,8, 47,9, 56,5 et 69,5~km/h, à moins de 6~\% de la vitesse visée, et la queue d'éloignement donne 20,5, 40,3, 47,4 et 51,1~km/h. La voiture roulait donc presque à la vitesse affichée en arrivant, puis elle freinait déjà en s'éloignant. Le conducteur devait atteindre la vitesse visée juste avant le passage et freiner juste après, donc la vitesse n'était constante que sur une partie de la route autour du point $P$, qui changeait d'un passage à l'autre. La vitesse mesurée est une moyenne des deux queues, ce qui explique la plus grande partie de l'écart avec le compteur.
 
-À 3,53~m, les passages à 50, 60 et 70~km/h sont sous la zone grise. Ce n'est pas un effet de l'incertitude sur la température, qui ne compte que pour 0,2~\% de $v$. Deux causes peuvent l'expliquer. Premièrement, la position de la source. Les haut-parleurs du système de son sont dans l'habitacle, alors que $d$ est mesurée jusqu'au côté de la voiture. Si la source se trouve en moyenne au centre de la voiture, à environ 0,9~m de son côté, la vraie distance est plus grande que celle utilisée dans le curve fit. Avec $d = 4{,}43~\text{m}$, les vitesses mesurées à 3,53~m augmentent de 0,7 à 7~km/h, contre 0,4 à 2,5~km/h à 8,97~m, où 0,9~m est une plus petite partie de la distance. Cet effet réduit l'écart, mais ne l'explique pas au complet pour le passage à 50~km/h ($37{,}5$~km/h avec $d = 4{,}43~\text{m}$). Deuxièmement, la vitesse n'était probablement pas constante devant le micro. À 3,53~m, la chute de fréquence dure seulement quelques dixièmes de seconde, et la zone à vitesse constante ne compte que 105 à 278 points à 50, 60 et 70~km/h, contre plus de 1000 à 10~km/h. Si la voiture accélère encore en entrant dans la zone ou freine déjà en sortant, la fréquence avant le passage est plus basse et celle après le passage est plus haute que prévu, et le curve fit donne une vitesse trop petite.
+À 3,53~m, l'écart est plus grand, de 27 à 34~\% pour les passages de 30 à 70~km/h. Ce n'est pas un effet de l'incertitude sur la température, qui ne compte que pour 0,2~\% de $v$. Ici, la fréquence de la source reste entre 438,9 et 441,7~Hz, et les deux queues donnent presque la même vitesse à 60 et 70~km/h (41,4 et 38,3~km/h, puis 46,6 et 45,1~km/h). La voiture roulait donc vraiment plus lentement que la vitesse visée pendant tout le passage, et pas seulement après. Cette série a été faite en premier, avec le micro à seulement 3,5~m de la route. Le conducteur n'a probablement pas atteint la vitesse visée avant d'arriver au micro, ou il ralentissait en passant près de lui. À 10~km/h, la voiture allait un peu plus vite que la vitesse affichée à 3,53~m. Par contre, l'aiguille est difficile à garder exactement à 10~km/h, et une petite variation de vitesse est déjà 10~\% de la vitesse visée.
 
 \subsubsection*{Distance}
-Avec l'audio seulement, la distance est mal déterminée. À 3,53~m, les six distances trouvées vont de 1,5 à 5,3~m. Cinq des six correspondent à 3,53~m à moins de deux fois leur incertitude, qui est d'environ 1~m. La distance est donc connue à environ 30~\% près pour un seul passage. Les distances de 1,5 et 1,8~m, à 60 et 70~km/h, restent sous 3,53~m même en ajoutant leur incertitude. Ce n'est pas possible, parce que la source est dans la voiture et donc au moins à 3,53~m du micro. Elles appuient l'idée que la vitesse n'était pas constante pendant ces passages: une voiture qui freine juste après le point $P$ donne une chute plus courte, qui ressemble à celle d'une voiture qui passe plus près.
+La source n'est pas exactement à la distance mesurée avec le galon. Les haut-parleurs sont dans l'habitacle, alors que $d$ est mesurée jusqu'au côté de la voiture. Si la source se trouve en moyenne au centre de la voiture, à environ 0,9~m de son côté, la distance attendue est entre 3,53 et 4,43~m à la première position, et entre 8,97 et 9,87~m à la deuxième. À 8,97~m, les passages à 30, 50 et 60~km/h donnent 8,0 à 9,4~m, avec une incertitude de 13 à 16~\%. À 3,53~m, les passages à 30, 50 et 60~km/h donnent 2,8 à 4,1~m, mais l'incertitude va de 33 à 64~\%. La chute y dure seulement quelques dixièmes de seconde, et le bruit du moteur et des pneus y est le plus fort.
 
-À 8,97~m, le curve fit ne converge pas pour trois passages sur cinq. La cause est la longueur de la zone à vitesse constante. Au bord de cette zone ($L = 10~\text{m}$), $\cos\theta$ vaut 0,94 à 3,53~m, mais seulement 0,74 à 8,97~m. À 8,97~m, la fréquence est donc encore loin de $f_a$ et de $f_e$, et on ne voit que la partie centrale de la courbe. Dans cette partie, la fréquence descend presque en ligne droite, avec une pente qui dépend seulement de $v^2/d$ (équation~\ref{eq:pente}). Une voiture plus rapide qui passe plus loin donne donc presque la même courbe, et le curve fit ne peut pas les séparer. Pour avoir $\cos\theta = 0{,}95$ au bord de la zone à 8,97~m, il faudrait une vitesse constante sur $|x| \leq 3d \approx 27~\text{m}$, soit environ 55~m au total.
+Les quatre autres passages donnent des distances à plus de deux incertitudes de la distance attendue: 5,1 et 5,6~m à 10~km/h, 1,9~m et 7,0~m à 70~km/h. La distance de 1,9~m est impossible, parce que la source est dans la voiture et donc au moins à 3,53~m du micro. Ce sont les passages où la vitesse changeait le plus. À 70~km/h et 8,97~m, $f_0 = 443{,}6~\text{Hz}$ est la valeur la plus loin de 440~Hz, et à 10~km/h une variation de 1~km/h est déjà 10~\% de la vitesse. Quand la vitesse change pendant le passage, la vitesse utilisée pour la région centrale n'est pas celle de la voiture au moment du passage. Comme la pente dépend de $v^2/d$ (équation~\ref{eq:pente}), une erreur relative sur $v$ devient une erreur deux fois plus grande sur $d$.
+
+Les queues ne sont jamais tout à fait des plateaux constants en fréquence. À $|x| = 2d$, au début des queues, $\cos\theta$ vaut seulement 0,89. À 8,97~m, les queues vont donc jusqu'à 30 à 45~m du point $P$ avant le passage. C'est là que la vitesse a le plus de chances de changer.
 
 \subsubsection*{Dispersion près du passage}
-À 3,53~m, la fréquence suivie est beaucoup plus dispersée autour du curve fit juste après le passage (Figure~\ref{fig:courbes}). Le bruit du moteur et des pneus y est le plus fort (Figure~\ref{fig:spectro}), ce qui diminue le rapport signal sur bruit. Aussi, le son arrive au micro par plusieurs chemins: les haut-parleurs sont à différents endroits dans la voiture et le son se réfléchit sur la route. Proche du point $P$, chaque chemin a un angle $\theta$ différent et donc un décalage Doppler différent, et ces sons interfèrent. Cet effet est plus fort quand la voiture passe proche du micro, parce que les angles changent plus vite.
+À 3,53~m, la fréquence suivie est beaucoup plus dispersée autour du modèle juste après le passage (Figure~\ref{fig:courbes}). Le bruit du moteur et des pneus y est le plus fort, ce qui diminue le rapport signal sur bruit. Aussi, le son arrive au micro par plusieurs chemins: les haut-parleurs sont à différents endroits dans la voiture et le son se réfléchit sur la route. Proche du point $P$, chaque chemin a un angle $\theta$ différent et donc un décalage Doppler différent, et ces sons interfèrent. Cet effet est plus fort quand la voiture passe proche du micro, parce que les angles changent plus vite.
 
 \subsubsection*{Améliorations}
-La principale amélioration serait une zone à vitesse constante plus longue, d'au moins 50~m, avec le régulateur de vitesse. Aussi, la vitesse réelle de chaque passage pourrait être mesurée avec le GPS d'un cellulaire dans la voiture pour avoir une valeur de référence plus précise que le compteur. Un petit haut-parleur fixé à l'extérieur, sur le côté de la voiture, donnerait une seule source à une position connue. Faire plusieurs passages pour chaque vitesse permettrait de vérifier si les résultats se répètent, alors qu'il n'y en a eu qu'un ici.
+La principale amélioration serait une zone à vitesse constante plus longue, avec le régulateur de vitesse. Pour que les queues aillent jusqu'à $|x| = 5d$ à 8,97~m, il faudrait environ 45~m de chaque côté du micro. Aussi, la vitesse réelle de chaque passage pourrait être mesurée avec le GPS d'un cellulaire dans la voiture pour avoir une valeur de référence plus précise que le compteur. Un petit haut-parleur fixé à l'extérieur, sur le côté de la voiture, donnerait une seule source à une position connue. Faire plusieurs passages pour chaque vitesse permettrait de vérifier si les résultats se répètent, alors qu'il n'y en a eu qu'un ici.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-Un sinus de 440~Hz joué par le système de son d'une voiture a permis de mesurer la courbe Doppler de 11 passages, à 3,53 et 8,97~m d'un sonomètre. La vitesse change la hauteur de la chute de fréquence et la distance change sa durée, comme le prévoit le modèle. Quand la distance est connue, un seul passage suffit pour mesurer la vitesse: à 8,97~m, les vitesses mesurées sont de 6 à 11~\% sous la vitesse affichée au compteur, ce qui correspond à l'erreur permise pour un compteur. À 3,53~m, les passages rapides sont plus lents que prévu, probablement à cause de la position de la source dans la voiture et d'une vitesse qui n'était pas tout à fait constante. Retrouver aussi la distance avec l'audio seulement n'a fonctionné qu'à 3,53~m, à environ 1~m près. Pour répondre au deuxième objectif, une prochaine expérience devrait garder la vitesse constante sur au moins 50~m, pour que la fréquence atteigne ses valeurs d'approche et d'éloignement. Aussi, mesurer la vitesse de référence avec un GPS permettrait de vérifier la précision de la méthode sans dépendre du compteur.
+Un sinus de 440~Hz joué par le système de son d'une voiture a permis de mesurer la courbe Doppler de 10 passages, à 3,53 et 8,97~m d'un microphone. La vitesse change la hauteur de la chute de fréquence et la distance change sa durée, comme le prévoit le modèle. En mesurant la vitesse sur les queues de la courbe et la distance sur sa partie centrale, un seul passage a suffi pour retrouver les deux. La distance correspond à celle mesurée avec le galon pour 6 passages sur 10. La fréquence de la source trouvée montre aussi quand la vitesse a changé pendant le passage: à 8,97~m, la voiture arrivait presque à la vitesse affichée, puis elle freinait déjà en s'éloignant. Les passages où la vitesse changeait le plus donnent les moins bonnes distances. Une prochaine expérience devrait garder la vitesse constante sur environ 45~m de chaque côté du micro. Aussi, mesurer la vitesse de référence avec un GPS permettrait de vérifier la précision de la méthode sans dépendre du compteur.
 
 \renewcommand{\refname}{Bibliographie}
 \begin{thebibliography}{9}
@@ -277,8 +278,8 @@ Morse, P.M. et Ingard, K.U. \textit{Theoretical Acoustics}. McGraw-Hill, New Yor
 \refsicitee{kinsler}{%
 Kinsler, L.E., Frey, A.R., Coppens, A.B. et Sanders, J.V. \textit{Fundamentals of Acoustics}, 4\textsuperscript{e} édition. Wiley, New York, 2000.}
 
-\refsicitee{ece39}{%
-Commission économique des Nations Unies pour l'Europe (CEE-ONU). \textit{Règlement n\textsuperscript{o}~39: Prescriptions uniformes relatives à l'homologation des véhicules en ce qui concerne l'appareil indicateur de vitesse, y compris son installation}. Genève.}
+\refsicitee{cmvss101}{%
+Gouvernement du Canada. \textit{Règlement sur la sécurité des véhicules automobiles} (C.R.C., ch.~1038), annexe~IV, norme~101: Commandes, témoins, indicateurs et sources lumineuses. https://laws-lois.justice.gc.ca/fra/reglements/C.R.C.,\_ch.\_1038/}
 
 \refsicitee{guier}{%
 Guier, W.H. et Weiffenbach, G.C. « Genesis of Satellite Navigation ». \textit{Johns Hopkins APL Technical Digest}, vol.~19, n\textsuperscript{o}~1, p.~14-17, 1998.}
