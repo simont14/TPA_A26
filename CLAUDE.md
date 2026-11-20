@@ -331,6 +331,86 @@ qui en ressort :
   (`hyperref` est déjà chargé dans le préambule).
 
 
+### Style étudiant: synthèse (rapport acoustique, 19 novembre 2026)
+
+Tirée d'une longue série de corrections de l'auteur sur
+`acoustique/rapport/TPA_Lab4.tex`. À appliquer dès le premier jet de
+chaque rapport, pour que l'auteur n'ait pas à repasser chaque phrase.
+
+Le ton visé: un·e étudiant·e qui explique son labo à un·e autre étudiant·e.
+Le but d'un rapport est de partager l'information clairement, pas d'avoir
+l'air savant.
+
+- Mots simples et banals, même si c'est un peu « simplet ». « Un micro est
+  positionné », « On dit que x est... », « θ est l'angle entre... »,
+  « On suppose ici... », « car la théorie dit que oui », « est assez pour ».
+  Pas de mot savant quand un mot courant marche (« habitacle » → « dans la
+  voiture », « trame » → « morceau », « reçue » → « entendue » dans le texte
+  courant).
+- Ne pas avoir peur de la répétition. Redire « le point P est le point
+  de... », répéter « la vitesse visée » plutôt que d'alterner avec
+  « affichée », « au compteur », etc. Un même objet garde le même nom
+  partout (texte, légendes, tableau, figures).
+- Nommer un concept une fois, clairement, puis réutiliser ce nom: « Ce
+  profil est ce qu'on appelle une courbe Doppler », « On l'appellera le
+  périastre pour le reste du rapport », « les queues ». Ensuite, utiliser
+  ce nom plutôt qu'une périphrase (« la courbe de la fréquence en fonction
+  du temps » → « la courbe Doppler »).
+- Expliquer le pourquoi en mots simples, comme à l'oral: « Pour séparer v
+  et d, il faut... », « Pour vérifier ça, on peut... », « ça veut dire
+  que... ». Un exemple chiffré simple vaut mieux qu'une phrase abstraite
+  (« une erreur de 5 % sur v donne environ 10 % sur d »).
+- Être exact sur la physique avec des mots simples: « la fréquence de son
+  bruit baisse » et pas « son bruit baisse ». « Des plateaux constants en
+  fréquence » plutôt que « des plateaux » tout court.
+- Ne pas chercher la phrase parfaite. Une phrase un peu lourde, une
+  répétition ou une construction parlée sont correctes. Corriger
+  l'orthographe et les accords, mais ne jamais transformer une tournure
+  simple de l'auteur en tournure plus élégante. Ne pas ajouter d'erreurs
+  exprès non plus.
+- Plusieurs phrases très courtes à la suite font haché: les joindre avec
+  « et » ou une virgule (« Les résultats sont présentés à la Section 4,
+  ils sont discutés à la Section 5 et la Section 6 conclut »).
+- Anglicismes: corriger en le disant à l'auteur (« assumer » au sens de
+  supposer → « supposer »).
+
+Par section:
+
+- Résumé: quoi et pourquoi, jamais comment (la méthode est plus loin). Un
+  seul chiffre par série de mesures (écart moyen par distance), en
+  commençant par la première série. Pas de sous-groupes, pas de cause.
+  Ne jamais omettre en silence un cas qui ne suit pas la tendance.
+- Introduction: dire les objectifs simplement, avec la raison (« déterminer
+  si, en pratique, ... est assez pour ..., car la théorie dit que oui »).
+- Théorie: poser les hypothèses et les symboles en phrases directes,
+  définir chaque terme utilisé plus loin (queues, périastre).
+- Légendes: minimales. « Schéma de l'expérience. », « Spectrogrammes des
+  passages à 50 km/h, à d = 3,53 m et 8,97 m. », « Vitesse et distance pour
+  les 10 passages. ». Nommer la grandeur par ce qu'elle est (« fréquence
+  dominante du spectre ») et pas par l'étape d'analyse. Pas de
+  gauche/droite/en haut quand chaque panneau a son étiquette. Pas de valeur
+  lue sur la figure.
+- Tableaux: seulement les colonnes qui servent au propos principal (la
+  colonne f₀ a été retirée). Les en-têtes nomment la grandeur (« d
+  réelle »), pas l'instrument.
+- Discussion et conclusion: une idée par phrase, la conclusion répond aux
+  objectifs de l'introduction.
+
+Figures:
+
+- Lisibles en noir et blanc (voir « Figures générées »).
+- Étiquette des panneaux avec le symbole: « v = 30 km/h », « d = 3,53 m ».
+- Pour une figure d'exemple (spectrogramme), choisir le cas le plus
+  propre et centrer la courbe dans le cadre. Ajuster la fenêtre d'analyse
+  et les limites d'axes au cas choisi, et montrer quelques essais à
+  l'auteur plutôt que d'en imposer un.
+
+Sources et normes:
+
+- Vérifier qu'une norme ou un règlement cité s'applique vraiment au
+  Québec/Canada. Sinon, ne pas l'utiliser comme argument.
+- Ne jamais nommer le modèle de la voiture utilisée dans le rapport.
+
 ## Journal des corrections de l'auteur
 
 Chaque correction que l'auteur demande (« Remplace X par Y ») est appliquée
